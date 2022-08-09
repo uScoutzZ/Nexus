@@ -12,7 +12,7 @@ import java.util.List;
 public class ItemBuilder<T extends ItemMeta> {
 
     private final ItemStack itemStack;
-    private final T meta;
+    final T meta;
 
     public ItemBuilder(ItemStack itemStack) {
         this.itemStack = itemStack;

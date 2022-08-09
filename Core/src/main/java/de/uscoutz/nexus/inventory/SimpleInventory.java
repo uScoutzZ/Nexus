@@ -23,7 +23,9 @@ public class SimpleInventory implements Cloneable{
     @Getter @Setter
     private boolean clickEventCancelled = true, deleteOnClose = true;
     @Getter
-    private final Map<Integer, Consumer<InventoryClickEvent>> clickHandlers = new HashMap<>();
+    private final Map<Integer, Consumer<InventoryClickEvent>> rightclickHandlers = new HashMap<>();
+    @Getter
+    private final Map<Integer, Consumer<InventoryClickEvent>> leftclickHandlers = new HashMap<>();
     @Getter
     private Consumer<InventoryCloseEvent> inventoryCloseListener = new Consumer<InventoryCloseEvent>() {
         @Override
@@ -53,12 +55,23 @@ public class SimpleInventory implements Cloneable{
 
     public SimpleInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer) {
         this.inventory.setItem(slot, item);
-        this.clickHandlers.put(slot, eventConsumer);
+        this.rightclickHandlers.put(slot, eventConsumer);
         return this;
     }
 
     public SimpleInventory setItem(int slot, ItemBuilder<?> item, Consumer<InventoryClickEvent> eventConsumer) {
         return setItem(slot, item.build(), eventConsumer);
+    }
+
+    public SimpleInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer, Consumer<InventoryClickEvent> eventConsumer2) {
+        this.inventory.setItem(slot, item);
+        this.rightclickHandlers.put(slot, eventConsumer);
+        this.leftclickHandlers.put(slot, eventConsumer2);
+        return this;
+    }
+
+    public SimpleInventory setItem(int slot, ItemBuilder<?> item, Consumer<InventoryClickEvent> eventConsumer, Consumer<InventoryClickEvent> eventConsumer2) {
+        return setItem(slot, item.build(), eventConsumer, eventConsumer2);
     }
 
     public SimpleInventory setItem(int slot, ItemStack item) {

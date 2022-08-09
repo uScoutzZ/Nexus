@@ -18,8 +18,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        player.getInventory().clear();
         NexusPlayer nexusPlayer = new NexusPlayer(player, plugin);
-
-
     }
 }

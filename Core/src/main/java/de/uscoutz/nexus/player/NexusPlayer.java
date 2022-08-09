@@ -1,8 +1,13 @@
 package de.uscoutz.nexus.player;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.utilities.GameProfileSerializer;
+import de.uscoutz.nexus.utilities.InventorySerializer;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -19,26 +24,27 @@ public class NexusPlayer {
     @Getter
     private Map<Integer, Profile> profilesMap;
     @Getter
-    private long firstLogin, playtime;
+    private long firstLogin, generalPlaytime, joined;
     @Getter
     private int currentProfileSlot;
-
 
     public NexusPlayer(Player player, NexusPlugin plugin) {
         this.plugin = plugin;
         this.player = player;
+        joined = System.currentTimeMillis();
         profilesMap = new HashMap<>();
         if(registered()) {
             player.sendMessage("§aRegistered, loading data");
             load();
         } else {
             player.sendMessage("§cNot registered, creating data");
-            plugin.getDatabaseAdapter().setAsync("players", player.getUniqueId(), 0, System.currentTimeMillis(), 0);
+            plugin.getDatabaseAdapter().setAsync("players", player.getUniqueId(), 0, System.currentTimeMillis(),
+                    0, GameProfileSerializer.toString(((CraftPlayer) player).getProfile()));
             player.sendMessage("§aCreated data, loading data now");
             load();
             player.sendMessage("§aProfile is being created");
             Profile profile = new Profile(UUID.randomUUID(), plugin);
-            profile.create(player.getUniqueId());
+            profile.create(player.getUniqueId(), 0);
         }
         player.sendMessage("§aProfiles are being loaded");
 
@@ -48,6 +54,14 @@ public class NexusPlayer {
                 loadProfiles();
             }
         }.runTaskLater(plugin, 2);
+        plugin.getPlayerManager().getPlayersMap().put(player, this);
+    }
+
+    public void switchProfile(int profileSlot) {
+        profilesMap.get(currentProfileSlot).getMembers().get(player.getUniqueId()).checkout(joined);
+        player.getInventory().clear();
+        currentProfileSlot = profileSlot;
+        setActiveProfile(profileSlot);
     }
 
     public void setActiveProfile(int profileSlot) {
@@ -72,7 +86,20 @@ public class NexusPlayer {
         if(profile.loaded()) {
             player.sendMessage("§aTeleporting");
             player.teleport(profile.getWorld().getSpawn());
+            if(!profile.getMembers().get(player.getUniqueId()).getInventoryBase64().equals("empty")) {
+                player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
+                        player.getUniqueId()).getInventoryBase64()).getContents());
+                player.sendMessage("§eInventory loaded");
+            }
         }
+    }
+
+    public void checkout() {
+        plugin.getDatabaseAdapter().updateAsync("players", "player", player.getUniqueId(), new DatabaseUpdate("playtime", generalPlaytime + (System.currentTimeMillis()-joined)),
+                new DatabaseUpdate("gameprofile", GameProfileSerializer.toString(((CraftPlayer) player).getProfile())),
+                new DatabaseUpdate("currentProfile", currentProfileSlot));
+        profilesMap.get(currentProfileSlot).getMembers().get(player.getUniqueId()).checkout(joined);
+        plugin.getPlayerManager().getPlayersMap().remove(player);
     }
 
     public boolean registered() {
@@ -84,7 +111,7 @@ public class NexusPlayer {
         try {
             if(resultSet.next()) {
                 firstLogin = resultSet.getLong("firstLogin");
-                playtime = resultSet.getLong("playtime");
+                generalPlaytime = resultSet.getLong("playtime");
                 currentProfileSlot = resultSet.getInt("currentProfile");
             }
         } catch (SQLException e) {
@@ -102,7 +129,6 @@ public class NexusPlayer {
                 if(plugin.getProfileManager().getProfilesMap().containsKey(profileId)) {
                     profile = plugin.getProfileManager().getProfilesMap().get(profileId);
                 } else {
-                    player.sendMessage("constructor");
                     profile = new Profile(profileId, plugin);
                 }
                 profilesMap.put(slot, profile);
@@ -114,7 +140,7 @@ public class NexusPlayer {
         if(profilesMap.isEmpty()) {
             player.sendMessage("§cYou don't have any profiles");
         } else {
-            player.sendMessage("§eProfile(s) found");
+            player.sendMessage("§e" + profilesMap.size() + " Profile(s) found");
             setActiveProfile(currentProfileSlot);
         }
     }

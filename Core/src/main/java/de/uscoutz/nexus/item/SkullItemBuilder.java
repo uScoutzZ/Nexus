@@ -2,15 +2,22 @@ package de.uscoutz.nexus.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.google.common.base.Suppliers;
+import com.mojang.authlib.GameProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class SkullItemBuilder extends ItemBuilder<SkullMeta> {
 
@@ -22,6 +29,30 @@ public class SkullItemBuilder extends ItemBuilder<SkullMeta> {
     public SkullItemBuilder(ItemStack itemStack) {
         super(itemStack);
     }
+
+    public SkullItemBuilder owner(GameProfile gameProfile) {
+        try {
+            skullOwnerField.get().set(meta, gameProfile);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    private static final Supplier<Field> skullOwnerField = Suppliers.memoize(new com.google.common.base.Supplier<Field>() {
+        @Override
+        public Field get() {
+            try {
+                ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+                Class<?> clazz = itemStack.getItemMeta().getClass();
+                Field field = clazz.getDeclaredField("profile");
+                field.setAccessible(true);
+                return field;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    });
 
     public SkullItemBuilder owner(String owner) {
         getMeta().setOwner(owner);

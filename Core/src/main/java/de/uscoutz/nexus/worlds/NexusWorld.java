@@ -35,6 +35,7 @@ public class NexusWorld {
         block.setType(Material.OAK_SIGN);
         Sign sign = (Sign) block.getState();
         sign.line(0, Component.text(profile.getOwner() + ""));
+        sign.line(1, Component.text(plugin.getPlayerManager().getPlayersMap().get(Bukkit.getPlayer(profile.getOwner())).getCurrentProfileSlot()));
         sign.update();
     }
 

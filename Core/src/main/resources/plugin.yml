@@ -2,3 +2,6 @@ name: NexusCore
 author: uScoutz
 version: 1.0
 main: de.uscoutz.nexus.NexusPlugin
+api-version: 1.19
+commands:
+  profile:

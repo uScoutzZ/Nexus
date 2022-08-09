@@ -148,6 +148,33 @@ public class DatabaseAdapter {
         this.executorService.execute(() -> update(table, whereKey, setKey, databases));
     }
 
+    public void updateTwo(String table, String whereKey, Object setKey, String secWhereKey, Object secSetKey, DatabaseUpdate... databases) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        StringBuilder stringBuilder = new StringBuilder("UPDATE `" + table + "` SET ");
+
+        short i = 1;
+
+        for(DatabaseUpdate data : databases) {
+            if(databases.length == i) {
+                stringBuilder.append("`").append(data.getKey()).append("`='").append(data.getValue()).append("' ");
+            } else {
+                stringBuilder.append("`").append(data.getKey()).append("`='").append(data.getValue()).append("', ");
+            }
+            i++;
+        }
+
+        stringBuilder.append("WHERE `").append(whereKey).append("`='").append(setKey).append("' AND `").append(secWhereKey).append("`='").append(secSetKey).append("'");
+
+        System.out.println(stringBuilder);
+
+        this.mySQL.queryUpdate(stringBuilder.toString());
+    }
+
+    public void updateTwoAsync(String table, String whereKey, Object setKey, String secWhereKey, Object secSetKey, DatabaseUpdate... databases) {
+        this.executorService.execute(() -> updateTwo(table, whereKey, setKey, secWhereKey, secSetKey, databases));
+    }
+
     public void delete(String table, String whereKey, Object setKey) {
         if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
 
@@ -199,7 +226,7 @@ public class DatabaseAdapter {
     private void createTables() {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS profiles (profileId VARCHAR(36), owner VARCHAR(36), nexusLevel int, start bigint, lastActivity bigint)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS playerProfiles (player VARCHAR(36), profileId VARCHAR(36), slot int, joinedProfile bigint, playtime bigint, inventory text)");
-        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36), currentProfile int, firstLogin bigint, playtime bigint)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36), currentProfile int, firstLogin bigint, playtime bigint, gameprofile text)");
     }
 }
 

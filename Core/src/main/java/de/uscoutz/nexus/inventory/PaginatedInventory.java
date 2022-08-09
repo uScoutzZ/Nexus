@@ -140,13 +140,33 @@ public class PaginatedInventory extends SimpleInventory {
         }
         int targetSlot = slot + getOffsetForPage(page);
         this.inventoryContents.put(targetSlot, item);
-        super.getClickHandlers().put(targetSlot, eventConsumer);
+        super.getRightclickHandlers().put(targetSlot, eventConsumer);
         return this;
     }
 
     @Override
     public PaginatedInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer) {
         return this.setItem(getPageForIndex(slot), slot, item, eventConsumer);
+    }
+
+    public PaginatedInventory setItem(int page, int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer, Consumer<InventoryClickEvent> eventConsumer2) {
+        if (page < 1) {
+            throw new PaginatedInventoryException("Page number can not be less than 1");
+        }
+        if (!getDynamicSlots().contains(slot)) {
+            super.setItem(slot, item, eventConsumer);
+            return this;
+        }
+        int targetSlot = slot + getOffsetForPage(page);
+        this.inventoryContents.put(targetSlot, item);
+        super.getRightclickHandlers().put(targetSlot, eventConsumer);
+        super.getLeftclickHandlers().put(targetSlot, eventConsumer2);
+        return this;
+    }
+
+    @Override
+    public PaginatedInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer, Consumer<InventoryClickEvent> eventConsumer2) {
+        return this.setItem(getPageForIndex(slot), slot, item, eventConsumer, eventConsumer2);
     }
 
     @Override
