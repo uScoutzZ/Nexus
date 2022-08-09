@@ -164,6 +164,24 @@ public class DatabaseAdapter {
         return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "'");
     }
 
+    public ResultSet getTwo(String table, String whereKey, String setkey, String secWhereKey, String secSetKey) {
+        return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "' AND " + secWhereKey + "='" + secSetKey + "'");
+    }
+
+    public ResultSet getTwoAsync(String table, String whereKey, String setKey, String secWhereKey, String secSetKey) {
+        Future<ResultSet> result = this.executorService.submit(() -> getTwo(table, whereKey, setKey, secWhereKey, secSetKey));
+
+        try {
+            return result.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public ResultSet getAsync(String table, String whereKey, String setKey) {
         Future<ResultSet> result = this.executorService.submit(() -> get(table, whereKey, setKey));
 
@@ -179,9 +197,9 @@ public class DatabaseAdapter {
     }
 
     private void createTables() {
-        mySQL.query("CREATE TABLE IF NOT EXISTS profiles (profileId VARCHAR(32), owner VARCHAR(32), nexusLevel int, start bigint, lastActivity bigint)");
-        mySQL.query("CREATE TABLE IF NOT EXISTS playerProfiles (player VARCHAR(32), profileId VARCHAR(32), slot int, joinedProfile bigint, playtime bigint, inventory text)");
-        mySQL.query("CREATE TABLE IF NOT EXISTS players (player VARCHAR(32), currentProfile int, firstLogin bigint, playtime bigint)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS profiles (profileId VARCHAR(36), owner VARCHAR(36), nexusLevel int, start bigint, lastActivity bigint)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS playerProfiles (player VARCHAR(36), profileId VARCHAR(36), slot int, joinedProfile bigint, playtime bigint, inventory text)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36), currentProfile int, firstLogin bigint, playtime bigint)");
     }
 }
 

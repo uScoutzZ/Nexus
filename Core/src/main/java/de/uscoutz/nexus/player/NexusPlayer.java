@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,15 +33,21 @@ public class NexusPlayer {
             load();
         } else {
             player.sendMessage("§cNot registered, creating data");
-            plugin.getDatabaseAdapter().setAsync("players", player.getUniqueId(), 0, System.currentTimeMillis(), System.currentTimeMillis());
+            plugin.getDatabaseAdapter().setAsync("players", player.getUniqueId(), 0, System.currentTimeMillis(), 0);
             player.sendMessage("§aCreated data, loading data now");
             load();
             player.sendMessage("§aProfile is being created");
-            new Profile(UUID.randomUUID(), plugin).create(player.getUniqueId());
+            Profile profile = new Profile(UUID.randomUUID(), plugin);
+            profile.create(player.getUniqueId());
         }
         player.sendMessage("§aProfiles are being loaded");
-        loadProfiles();
 
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadProfiles();
+            }
+        }.runTaskLater(plugin, 2);
     }
 
     public void setActiveProfile(int profileSlot) {
@@ -75,16 +82,18 @@ public class NexusPlayer {
     private void load() {
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("players", "player", String.valueOf(player.getUniqueId()));
         try {
-            firstLogin = resultSet.getLong("firstLogin");
-            playtime = resultSet.getLong("playtime");
-            currentProfileSlot = resultSet.getInt("currentProfile");
+            if(resultSet.next()) {
+                firstLogin = resultSet.getLong("firstLogin");
+                playtime = resultSet.getLong("playtime");
+                currentProfileSlot = resultSet.getInt("currentProfile");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void loadProfiles() {
-        ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("playerProfiles", "player", String.valueOf(player.getUniqueId()));
+        ResultSet resultSet = plugin.getDatabaseAdapter().get("playerProfiles", "player", String.valueOf(player.getUniqueId()));
         try {
             while(resultSet.next()) {
                 UUID profileId = UUID.fromString(resultSet.getString("profileId"));
@@ -93,12 +102,20 @@ public class NexusPlayer {
                 if(plugin.getProfileManager().getProfilesMap().containsKey(profileId)) {
                     profile = plugin.getProfileManager().getProfilesMap().get(profileId);
                 } else {
+                    player.sendMessage("constructor");
                     profile = new Profile(profileId, plugin);
                 }
                 profilesMap.put(slot, profile);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+
+        if(profilesMap.isEmpty()) {
+            player.sendMessage("§cYou don't have any profiles");
+        } else {
+            player.sendMessage("§eProfile(s) found");
+            setActiveProfile(currentProfileSlot);
         }
     }
 }

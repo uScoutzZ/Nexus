@@ -2,7 +2,6 @@ package de.uscoutz.nexus.profile;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.worlds.NexusWorld;
-import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,6 +30,7 @@ public class Profile {
     private boolean loading;
 
     public Profile(UUID profileId, NexusPlugin plugin) {
+        this.plugin = plugin;
         this.profileId = profileId;
         this.members = new ArrayList<>();
         if(exists()) {
@@ -60,20 +60,25 @@ public class Profile {
     }
 
     public void prepare() {
-        ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("profiles", "owner", String.valueOf(profileId));
+        ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("profiles", "profileId", String.valueOf(profileId));
+
         try {
-            owner = UUID.fromString(resultSet.getString("owner"));
-            nexusLevel = resultSet.getInt("nexusLevel");
-            start = resultSet.getLong("start");
-            lastActivity = resultSet.getLong("lastActivity");
+            while(resultSet.next()) {
+                owner = UUID.fromString(resultSet.getString("owner"));
+                nexusLevel = resultSet.getInt("nexusLevel");
+                start = resultSet.getLong("start");
+                lastActivity = resultSet.getLong("lastActivity");
+            }
+            Bukkit.broadcastMessage("profile prepared");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void create(UUID owner) {
-        plugin.getDatabaseAdapter().setAsync("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
-        plugin.getDatabaseAdapter().setAsync("playerProfiles", owner, profileId, 0);
+        plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
+        plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, 0, System.currentTimeMillis(), 0, "");
+        this.owner = owner;
         Bukkit.getPlayer(owner).sendMessage("§aProfile data was created");
     }
 
