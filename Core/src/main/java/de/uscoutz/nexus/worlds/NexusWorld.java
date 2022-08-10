@@ -37,6 +37,7 @@ public class NexusWorld {
         sign.line(0, Component.text(profile.getOwner() + ""));
         sign.line(1, Component.text(plugin.getPlayerManager().getPlayersMap().get(Bukkit.getPlayer(profile.getOwner())).getCurrentProfileSlot()));
         sign.update();
+        Bukkit.broadcastMessage("§eA map was assigned");
     }
 
     public void unload() {

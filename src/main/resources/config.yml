@@ -1,6 +1,0 @@
-blank-worlds: 5
-mysql:
-  username: "username"
-  password: "password"
-  hostname: "localhost"
-  database: "nexus"

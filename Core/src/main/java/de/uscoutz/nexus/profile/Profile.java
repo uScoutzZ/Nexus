@@ -3,8 +3,10 @@ package de.uscoutz.nexus.profile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,6 +38,23 @@ public class Profile {
         }
     }
 
+    public void checkout() {
+        if(loaded()) {
+            for(Player all : world.getWorld().getPlayers()) {
+                all.kick(Component.text(plugin.getMessage().get("profile-unloaded")));
+            }
+            plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
+            plugin.getNexusServer().getProfilesServerMap().remove(profileId);
+        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getProfileManager().getProfilesMap().remove(profileId);
+            }
+        }.runTaskLater(plugin, 3);
+    }
+
     public void loadMembers() {
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("playerProfiles", "profileId", String.valueOf(profileId));
 
@@ -61,6 +80,7 @@ public class Profile {
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
                 requestor.sendMessage("§aLoading world");
                 world = new NexusWorld(this, plugin);
+                plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
             } else {
                 requestor.sendMessage("§cCouldn't load profile because there aren't any empty maps");
                 loading = false;

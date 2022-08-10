@@ -5,6 +5,9 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventorySerializer;
+import eu.thesimplecloud.api.CloudAPI;
+import eu.thesimplecloud.api.service.ICloudService;
+import eu.thesimplecloud.plugin.startup.CloudPlugin;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
@@ -58,21 +61,50 @@ public class NexusPlayer {
     }
 
     public void switchProfile(int profileSlot) {
-        profilesMap.get(currentProfileSlot).getMembers().get(player.getUniqueId()).checkout(joined);
+        getCurrentProfile().getMembers().get(player.getUniqueId()).checkout(joined);
         player.getInventory().clear();
         currentProfileSlot = profileSlot;
         setActiveProfile(profileSlot);
     }
 
-    public void setActiveProfile(int profileSlot) {
+    public boolean setActiveProfile(int profileSlot) {
         Profile profile = profilesMap.get(profileSlot);
+        ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         if(profile.isPrepared()) {
             player.sendMessage("§aProfile is prepared");
             if(profile.loaded()) {
                 player.sendMessage("§aProfile is already loaded, teleporting");
             } else {
                 player.sendMessage("§aProfile not loaded, loading");
-                profile.load(player);
+                if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
+                    player.sendMessage("§cProfile is loaded somewhere");
+                    String server = plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId());
+                    if(!server.equals(plugin.getNexusServer().getThisServiceName())) {
+                        player.sendMessage("§cProfile is loaded on another server");
+                        ICloudService iCloudService = plugin.getNexusServer().getServiceByName(server);
+                        if(iCloudService != null && iCloudService.isOnline()) {
+                            player.sendMessage("§eServer is online, sending");
+                            CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()),
+                                    iCloudService);
+                        } else {
+                            player.sendMessage("§6Server is offline. Resetting session...");
+                            plugin.getNexusServer().getProfilesServerMap().remove(profile.getProfileId());
+                            return setActiveProfile(profileSlot);
+                        }
+                    } else {
+                        player.sendMessage("§c§lProfile should be loaded on your current server. Session resetted");
+                        plugin.getNexusServer().getProfilesServerMap().remove(profile.getProfileId());
+                        return setActiveProfile(profileSlot);
+                    }
+                } else {
+                    profile.load(player);
+                    /*if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
+                        profile.load(player);
+                    } else {
+                        player.sendMessage("§dOther server is more empty, sending");
+                        CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);
+                    }*/
+                }
                 if(profile.loaded()) {
                     player.sendMessage("§aWorld was loaded, teleporting");
                 } else {
@@ -91,15 +123,26 @@ public class NexusPlayer {
                         player.getUniqueId()).getInventoryBase64()).getContents());
                 player.sendMessage("§eInventory loaded");
             }
+            return true;
+        } else {
+            player.sendMessage("§4Profile is not loaded");
+            return false;
         }
     }
 
     public void checkout() {
-        plugin.getDatabaseAdapter().updateAsync("players", "player", player.getUniqueId(), new DatabaseUpdate("playtime", generalPlaytime + (System.currentTimeMillis()-joined)),
+        plugin.getDatabaseAdapter().updateAsync("players", "player", player.getUniqueId(),
+                new DatabaseUpdate("playtime", generalPlaytime + (System.currentTimeMillis()-joined)),
                 new DatabaseUpdate("gameprofile", GameProfileSerializer.toString(((CraftPlayer) player).getProfile())),
                 new DatabaseUpdate("currentProfile", currentProfileSlot));
-        profilesMap.get(currentProfileSlot).getMembers().get(player.getUniqueId()).checkout(joined);
+        if(getCurrentProfile().loaded()) {
+            getCurrentProfile().getMembers().get(player.getUniqueId()).checkout(joined);
+        }
         plugin.getPlayerManager().getPlayersMap().remove(player);
+    }
+
+    public Profile getCurrentProfile() {
+        return profilesMap.get(currentProfileSlot);
     }
 
     public boolean registered() {
@@ -141,7 +184,6 @@ public class NexusPlayer {
             player.sendMessage("§cYou don't have any profiles");
         } else {
             player.sendMessage("§e" + profilesMap.size() + " Profile(s) found");
-            setActiveProfile(currentProfileSlot);
         }
     }
 }

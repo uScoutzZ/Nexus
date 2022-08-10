@@ -1,3 +1,4 @@
+prefix: §7[§3Nexus§7]§f
 profiles-title: §0Profile §c§l» §8Wähle aus
 profile-slot: §aProfil {0}
 profiles_members-title: §0Profil §c§l» §8Mitglieder
@@ -6,3 +7,8 @@ profiles_members_playtime: §7Spielzeit:§6 {0}
 minutes: {0} Minuten
 hours: {0} Stunden
 hour: 1 Stunde
+profile-unloaded: %prefix% §cDu wurdest gekickt, da das Profil entladen wird.
+command_coop_not-owner: %prefix% §cDu bist nicht der Inhaber dieses Profils
+command_coop_help: %prefix% §6Coop-Befehle \n§e/coop invite <Spieler> §7Lädt Spieler in dein Profil ein \n§e/coop accept|deny <Spieler> §7Lehnt eine Coop-Anfrage ab\n§e/coop kick §7Kickt Spieler aus deinem Profil
+command_coop_already-in-coop: %prefix% §7Der Spieler ist bereits in deinem Coop
+command_coop_player-offline: %prefix% §7Dieser Spieler ist offline

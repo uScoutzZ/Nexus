@@ -1,4 +1,4 @@
-package de.uscoutz.nexus.listeners;
+package de.uscoutz.nexus.listeners.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import org.bukkit.entity.Player;
@@ -17,6 +17,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+
         plugin.getPlayerManager().getPlayersMap().get(player).checkout();
     }
 }

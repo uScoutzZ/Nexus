@@ -11,6 +11,7 @@
     <modules>
         <module>Core</module>
         <module>Schematic</module>
+        <module>Networking</module>
     </modules>
 
     <repositories>
