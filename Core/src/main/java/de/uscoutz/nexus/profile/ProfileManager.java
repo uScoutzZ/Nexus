@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,9 +14,12 @@ public class ProfileManager {
 
     @Getter
     private Map<UUID, Profile> profilesMap;
+    @Getter
+    private Map<UUID, List<UUID>> coopInvitations;
 
     public ProfileManager(NexusPlugin plugin) {
         this.plugin = plugin;
         profilesMap = new HashMap<>();
+        coopInvitations = new HashMap<>();
     }
 }

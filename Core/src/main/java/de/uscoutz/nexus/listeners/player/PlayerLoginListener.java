@@ -21,18 +21,7 @@ public class PlayerLoginListener implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        player.getInventory().clear();
-        NexusPlayer nexusPlayer = new NexusPlayer(player, plugin);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if(nexusPlayer.setActiveProfile(nexusPlayer.getCurrentProfileSlot())) {
-                    player.sendMessage("§2Everything was loaded correctly");
-                } else {
-                    player.sendMessage("§4There was an error while loading your player- and profile-data");
-                }
-            }
-        }.runTaskLater(plugin, 3);
+        NexusPlayer nexusPlayer = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId());
+        nexusPlayer.setPlayer(player);
     }
 }

@@ -4,7 +4,6 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -41,7 +40,7 @@ public class Profile {
     public void checkout() {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
-                all.kick(Component.text(plugin.getMessage().get("profile-unloaded")));
+                all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
             }
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
@@ -64,7 +63,9 @@ public class Profile {
                 long joinedProfile = resultSet.getLong("joinedProfile"),
                         profilePlaytime = resultSet.getLong("playtime");
                 String inventory = resultSet.getString("inventory");
-                new ProfilePlayer(this, player, profilePlaytime, joinedProfile, inventory, plugin);
+                if(!members.containsKey(player)) {
+                    new ProfilePlayer(this, player, profilePlaytime, joinedProfile, inventory, plugin);
+                }
             }
             plugin.getProfileManager().getProfilesMap().put(profileId, this);
         } catch (SQLException e) {
@@ -72,17 +73,13 @@ public class Profile {
         }
     }
 
-    public void load(Player requestor) {
-        if(loading) {
-            requestor.sendMessage("§cThis profile is already being loaded");
-        } else {
+    public void load() {
+        if(!loading) {
             loading = true;
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
-                requestor.sendMessage("§aLoading world");
                 world = new NexusWorld(this, plugin);
                 plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
             } else {
-                requestor.sendMessage("§cCouldn't load profile because there aren't any empty maps");
                 loading = false;
             }
         }
@@ -105,12 +102,23 @@ public class Profile {
         }
     }
 
-    public void create(UUID owner, int currentSlot) {
+    public void create(UUID owner, int profileSlot) {
         plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
-        plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, currentSlot,
+        plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
         this.owner = owner;
-        Bukkit.getPlayer(owner).sendMessage("§aProfile data was created");
+    }
+
+    public void addPlayer(int profileSlot, UUID player) {
+        plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
+                System.currentTimeMillis(), 0, "empty");
+        loadMembers();
+    }
+
+    public void kickPlayer(UUID player) {
+        members.remove(player);
+        plugin.getDatabaseAdapter().deleteTwoAsync("playerProfiles", "player", player, "profileId", String.valueOf(profileId));
+        loadMembers();
     }
 
     public boolean loaded() {

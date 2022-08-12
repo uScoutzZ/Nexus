@@ -25,10 +25,13 @@ public class NexusServer {
     private RedissonClient redissonClient;
     @Getter
     private Map<String, Integer> profileCountByServer;
+    @Getter
+    private Map<UUID, Integer> profileToLoad;
 
     public NexusServer(NexusPlugin plugin) {
         this.plugin = plugin;
         profileCountByServer = new HashMap<>();
+        profileToLoad = new HashMap<>();
         createRedisConnection();
     }
 

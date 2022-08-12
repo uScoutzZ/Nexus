@@ -55,7 +55,7 @@ public class SimpleInventory implements Cloneable{
 
     public SimpleInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer) {
         this.inventory.setItem(slot, item);
-        this.rightclickHandlers.put(slot, eventConsumer);
+        this.leftclickHandlers.put(slot, eventConsumer);
         return this;
     }
 

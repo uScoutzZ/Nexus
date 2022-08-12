@@ -183,8 +183,20 @@ public class DatabaseAdapter {
         this.mySQL.queryUpdate("DELETE FROM `" + table + "` WHERE `" + whereKey + "`='" + setKey + "'");
     }
 
+    public void deleteTwo(String table, String whereKey, Object setKey, String whereKey2, Object setKey2) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        System.out.println(table + " " + whereKey + " " + setKey + " " + whereKey2 + " " + setKey2);
+
+        this.mySQL.queryUpdate("DELETE FROM " + table + " WHERE " + whereKey + " = '" + setKey + "' AND " + whereKey2 + " = '" + setKey2 + "'");
+    }
+
     public void deleteAsync(String table, String whereKey, Object setKey) {
         this.executorService.execute(() -> delete(table, whereKey, setKey));
+    }
+
+    public void deleteTwoAsync(String table, String whereKey, Object setKey, String whereKey2, String setKey2) {
+        this.executorService.execute(() -> deleteTwo(table, whereKey, setKey, whereKey2, setKey2));
     }
 
     public ResultSet get(String table, String whereKey, String setkey) {

@@ -18,6 +18,6 @@ public class PlayerQuitListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        plugin.getPlayerManager().getPlayersMap().get(player).checkout();
+        plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).checkout();
     }
 }

@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class NexusWorld {
 
@@ -32,12 +33,15 @@ public class NexusWorld {
 
     public void assign() {
         Block block = world.getSpawnLocation().add(0, 1, 0).getBlock();
-        block.setType(Material.OAK_SIGN);
-        Sign sign = (Sign) block.getState();
-        sign.line(0, Component.text(profile.getOwner() + ""));
-        sign.line(1, Component.text(plugin.getPlayerManager().getPlayersMap().get(Bukkit.getPlayer(profile.getOwner())).getCurrentProfileSlot()));
-        sign.update();
-        Bukkit.broadcastMessage("§eA map was assigned");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                block.setType(Material.OAK_SIGN);
+                Sign sign = (Sign) block.getState();
+                sign.line(0, Component.text(profile.getOwner() + ""));
+                sign.update();
+            }
+        }.runTask(plugin);
     }
 
     public void unload() {

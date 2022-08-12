@@ -77,11 +77,11 @@ public class ProfilePlayer {
         }
 
         if(hours == 0) {
-            return plugin.getMessage().get("minutes", String.valueOf(minuts));
+            return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minuts));
         } else if(hours == 1) {
-            return plugin.getMessage().get("hour");
+            return plugin.getLocaleManager().translate("de_DE", "hour");
         } else {
-            return plugin.getMessage().get("hours", String.valueOf(hours));
+            return plugin.getLocaleManager().translate("de_DE", "hours", String.valueOf(hours));
         }
     }
 }

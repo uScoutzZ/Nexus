@@ -19,8 +19,10 @@ public class PlayerSpawnLocationListener implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerSpawnLocationEvent event) {
         Player player = event.getPlayer();
-        NexusPlayer nexusPlayer = plugin.getPlayerManager().getPlayersMap().get(player);
+        NexusPlayer nexusPlayer = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId());
 
-        event.setSpawnLocation(nexusPlayer.getCurrentProfile().getWorld().getSpawn());
+        if(nexusPlayer.getCurrentProfile() != null) {
+            event.setSpawnLocation(nexusPlayer.getCurrentProfile().getWorld().getSpawn());
+        }
     }
 }

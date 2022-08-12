@@ -5,3 +5,4 @@ mysql:
   hostname: "localhost"
   database: "nexus"
 cloudtype: "NEXUSDEV"
+profile-slots: 4
