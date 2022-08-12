@@ -254,6 +254,15 @@ public class NexusPlayer {
             itemBuilder.flag(ItemFlag.HIDE_ATTRIBUTES);
 
             if(coopInvitation == null) {
+
+                inventory.fill(0, 9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
+                inventory.setItem(4, ItemBuilder.skull()
+                        .texture("https://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f")
+                        .name("profiles_coop"));
+                inventory.setItem(8, ItemBuilder.skull()
+                        .texture("https://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f")
+                        .name("profiles_delete-profile"));
+
                 inventory.setItem(i, itemBuilder, leftClick -> {
                     SimpleInventory simpleInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_members-title"));
                     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");

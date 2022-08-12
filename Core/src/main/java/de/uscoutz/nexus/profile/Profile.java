@@ -37,6 +37,10 @@ public class Profile {
         }
     }
 
+    public void delete() {
+
+    }
+
     public void checkout() {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
