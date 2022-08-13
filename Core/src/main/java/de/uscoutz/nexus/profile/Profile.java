@@ -1,15 +1,19 @@
 package de.uscoutz.nexus.profile;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
+import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,6 +36,11 @@ public class Profile {
     @Getter
     private boolean loading;
 
+    @Getter
+    private int[] timeToCheckout;
+    @Getter
+    private BukkitTask checkoutTask;
+
     public Profile(UUID profileId, NexusPlugin plugin) {
         this.plugin = plugin;
         this.profileId = profileId;
@@ -39,6 +48,35 @@ public class Profile {
         if(exists()) {
             prepare();
         }
+    }
+
+    public void scheduleCheckout() {
+        timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
+        checkoutTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(timeToCheckout[0] == 0) {
+                    checkout();
+                    cancel();
+                }
+                timeToCheckout[0]--;
+            }
+        }.runTaskTimer(plugin, 20, 20);
+    }
+
+    public void cancelCheckout() {
+        if(checkoutTask != null) {
+            checkoutTask.cancel();
+        }
+    }
+
+    public List<NexusPlayer> getActivePlayers() {
+        List<NexusPlayer> players = new ArrayList<>();
+        for(Player activePlayer : world.getWorld().getPlayers()) {
+            players.add(plugin.getPlayerManager().getPlayersMap().get(activePlayer.getUniqueId()));
+        }
+
+        return players;
     }
 
     public void delete() {
@@ -70,12 +108,18 @@ public class Profile {
 
     public void checkout() {
         if(loaded()) {
+            Bukkit.broadcastMessage("loaded");
             for(Player all : world.getWorld().getPlayers()) {
                 all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
             }
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
+            Bukkit.broadcastMessage("added world to empty");
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
         }
+
+        plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
+                new DatabaseUpdate("nexusLevel", nexusLevel),
+                new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
 
         new BukkitRunnable() {
             @Override

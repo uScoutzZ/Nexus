@@ -8,6 +8,7 @@ import de.uscoutz.nexus.utilities.InventorySerializer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,13 +55,21 @@ public class ProfilePlayer {
         plugin.getDatabaseAdapter().updateTwoAsync("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
                 new DatabaseUpdate("inventory", inventoryBase64));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(profile.getActivePlayers().size() == 0) {
+                    profile.scheduleCheckout();
+                }
+            }
+        }.runTaskLater(plugin, 10);
     }
 
     public String getOnlineTime() {
         long different = playtime;
 
         int seconds = 0;
-        int minuts = 0;
+        int minutes = 0;
         int hours = 0;
 
         while (different > 1000) {
@@ -69,15 +78,15 @@ public class ProfilePlayer {
         }
         while (seconds > 60) {
             seconds-=60;
-            minuts++;
+            minutes++;
         }
-        while (minuts > 60) {
-            minuts-=60;
+        while (minutes > 60) {
+            minutes-=60;
             hours++;
         }
 
         if(hours == 0) {
-            return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minuts));
+            return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minutes));
         } else if(hours == 1) {
             return plugin.getLocaleManager().translate("de_DE", "hour");
         } else {

@@ -6,3 +6,4 @@ mysql:
   database: "nexus"
 cloudtype: "NEXUSDEV"
 profile-slots: 4
+profile-checkout-after: 30

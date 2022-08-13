@@ -130,6 +130,7 @@ public class NexusPlayer {
         }
 
         if(profile.loaded()) {
+            profile.cancelCheckout();
             if(join) {
                 new BukkitRunnable() {
                     @Override
