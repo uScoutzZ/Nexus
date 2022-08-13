@@ -40,7 +40,7 @@ public class NexusPlayer {
     @Getter
     private Map<Integer, Profile> profilesMap;
     @Getter
-    private long firstLogin, generalPlaytime, joined;
+    private long firstLogin, generalPlaytime, joined, joinedProfile;
     @Getter @Setter
     private int currentProfileSlot;
 
@@ -48,9 +48,9 @@ public class NexusPlayer {
         this.plugin = plugin;
         this.uuid = uuid;
         joined = System.currentTimeMillis();
+        joinedProfile = System.currentTimeMillis();
         profilesMap = new HashMap<>();
         if(registered()) {
-            Bukkit.broadcastMessage("§aRegistered, loading data");
             load();
             loadProfiles();
         } else {
@@ -71,7 +71,6 @@ public class NexusPlayer {
                 }
             }.runTaskLater(plugin, 5);
         }
-        Bukkit.broadcastMessage("§aProfiles were loaded");
         plugin.getPlayerManager().getPlayersMap().put(uuid, this);
     }
 
@@ -93,6 +92,7 @@ public class NexusPlayer {
             currentProfileSlot = profileSlot;
             profile = profilesMap.get(profileSlot);
         }
+        joinedProfile = System.currentTimeMillis();
         //ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         if(profile.isPrepared()) {
             if(!profile.loaded()) {

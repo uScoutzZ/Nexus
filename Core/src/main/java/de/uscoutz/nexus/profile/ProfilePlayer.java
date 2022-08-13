@@ -86,7 +86,11 @@ public class ProfilePlayer {
         }
 
         if(hours == 0) {
-            return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minutes));
+            if(minutes == 0) {
+                return plugin.getLocaleManager().translate("de_DE", "seconds", String.valueOf(seconds));
+            } else {
+                return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minutes));
+            }
         } else if(hours == 1) {
             return plugin.getLocaleManager().translate("de_DE", "hour");
         } else {

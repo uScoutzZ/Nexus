@@ -108,12 +108,10 @@ public class Profile {
 
     public void checkout() {
         if(loaded()) {
-            Bukkit.broadcastMessage("loaded");
             for(Player all : world.getWorld().getPlayers()) {
                 all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
             }
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
-            Bukkit.broadcastMessage("added world to empty");
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
         }
 
