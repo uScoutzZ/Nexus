@@ -30,23 +30,9 @@ public class PacketCoopKicked extends Packet {
                     nexusPlayer.loadProfiles();
                     nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "command_coop_kicked_other-profiles"));
                     nexusPlayer.switchProfile(0);
-                    /*if(nexusPlayer.getProfilesMap().size() > 1) {
-                        for(int i = 0; i < NexusPlugin.getInstance().getConfig().getInt("profile-slots"); i++) {
-                            if(nexusPlayer.getProfilesMap().containsKey(i)) {
-                                Profile profile = nexusPlayer.getProfilesMap().get(i);
-                                if(profile != nexusPlayer.getCurrentProfile()) {
-
-                                    break;
-                                }
-                            }
-                        }
-                    } else {
-                        nexusPlayer.getPlayer().kick(Component.text(NexusPlugin.getInstance().getLocaleManager().tranlate("de_DE", "command_coop_kicked_no-profiles")));
-                    }*/
                 }
             }.runTaskLater(NexusPlugin.getInstance(), 2);
         } else {
-            Bukkit.broadcastMessage("other profile " + nexusPlayer.getCurrentProfile().getProfileId());
             for (int i = 0; i < NexusPlugin.getInstance().getConfig().getInt("profile-slots"); i++) {
                 if (nexusPlayer.getProfilesMap().containsKey(i)) {
                     Profile profile = nexusPlayer.getProfilesMap().get(i);

@@ -1,7 +1,11 @@
 package de.uscoutz.nexus.profile;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
+import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.worlds.NexusWorld;
+import eu.thesimplecloud.api.CloudAPI;
+import eu.thesimplecloud.api.player.ICloudPlayer;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -38,7 +42,30 @@ public class Profile {
     }
 
     public void delete() {
+        if(loaded()) {
+            for(Player all : world.getWorld().getPlayers()) {
+                all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted-teleport"));
+                plugin.getPlayerManager().getPlayersMap().get(all.getUniqueId()).switchProfile(0);
+            }
+        }
 
+        for(UUID member : members.keySet()) {
+            ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(member).getBlockingOrNull();
+            if(cloudPlayer != null) {
+                if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
+                    new PacketCoopKicked("123", member, profileId).send(cloudPlayer.getConnectedServer());
+                }
+            }
+        }
+
+        plugin.getDatabaseAdapter().delete("playerProfiles", "profileId", profileId);
+        plugin.getDatabaseAdapter().deleteTwo("profiles", "owner", owner, "profileId", profileId);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                checkout();
+            }
+        }.runTaskLater(plugin, 8);
     }
 
     public void checkout() {
@@ -116,13 +143,23 @@ public class Profile {
     public void addPlayer(int profileSlot, UUID player) {
         plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
-        loadMembers();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadMembers();
+            }
+        }.runTaskLater(plugin, 3);
     }
 
     public void kickPlayer(UUID player) {
         members.remove(player);
         plugin.getDatabaseAdapter().deleteTwoAsync("playerProfiles", "player", player, "profileId", String.valueOf(profileId));
-        loadMembers();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadMembers();
+            }
+        }.runTaskLater(plugin, 3);
     }
 
     public boolean loaded() {
