@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.commands;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
+import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,18 +24,25 @@ public class LoadSchematicCommand implements CommandExecutor {
             Player player = (Player) sender;
             SchematicPlayer schematicPlayer = plugin.getPlayerManager().getPlayerMap().get(player.getUniqueId());
             if (player.hasPermission("nexus.schematics")) {
-                if(args.length == 2) {
+                if(args.length >= 2) {
                     try {
                         SchematicType schematicType = SchematicType.valueOf(args[0]);
                         int level = Integer.parseInt(args[1]);
-                        plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level)
-                                .build(player.getLocation(), 0);
+                        Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level);
+                        player.sendMessage("§ePasting " + schematic.getBlocks().size() +" blocks");
+                        int rotation = 0;
+                        if(args.length == 3) {
+                            rotation = Integer.parseInt(args[2]);
+                        }
+                        schematic.build(player.getLocation(), rotation);
                     } catch (IllegalArgumentException exception) {
                         sendHelp(player);
                     }
                 } else {
                     sendHelp(player);
                 }
+            } else {
+                player.sendMessage(plugin.getNO_PERMISSION());
             }
         }
 
@@ -42,6 +50,6 @@ public class LoadSchematicCommand implements CommandExecutor {
     }
 
     private void sendHelp(Player player) {
-        player.sendMessage("§cSyntax: /loadschematic <SchematicType> <Level>");
+        player.sendMessage("§cSyntax: /loadschematic <SchematicType> <Level> [Rotation]");
     }
 }

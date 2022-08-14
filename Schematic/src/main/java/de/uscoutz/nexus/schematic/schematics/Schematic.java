@@ -2,8 +2,14 @@ package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +38,12 @@ public class Schematic {
         corner2 = schematicType.getLocation2().clone().add(0, 0, schematicType.getZDistance()*level);
 
         int minX, minY, minZ, maxX, maxY, maxZ;
-        minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+        minX = Math.min(corner1.getBlockX()+1, corner2.getBlockX()+1);
         minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
-        minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
-        maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+        minZ = Math.min(corner1.getBlockZ()+1, corner2.getBlockZ()+1);
+        maxX = Math.max(corner1.getBlockX()-1, corner2.getBlockX()-1);
         maxY = Math.max(corner1.getBlockY(), corner2.getBlockY());
-        maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+        maxZ = Math.max(corner1.getBlockZ()-1, corner2.getBlockZ()-1);
         substractX = minX;
         substractY = minY;
         substractZ = minZ;
@@ -45,11 +51,14 @@ public class Schematic {
             for(int j = minY; j <= maxY; j++) {
                 for(int k = minZ; k <= maxZ; k++) {
                     Block block = corner1.getWorld().getBlockAt(i, j, k);
-                    blocks.put(blocks.size(), block);
+                    if(block.getType() != Material.AIR) {
+                        blocks.put(blocks.size(), block);
+                    }
                 }
             }
         }
 
+        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level);
         plugin.getSchematicManager().getSchematicsMap().get(schematicType).put(level, this);
     }
 
@@ -58,8 +67,9 @@ public class Schematic {
             Block block = blocks.get(i);
             Location blockLocation = block.getLocation().clone();
             blockLocation.setX(blockLocation.getX()-substractX + location.getX());
-            blockLocation.setY(blockLocation.getY()-substractY + location.getY());
+            blockLocation.setY(blockLocation.getY()-substractY + location.getY()-1);
             blockLocation.setZ(blockLocation.getZ()-substractZ + location.getZ());
+            blockLocation.setWorld(location.getWorld());
 
             if(rotation != 0) {
                 double x = blockLocation.getX(), z = blockLocation.getZ();
@@ -77,6 +87,44 @@ public class Schematic {
 
             blockLocation.getBlock().setType(block.getType());
             blockLocation.getBlock().setBlockData(block.getBlockData());
+            if(block.getState() instanceof Sign) {
+                Block pastedBlock = blockLocation.getBlock();
+                Sign sign = (Sign) block.getState();
+                Sign pastedSign = (Sign) pastedBlock.getState();
+                for(int l = 0; l < sign.lines().size(); l++) {
+                    pastedSign.line(l, sign.line(l));
+                }
+                pastedSign.update();
+            }
+
+            BlockData blockData = blockLocation.getBlock().getBlockData();
+            if (blockData instanceof Directional) {
+                Directional directional = (Directional) blockData;
+                if(rotation == 180) {
+                    directional.setFacing(directional.getFacing().getOppositeFace());
+                } else if(rotation == 270) {
+                    if(directional.getFacing() == BlockFace.SOUTH) {
+                        directional.setFacing(BlockFace.WEST);
+                    } else if(directional.getFacing() == BlockFace.NORTH) {
+                        directional.setFacing(BlockFace.EAST);
+                    } else if(directional.getFacing() == BlockFace.WEST) {
+                        directional.setFacing(BlockFace.NORTH);
+                    } else if(directional.getFacing() == BlockFace.EAST) {
+                        directional.setFacing(BlockFace.SOUTH);
+                    }
+                } else if(rotation == 90) {
+                    if(directional.getFacing() == BlockFace.SOUTH) {
+                        directional.setFacing(BlockFace.EAST);
+                    } else if(directional.getFacing() == BlockFace.NORTH) {
+                        directional.setFacing(BlockFace.WEST);
+                    } else if(directional.getFacing() == BlockFace.WEST) {
+                        directional.setFacing(BlockFace.SOUTH);
+                    } else if(directional.getFacing() == BlockFace.EAST) {
+                        directional.setFacing(BlockFace.NORTH);
+                    }
+                }
+                block.setBlockData(directional);
+            }
         }
     }
 }

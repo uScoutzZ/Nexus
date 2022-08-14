@@ -25,6 +25,8 @@ public class SchematicWand implements CommandExecutor {
             SchematicPlayer schematicPlayer = plugin.getPlayerManager().getPlayerMap().get(player.getUniqueId());
             if(player.hasPermission("nexus.schematics")) {
                 player.getInventory().addItem(new ItemStack(Material.GOLDEN_AXE));
+            } else {
+                player.sendMessage(plugin.getNO_PERMISSION());
             }
         }
         return false;

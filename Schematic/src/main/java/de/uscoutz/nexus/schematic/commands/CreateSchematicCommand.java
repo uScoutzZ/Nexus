@@ -59,6 +59,8 @@ public class CreateSchematicCommand implements CommandExecutor {
                 } else {
                     player.sendMessage("§cYou didn't set location 1 and 2");
                 }
+            } else {
+                player.sendMessage(plugin.getNO_PERMISSION());
             }
         }
         return false;
