@@ -1,0 +1,8 @@
+name: NexusSchematic
+author: uScoutz
+version: 1.0
+main: de.uscoutz.nexus.schematic.NexusSchematicPlugin
+api-version: 1.19
+commands:
+  schematicwand:
+  createschematic:
