@@ -37,6 +37,7 @@ public class LoadSchematicCommand implements CommandExecutor {
                         schematic.build(player.getLocation(), rotation);
                     } catch (IllegalArgumentException exception) {
                         sendHelp(player);
+                        exception.printStackTrace();
                     }
                 } else {
                     sendHelp(player);

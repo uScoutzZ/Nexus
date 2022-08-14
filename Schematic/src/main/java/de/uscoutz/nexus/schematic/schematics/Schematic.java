@@ -65,28 +65,24 @@ public class Schematic {
     public void build(Location location, int rotation) {
         for(int i = 0; i < blocks.size(); i++) {
             Block block = blocks.get(i);
+
             Location blockLocation = block.getLocation().clone();
-            blockLocation.setX(blockLocation.getX()-substractX + location.getX());
-            blockLocation.setY(blockLocation.getY()-substractY + location.getY()-1);
-            blockLocation.setZ(blockLocation.getZ()-substractZ + location.getZ());
+            blockLocation.setX(blockLocation.getX()-substractX);
+            blockLocation.setY(blockLocation.getY()-substractY);
+            blockLocation.setZ(blockLocation.getZ()-substractZ);
             blockLocation.setWorld(location.getWorld());
 
-            if(rotation != 0) {
-                double x = blockLocation.getX(), z = blockLocation.getZ();
-                if(rotation == 90) {
-                    blockLocation.setZ(x);
-                    blockLocation.setX(-z);
-                } else if(rotation == 180) {
-                    blockLocation.setZ(z*-1);
-                    blockLocation.setX(x*-1);
-                } else if(rotation == 270) {
-                    blockLocation.setZ(-x);
-                    blockLocation.setX(z);
-                }
+            if(rotation == 0) {
+                blockLocation.add(location.getX(), location.getY(), location.getZ());
+            } else {
+                blockLocation = rotate(blockLocation, rotation);
+                blockLocation.add(location.getX(), location.getY(), location.getZ());
             }
 
             blockLocation.getBlock().setType(block.getType());
-            blockLocation.getBlock().setBlockData(block.getBlockData());
+            BlockData blockData = block.getBlockData();
+
+            blockLocation.getBlock().setBlockData(blockData);
             if(block.getState() instanceof Sign) {
                 Block pastedBlock = blockLocation.getBlock();
                 Sign sign = (Sign) block.getState();
@@ -97,7 +93,6 @@ public class Schematic {
                 pastedSign.update();
             }
 
-            BlockData blockData = blockLocation.getBlock().getBlockData();
             if (blockData instanceof Directional) {
                 Directional directional = (Directional) blockData;
                 if(rotation == 180) {
@@ -123,8 +118,26 @@ public class Schematic {
                         directional.setFacing(BlockFace.NORTH);
                     }
                 }
-                block.setBlockData(directional);
+                blockLocation.getBlock().setBlockData(directional);
             }
         }
+    }
+
+    private Location rotate(Location startLocation, int rotation) {
+        if(rotation != 0) {
+            double x = startLocation.getX(), z = startLocation.getZ();
+            if (rotation == 90) {
+                startLocation.setZ(-x);
+                startLocation.setX(z);
+            } else if (rotation == 180) {
+                startLocation.setZ(z * -1);
+                startLocation.setX(x * -1);
+            } else if (rotation == 270) {
+                startLocation.setZ(x);
+                startLocation.setX(-z);
+            }
+        }
+
+        return startLocation;
     }
 }
