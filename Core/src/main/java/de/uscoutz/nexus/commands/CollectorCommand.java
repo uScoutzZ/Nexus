@@ -1,7 +1,7 @@
 package de.uscoutz.nexus.commands;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.collector.Collector;
+import de.uscoutz.nexus.gamemechanics.collector.Collector;
 import de.uscoutz.nexus.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.command.Command;

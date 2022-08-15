@@ -1,9 +1,11 @@
 package de.uscoutz.nexus;
 
-import de.uscoutz.nexus.collector.CollectorManager;
+import de.uscoutz.nexus.gamemechanics.collector.CollectorManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
+import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
 import de.uscoutz.nexus.inventory.InventoryListener;
+import de.uscoutz.nexus.listeners.block.BlockBreakListener;
 import de.uscoutz.nexus.listeners.player.*;
 import de.uscoutz.nexus.locations.LocationManager;
 import de.uscoutz.nexus.networking.NetworkServer;
@@ -40,6 +42,8 @@ public class NexusPlugin extends JavaPlugin {
     private LocationManager locationManager;
     @Getter
     private CollectorManager collectorManager;
+    @Getter
+    private ToolManager toolManager;
 
     private NetworkServer networkServer;
 
@@ -57,6 +61,8 @@ public class NexusPlugin extends JavaPlugin {
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
         collectorManager = new CollectorManager(this);
+        toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"));
+        toolManager.loadTools();
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
@@ -68,6 +74,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));

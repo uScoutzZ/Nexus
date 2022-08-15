@@ -1,7 +1,7 @@
 package de.uscoutz.nexus.listeners.player;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.collector.Collector;
+import de.uscoutz.nexus.gamemechanics.collector.Collector;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

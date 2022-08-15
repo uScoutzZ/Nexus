@@ -1,4 +1,4 @@
-package de.uscoutz.nexus.collector;
+package de.uscoutz.nexus.gamemechanics.collector;
 
 import de.uscoutz.nexus.NexusPlugin;
 import lombok.Getter;

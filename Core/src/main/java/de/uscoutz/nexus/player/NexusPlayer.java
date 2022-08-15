@@ -2,6 +2,7 @@ package de.uscoutz.nexus.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.SimpleInventory;
 import de.uscoutz.nexus.item.ItemBuilder;
@@ -152,6 +153,10 @@ public class NexusPlayer {
             player.teleport(plugin.getLocationManager().getLocation("base-spawn", profile.getWorld().getWorld()));
         }
         player.getInventory().clear();
+
+        for(Tool tool : plugin.getToolManager().getToolMap().values()) {
+            player.getInventory().addItem(tool.getItemStack());
+        }
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
                 player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
