@@ -9,3 +9,4 @@ commands:
   stop:
   deletedata:
   checkplayer:
+  setlocation:

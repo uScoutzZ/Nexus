@@ -149,7 +149,7 @@ public class NexusPlayer {
 
     public void finishProfileLoading(boolean join, Profile profile) {
         if(!join) {
-            player.teleport(profile.getWorld().getSpawn());
+            player.teleport(plugin.getLocationManager().getLocation("base-spawn", profile.getWorld().getWorld()));
         }
         player.getInventory().clear();
 

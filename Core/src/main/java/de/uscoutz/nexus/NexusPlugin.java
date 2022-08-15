@@ -4,6 +4,7 @@ import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
 import de.uscoutz.nexus.inventory.InventoryListener;
 import de.uscoutz.nexus.listeners.player.*;
+import de.uscoutz.nexus.locations.LocationManager;
 import de.uscoutz.nexus.networking.NetworkServer;
 import de.uscoutz.nexus.networking.NexusServer;
 import de.uscoutz.nexus.player.PlayerManager;
@@ -34,6 +35,8 @@ public class NexusPlugin extends JavaPlugin {
     private NexusServer nexusServer;
     @Getter
     private LocaleManager localeManager;
+    @Getter
+    private LocationManager locationManager;
 
     private NetworkServer networkServer;
 
@@ -49,6 +52,7 @@ public class NexusPlugin extends JavaPlugin {
         nexusServer.updatePlayersOnServer();
         localeManager = new LocaleManager(this);
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
+        locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
@@ -64,6 +68,7 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("stop").setExecutor(new StopCommand(this));
         getCommand("deletedata").setExecutor(new DeleteDataCommand(this));
         getCommand("checkplayer").setExecutor(new CheckPlayerCommand(this));
+        getCommand("setlocation").setExecutor(new SetLocationCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
     }
