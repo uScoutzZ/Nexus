@@ -10,3 +10,4 @@ commands:
   deletedata:
   checkplayer:
   setlocation:
+  collector:
