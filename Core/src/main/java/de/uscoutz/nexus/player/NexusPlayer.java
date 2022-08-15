@@ -19,10 +19,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
@@ -154,13 +159,27 @@ public class NexusPlayer {
         }
         player.getInventory().clear();
 
-        for(Tool tool : plugin.getToolManager().getToolMap().values()) {
-            player.getInventory().addItem(tool.getItemStack());
-        }
-
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
-                player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
-                        player.getUniqueId()).getInventoryBase64()).getContents());
+            player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
+                    player.getUniqueId()).getInventoryBase64()).getContents());
+            for(ItemStack itemStack : player.getInventory().getContents()) {
+                if(itemStack != null && itemStack.getItemMeta() != null) {
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    if(plugin.getToolManager().isTool(itemMeta)) {
+                        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+                        NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
+                        int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
+                        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                        int toolBreakingPower = plugin.getToolManager().getToolMap().get(key).getBreakingPower();
+                        if(breakingPower != toolBreakingPower) {
+                            Objects.requireNonNull(itemMeta.lore()).clear();
+                            itemMeta.lore(plugin.getToolManager().getToolMap().get(key).getItemStack().lore());
+                            itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
+                            itemStack.setItemMeta(itemMeta);
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -61,8 +61,10 @@ public class NexusPlugin extends JavaPlugin {
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
         collectorManager = new CollectorManager(this);
-        toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"));
+        toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"),
+                new File("/home/networksync/nexus/blockresistance.yml"));
         toolManager.loadTools();
+        toolManager.loadBlockResistances();
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();

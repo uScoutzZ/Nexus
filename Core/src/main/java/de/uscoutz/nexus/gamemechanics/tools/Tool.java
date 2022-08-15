@@ -15,14 +15,14 @@ public class Tool {
     private NexusPlugin plugin;
 
     private String key;
-    private ItemBuilder itemBuilder;
+    private ItemBuilder<ItemMeta> itemBuilder;
 
     @Getter
     private ItemStack itemStack;
     @Getter
     private int breakingPower;
 
-    public Tool(String key, ItemBuilder itemBuilder, NexusPlugin plugin) {
+    public Tool(String key, ItemBuilder<ItemMeta> itemBuilder, NexusPlugin plugin) {
         this.key = key;
         this.itemBuilder = itemBuilder;
         this.plugin = plugin;
@@ -32,19 +32,19 @@ public class Tool {
         this.breakingPower = breakingPower;
         itemBuilder.lore(plugin.getLocaleManager().translate("de_DE", "tool_breaking-power", breakingPower));
         Bukkit.getConsoleSender().sendMessage(key + " " + breakingPower);
-        NamespacedKey key = new NamespacedKey(plugin.getName(), "breakingpower");
+        NamespacedKey key = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
         addPersistentData(key, PersistentDataType.INTEGER, breakingPower);
         return this;
     }
 
     public void build() {
-        NamespacedKey key = new NamespacedKey(plugin.getName(), "key");
-        addPersistentData(key, PersistentDataType.STRING, key);
+        NamespacedKey key = new NamespacedKey(plugin.getName().toLowerCase(), "key");
+        addPersistentData(key, PersistentDataType.STRING, this.key);
         itemStack = itemBuilder.build();
         plugin.getToolManager().getToolMap().put(this.key, this);
     }
 
-    private ItemBuilder addPersistentData(NamespacedKey key, PersistentDataType type, Object value) {
+    private ItemBuilder<ItemMeta> addPersistentData(NamespacedKey key, PersistentDataType type, Object value) {
         ItemMeta meta = itemBuilder.build().getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(key, type, value);

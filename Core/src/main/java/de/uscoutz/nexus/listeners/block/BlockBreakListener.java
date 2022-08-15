@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.listeners.block;
 
 import de.uscoutz.nexus.NexusPlugin;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,15 +25,24 @@ public class BlockBreakListener implements Listener {
 
         event.getPlayer().getInventory().getItemInMainHand();
         ItemMeta itemMeta = event.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-        if(itemMeta != null) {
-            PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-            NamespacedKey namespacedKey = new NamespacedKey(plugin.getName(), "breakingPower");
-            if(dataContainer.has(namespacedKey)) {
+        if(plugin.getToolManager().getBlockResistance().containsKey(event.getBlock().getType())) {
+            int blockResistance = plugin.getToolManager().getBlockResistance().get(event.getBlock().getType());
+            if(itemMeta != null && plugin.getToolManager().isTool(itemMeta)) {
+                PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+                NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
                 int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
-                String key = dataContainer.get(new NamespacedKey(plugin.getName(), "key"), PersistentDataType.STRING);
+                String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 player.sendMessage("Key: " + key);
                 player.sendMessage("breakingPower: " + breakingPower);
+                player.sendMessage("blockResistance: " + blockResistance);
+                if(breakingPower >= blockResistance) {
+                    event.setCancelled(false);
+                    return;
+                } else {
+                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
+                }
             }
         }
+        event.setCancelled(true);
     }
 }
