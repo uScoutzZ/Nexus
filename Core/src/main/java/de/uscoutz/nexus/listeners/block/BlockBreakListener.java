@@ -29,12 +29,8 @@ public class BlockBreakListener implements Listener {
             int blockResistance = plugin.getToolManager().getBlockResistance().get(event.getBlock().getType());
             if(itemMeta != null && plugin.getToolManager().isTool(itemMeta)) {
                 PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
-                int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
-                String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
-                player.sendMessage("Key: " + key);
-                player.sendMessage("breakingPower: " + breakingPower);
-                player.sendMessage("blockResistance: " + blockResistance);
+                int breakingPower = plugin.getToolManager().getBreakingPower(itemMeta);
+                String key = plugin.getToolManager().getKey(itemMeta);
                 if(breakingPower >= blockResistance) {
                     event.setCancelled(false);
                     return;

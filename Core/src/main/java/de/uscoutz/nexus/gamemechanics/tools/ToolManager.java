@@ -3,13 +3,13 @@ package de.uscoutz.nexus.gamemechanics.tools;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +69,15 @@ public class ToolManager {
             int resistance = resistanceConfig.getInt(key);
             blockResistance.put(material, resistance);
         }
+    }
+
+    public String getKey(ItemMeta itemMeta) {
+        return itemMeta.getPersistentDataContainer().get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+    }
+
+    public int getBreakingPower(ItemMeta itemMeta) {
+        NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
+        return itemMeta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.INTEGER);
     }
 
     public boolean isTool(ItemMeta itemMeta) {
