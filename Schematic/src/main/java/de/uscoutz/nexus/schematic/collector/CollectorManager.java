@@ -50,19 +50,8 @@ public class CollectorManager {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(schematicCollectorsFile);
         for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
             for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).values()) {
-                List<ItemStack> neededItems = new ArrayList<>();
-
                 String needed = fileConfiguration.getString(schematicType.toString().toLowerCase() + "." + schematic.getLevel());
-                if(!needed.equals("")) {
-                    for(String stringMaterial : needed.split(", ")) {
-                        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] " + stringMaterial);
-                        int amount = Integer.parseInt(stringMaterial.split(":")[1]);
-                        Material material = Material.getMaterial(stringMaterial.split(":")[0]);
-                        neededItems.add(new ItemStack(material, amount));
-                    }
-                }
-
-                collectorNeededMap.get(schematicType).put(schematic.getLevel(), neededItems);
+                collectorNeededMap.get(schematicType).put(schematic.getLevel(), getNeededItemsFromString(needed));
             }
         }
 
@@ -71,5 +60,20 @@ public class CollectorManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<ItemStack> getNeededItemsFromString(String needed) {
+        List<ItemStack> neededItems = new ArrayList<>();
+
+        if(needed != null && !needed.equals("")) {
+            for(String stringMaterial : needed.split(", ")) {
+                Bukkit.getConsoleSender().sendMessage("[NexusSchematic] " + stringMaterial);
+                int amount = Integer.parseInt(stringMaterial.split(":")[1]);
+                Material material = Material.getMaterial(stringMaterial.split(":")[0]);
+                neededItems.add(new ItemStack(material, amount));
+            }
+        }
+
+        return neededItems;
     }
 }

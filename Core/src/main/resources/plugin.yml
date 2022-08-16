@@ -10,3 +10,5 @@ commands:
   deletedata:
   checkplayer:
   setlocation:
+loadbefore:
+  - NexusSchematic

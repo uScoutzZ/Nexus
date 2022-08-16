@@ -42,6 +42,7 @@ public class NexusPlugin extends JavaPlugin {
     @Getter
     private ToolManager toolManager;
 
+
     private NetworkServer networkServer;
 
     @Override

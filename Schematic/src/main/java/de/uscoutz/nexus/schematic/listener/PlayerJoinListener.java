@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.listener;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
+import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerJoinListener implements Listener {
 
@@ -23,5 +25,13 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         SchematicPlayer schematicPlayer = new SchematicPlayer(player.getUniqueId(), plugin);
 
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
+                    player.getInventory().addItem(schematicItem.getItemStack());
+                }
+            }
+        }.runTaskLater(plugin, 20);
     }
 }

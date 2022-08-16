@@ -1,5 +1,8 @@
 package de.uscoutz.nexus.schematic;
 
+import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.schematic.listener.PlayerItemHeldListener;
+import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
 import de.uscoutz.nexus.schematic.commands.CollectorCommand;
 import de.uscoutz.nexus.schematic.commands.CreateSchematicCommand;
@@ -30,6 +33,8 @@ public class NexusSchematicPlugin extends JavaPlugin {
     private SchematicManager schematicManager;
     @Getter
     private CollectorManager collectorManager;
+    @Getter
+    private SchematicItemManager schematicItemManager;
 
     @Getter
     private final String NO_PERMISSION = "§cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.";
@@ -44,6 +49,11 @@ public class NexusSchematicPlugin extends JavaPlugin {
         schematicManager.loadSchematics();
         collectorManager = new CollectorManager(new File("/home/networksync/nexus/schematiccollectors.yml"), this);
         collectorManager.loadCollectors();
+        Bukkit.getConsoleSender().sendMessage(NexusPlugin.getInstance() +": " + Bukkit.getPluginManager().isPluginEnabled("NexusCore"));
+        schematicItemManager = new SchematicItemManager(this, NexusPlugin.getInstance(),
+                new File("/home/networksync/nexus/schematicitems.yml"));
+        schematicItemManager.loadItems();
+
         getCommand("schematicwand").setExecutor(new SchematicWand(this));
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));
         getCommand("loadschematic").setExecutor(new LoadSchematicCommand(this));
@@ -51,6 +61,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerItemHeldListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }

@@ -17,7 +17,7 @@ import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.service.ICloudService;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
@@ -170,16 +170,31 @@ public class NexusPlayer {
                         NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
                         int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
                         String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
-                        int toolBreakingPower = plugin.getToolManager().getToolMap().get(key).getBreakingPower();
+                        Tool tool = plugin.getToolManager().getToolMap().get(key);
+                        int toolBreakingPower = tool.getBreakingPower();
                         if(breakingPower != toolBreakingPower) {
                             Objects.requireNonNull(itemMeta.lore()).clear();
-                            itemMeta.lore(plugin.getToolManager().getToolMap().get(key).getItemStack().lore());
+                            itemMeta.lore(tool.getItemStack().lore());
                             itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
-                            itemStack.setItemMeta(itemMeta);
                         }
+
+                        if(tool.getLocale() != null) {
+                            String displayName = plugin.getLocaleManager().translate("de_DE", tool.getLocale());
+                            if(itemMeta.hasDisplayName() && !itemMeta.getDisplayName().equals(displayName)) {
+                                itemMeta.displayName(Component.text(displayName));
+                            }
+                        } else {
+                            itemMeta.displayName(Component.text(""));
+                        }
+
+                        itemStack.setItemMeta(itemMeta);
                     }
                 }
             }
+        }
+
+        for(Tool tool : plugin.getToolManager().getToolMap().values()) {
+            player.getInventory().addItem(tool.getItemStack());
         }
     }
 

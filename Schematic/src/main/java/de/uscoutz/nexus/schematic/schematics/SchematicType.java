@@ -13,7 +13,8 @@ import java.io.File;
 public enum SchematicType {
 
     NEXUS,
-    TOWER;
+    TOWER,
+    WALL;
 
     @Getter
     private int zDistance;

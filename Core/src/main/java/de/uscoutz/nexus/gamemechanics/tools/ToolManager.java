@@ -57,9 +57,14 @@ public class ToolManager {
         for(String key : toolsConfig.getKeys(false)) {
             Material material = Material.getMaterial(toolsConfig.getString(key + ".material"));
 
-            new Tool(key, ItemBuilder.create(material), plugin)
-                    .breakingPower(toolsConfig.getInt(key + ".breakingPower"))
-                    .build();
+            Tool tool = new Tool(key, ItemBuilder.create(material), plugin);
+            tool.breakingPower(toolsConfig.getInt(key + ".breakingPower"));
+            if(toolsConfig.getString(key + ".locale") != null) {
+                tool.name(toolsConfig.getString(key + ".locale"));
+            }
+
+            tool.build();
+            toolMap.put(key, tool);
         }
     }
 

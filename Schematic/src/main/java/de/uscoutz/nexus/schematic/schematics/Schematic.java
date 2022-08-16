@@ -4,14 +4,16 @@ import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,6 +65,56 @@ public class Schematic {
 
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level);
         plugin.getSchematicManager().getSchematicsMap().get(schematicType).put(level, this);
+    }
+
+    public void preview(Location location, int rotation) {
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE
+                , maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for(int i = 0; i < blocks.size(); i++) {
+            Block block = blocks.get(i);
+
+            Location blockLocation = block.getLocation().clone();
+            blockLocation.setX(blockLocation.getX() - substractX);
+            blockLocation.setY(blockLocation.getY() - substractY);
+            blockLocation.setZ(blockLocation.getZ() - substractZ);
+            blockLocation.setWorld(location.getWorld());
+
+            if (rotation == 0) {
+                blockLocation.add(location.getX(), location.getY(), location.getZ());
+            } else {
+                blockLocation = rotate(blockLocation, rotation);
+                blockLocation.add(location.getX(), location.getY(), location.getZ());
+            }
+
+            minX = Math.min(minX, blockLocation.getBlockX());
+            minY = Math.min(minY, blockLocation.getBlockY());
+            minZ = Math.min(minZ, blockLocation.getBlockZ());
+            maxX = Math.max(maxX, blockLocation.getBlockX());
+            maxY = Math.max(maxY, blockLocation.getBlockY());
+            maxZ = Math.max(maxZ, blockLocation.getBlockZ());
+        }
+        Location point1 = new Location(location.getWorld(), maxX, minY+1.2, maxZ);
+        Location point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+        Location point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ);
+        Location point4 = new Location(location.getWorld(), maxX, minY+1.2, minZ);
+
+        drawLine(point3, point2, 0.5);
+        drawLine(point1, point3, 0.5);
+        drawLine(point1, point4, 0.5);
+        drawLine(point2, point4, 0.5);
+    }
+
+    public void drawLine(Location point1, Location point2, double space) {
+        World world = point1.getWorld();
+        double distance = point1.distance(point2);
+        Vector p1 = point1.toVector();
+        Vector p2 = point2.toVector();
+        Vector vector = p2.clone().subtract(p1).normalize().multiply(space);
+        double length = 0;
+        for (; length < distance; p1.add(vector)) {
+            world.spawnParticle(Particle.DUST_COLOR_TRANSITION, p1.getX(), p1.getY(), p1.getZ(), 1, new Particle.DustTransition(Color.GREEN, Color.LIME, 2));
+            length += space;
+        }
     }
 
     public void build(Location location, int rotation) {
@@ -137,14 +189,14 @@ public class Schematic {
         if(rotation != 0) {
             double x = startLocation.getX(), z = startLocation.getZ();
             if (rotation == 90) {
-                startLocation.setZ(-x);
+                startLocation.setZ(-x+1);
                 startLocation.setX(z);
             } else if (rotation == 180) {
-                startLocation.setZ(z * -1);
-                startLocation.setX(x * -1);
+                startLocation.setZ((z * -1)+1);
+                startLocation.setX((x * -1)+1);
             } else if (rotation == 270) {
                 startLocation.setZ(x);
-                startLocation.setX(-z);
+                startLocation.setX(-z+1);
             }
         }
 
