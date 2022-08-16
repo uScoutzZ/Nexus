@@ -1,6 +1,5 @@
 package de.uscoutz.nexus;
 
-import de.uscoutz.nexus.gamemechanics.collector.CollectorManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
 import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
@@ -41,8 +40,6 @@ public class NexusPlugin extends JavaPlugin {
     @Getter
     private LocationManager locationManager;
     @Getter
-    private CollectorManager collectorManager;
-    @Getter
     private ToolManager toolManager;
 
     private NetworkServer networkServer;
@@ -60,7 +57,6 @@ public class NexusPlugin extends JavaPlugin {
         localeManager = new LocaleManager(this);
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
-        collectorManager = new CollectorManager(this);
         toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"),
                 new File("/home/networksync/nexus/blockresistance.yml"));
         toolManager.loadTools();
@@ -75,7 +71,6 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
@@ -83,7 +78,6 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("deletedata").setExecutor(new DeleteDataCommand(this));
         getCommand("checkplayer").setExecutor(new CheckPlayerCommand(this));
         getCommand("setlocation").setExecutor(new SetLocationCommand(this));
-        getCommand("collector").setExecutor(new CollectorCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
     }

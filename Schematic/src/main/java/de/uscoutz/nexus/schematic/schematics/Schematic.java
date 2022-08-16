@@ -1,6 +1,8 @@
 package de.uscoutz.nexus.schematic.schematics;
 
+import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.Collector;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,6 +13,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +94,13 @@ public class Schematic {
                     pastedSign.line(l, sign.line(l));
                 }
                 pastedSign.update();
+                if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
+                    new Collector(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level), plugin).setFilledAction(player1 -> {
+                        player1.sendMessage("§6Wer das liest ist blöd");
+                    }).spawn(pastedSign.getLocation());
+
+                    blockLocation.getBlock().setType(Material.AIR);
+                }
             }
 
             if (blockData instanceof Directional) {

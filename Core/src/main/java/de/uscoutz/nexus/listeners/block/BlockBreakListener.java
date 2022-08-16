@@ -25,20 +25,21 @@ public class BlockBreakListener implements Listener {
 
         event.getPlayer().getInventory().getItemInMainHand();
         ItemMeta itemMeta = event.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-        if(plugin.getToolManager().getBlockResistance().containsKey(event.getBlock().getType())) {
-            int blockResistance = plugin.getToolManager().getBlockResistance().get(event.getBlock().getType());
+        int blockResistance, breakingPower = 0;
+        if(!plugin.getToolManager().getBlockResistance().containsKey(event.getBlock().getType())) {
+            event.setCancelled(true);
+            return;
+        } else {
+            blockResistance = plugin.getToolManager().getBlockResistance().get(event.getBlock().getType());
             if(itemMeta != null && plugin.getToolManager().isTool(itemMeta)) {
-                PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                int breakingPower = plugin.getToolManager().getBreakingPower(itemMeta);
-                String key = plugin.getToolManager().getKey(itemMeta);
-                if(breakingPower >= blockResistance) {
-                    event.setCancelled(false);
-                    return;
-                } else {
-                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
-                }
+                breakingPower = plugin.getToolManager().getBreakingPower(itemMeta);
             }
         }
-        event.setCancelled(true);
+        if(breakingPower >= blockResistance) {
+            event.setCancelled(false);
+        } else {
+            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
+            event.setCancelled(true);
+        }
     }
 }

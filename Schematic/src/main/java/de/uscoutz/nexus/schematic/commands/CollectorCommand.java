@@ -1,7 +1,8 @@
-package de.uscoutz.nexus.commands;
+package de.uscoutz.nexus.schematic.commands;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.gamemechanics.collector.Collector;
+import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -14,9 +15,9 @@ import java.util.Arrays;
 
 public class CollectorCommand implements CommandExecutor {
 
-    private NexusPlugin plugin;
+    private NexusSchematicPlugin plugin;
 
-    public CollectorCommand(NexusPlugin plugin) {
+    public CollectorCommand(NexusSchematicPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -24,7 +25,7 @@ public class CollectorCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender instanceof Player) {
             Player player = (Player) sender;
-            new Collector(player.getLocation(), Arrays.asList(
+            new Collector(Arrays.asList(
                     ItemBuilder.create(Material.COAL)
                             .amount(16)
                             .build(),
@@ -36,7 +37,7 @@ public class CollectorCommand implements CommandExecutor {
                             .build()
             ), plugin).setFilledAction(player1 -> {
                 player1.sendMessage("§6Wer das liest ist blöd");
-            }).spawn();
+            }).spawn(player.getLocation());
         }
         return false;
     }

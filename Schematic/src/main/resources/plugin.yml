@@ -7,3 +7,4 @@ commands:
   schematicwand:
   createschematic:
   loadschematic:
+  collector:

@@ -1,7 +1,8 @@
-package de.uscoutz.nexus.listeners.player;
+package de.uscoutz.nexus.schematic.listener;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.gamemechanics.collector.Collector;
+import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.Collector;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,9 +13,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerDropListener implements Listener {
 
-    private NexusPlugin plugin;
+    private NexusSchematicPlugin plugin;
 
-    public PlayerDropListener(NexusPlugin plugin) {
+    public PlayerDropListener(NexusSchematicPlugin plugin) {
         this.plugin = plugin;
     }
 

@@ -1,6 +1,7 @@
-package de.uscoutz.nexus.gamemechanics.collector;
+package de.uscoutz.nexus.schematic.collector;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class Collector {
 
-    private NexusPlugin plugin;
+    private NexusSchematicPlugin plugin;
 
     @Getter
     private Location location;
@@ -30,9 +31,8 @@ public class Collector {
     private Material oldBlockType;
     private Consumer<Player> actionOnFull;
 
-    public Collector(Location location, List<ItemStack> neededItems, NexusPlugin plugin) {
+    public Collector(List<ItemStack> neededItems, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
-        this.location = location;
         hologram = new HashMap<>();
         this.neededItems = new LinkedHashMap<>();
 
@@ -41,7 +41,8 @@ public class Collector {
         }
     }
 
-    public void spawn() {
+    public void spawn(Location location) {
+        this.location = location;
         spawnHolograms();
         blockLocation = location.clone().subtract(0, 1, 0);
         Block block = blockLocation.getBlock();
