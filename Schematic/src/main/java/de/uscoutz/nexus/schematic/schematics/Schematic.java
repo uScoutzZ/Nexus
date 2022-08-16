@@ -11,13 +11,15 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Schematic {
 
@@ -171,9 +173,90 @@ public class Schematic {
 
                     blockLocation.getBlock().setType(Material.AIR);
                 }
-            }
+            } else if(block.getBlockData() instanceof MultipleFacing) {
+                MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
+                List<BlockFace> newFaces = new ArrayList<>();
+                if (rotation == 180) {
+                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
+                        newFaces.add(BlockFace.SOUTH);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.EAST)) {
+                        newFaces.add(BlockFace.WEST);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
+                        newFaces.add(BlockFace.NORTH);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.WEST)) {
+                        newFaces.add(BlockFace.EAST);
+                    }
+                } else if (rotation == 270) {
+                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
+                        newFaces.add(BlockFace.EAST);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.EAST)) {
+                        newFaces.add(BlockFace.SOUTH);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
+                        newFaces.add(BlockFace.WEST);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.WEST)) {
+                        newFaces.add(BlockFace.NORTH);
+                    }
+                } else if (rotation == 90) {
+                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
+                        newFaces.add(BlockFace.WEST);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.EAST)) {
+                        newFaces.add(BlockFace.NORTH);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
+                        newFaces.add(BlockFace.EAST);
+                    }
+                    if (multipleFacing.hasFace(BlockFace.WEST)) {
+                        newFaces.add(BlockFace.SOUTH);
+                    }
+                }
+                if (rotation != 0) {
+                    for (BlockFace face : multipleFacing.getFaces()) {
+                        multipleFacing.setFace(face, false);
+                    }
+                    for (BlockFace face : newFaces) {
+                        multipleFacing.setFace(face, true);
+                    }
+                    blockLocation.getBlock().setBlockData(multipleFacing);
+                }
+            } else if(blockData instanceof Wall) {
+                Wall wall = (Wall) blockData;
+                Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
+                if (rotation == 180) {
+                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.NORTH));
+                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.EAST));
+                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.SOUTH));
+                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.WEST));
 
-            if (blockData instanceof Directional) {
+                } else if (rotation == 270) {
+                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.NORTH));
+                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.EAST));
+                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.SOUTH));
+                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.WEST));
+                } else if (rotation == 90) {
+                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.NORTH));
+                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.EAST));
+                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.SOUTH));
+                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.WEST));
+                }
+                if (rotation != 0) {
+                    for (BlockFace face : BlockFace.values()) {
+                        if(face == BlockFace.EAST || face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.WEST) {
+                            wall.setHeight(face, Wall.Height.NONE);
+                        }
+                    }
+                    for (BlockFace face : newFaces.keySet()) {
+                        wall.setHeight(face, newFaces.get(face));
+                    }
+                    blockLocation.getBlock().setBlockData(wall);
+                }
+            } else if (blockData instanceof Directional) {
                 Directional directional = (Directional) blockData;
                 if(rotation == 180) {
                     directional.setFacing(directional.getFacing().getOppositeFace());
