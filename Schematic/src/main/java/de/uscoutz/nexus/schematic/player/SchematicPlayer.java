@@ -49,21 +49,26 @@ public class SchematicPlayer {
                             block = block.getLocation().subtract(0, 1, 0).getBlock();
                         }
 
-                        int rotation = 0;
-                        if(player.getFacing() == BlockFace.EAST) {
-                            rotation = 0;
-                        } else if(player.getFacing() == BlockFace.SOUTH) {
-                            rotation = 270;
-                        } else if(player.getFacing() == BlockFace.WEST) {
-                            rotation = 180;
-                        } else if(player.getFacing() == BlockFace.NORTH) {
-                            rotation = 90;
-                        }
-
+                        int rotation = getRotationFromFacing(player.getFacing());
                         schematicItem.getSchematic().preview(block.getLocation(), rotation);
                     }
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
+    }
+
+    public int getRotationFromFacing(BlockFace blockFace) {
+        int rotation = 0;
+        if(blockFace == BlockFace.EAST) {
+            rotation = 0;
+        } else if(blockFace == BlockFace.SOUTH) {
+            rotation = 270;
+        } else if(blockFace == BlockFace.WEST) {
+            rotation = 180;
+        } else if(blockFace == BlockFace.NORTH) {
+            rotation = 90;
+        }
+
+        return rotation;
     }
 }

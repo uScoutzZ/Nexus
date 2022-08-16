@@ -28,7 +28,7 @@ public class Schematic {
     @Getter
     private Map<Integer, Block> blocks;
     @Getter
-    private int level, substractX, substractY, substractZ;
+    private int level, substractX, substractY, substractZ, xLength, zLength;
     @Getter
     private Location corner1, corner2;
 
@@ -52,6 +52,10 @@ public class Schematic {
         substractX = minX;
         substractY = minY;
         substractZ = minZ;
+
+        xLength = maxX-minX;
+        zLength = maxZ-minZ;
+
         for(int i = minX; i <= maxX; i++) {
             for(int j = minY; j <= maxY; j++) {
                 for(int k = minZ; k <= maxZ; k++) {
@@ -79,12 +83,8 @@ public class Schematic {
             blockLocation.setZ(blockLocation.getZ() - substractZ);
             blockLocation.setWorld(location.getWorld());
 
-            if (rotation == 0) {
-                blockLocation.add(location.getX(), location.getY(), location.getZ());
-            } else {
-                blockLocation = rotate(blockLocation, rotation);
-                blockLocation.add(location.getX(), location.getY(), location.getZ());
-            }
+            blockLocation = rotate(blockLocation, rotation);
+            blockLocation.add(location.getX(), location.getY(), location.getZ());
 
             minX = Math.min(minX, blockLocation.getBlockX());
             minY = Math.min(minY, blockLocation.getBlockY());
@@ -93,10 +93,33 @@ public class Schematic {
             maxY = Math.max(maxY, blockLocation.getBlockY());
             maxZ = Math.max(maxZ, blockLocation.getBlockZ());
         }
-        Location point1 = new Location(location.getWorld(), maxX, minY+1.2, maxZ);
-        Location point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
-        Location point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ);
-        Location point4 = new Location(location.getWorld(), maxX, minY+1.2, minZ);
+
+        Location point1;
+        Location point2;
+        Location point3;
+        Location point4;
+
+        if(rotation == 90) { //RICHTIG
+            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
+            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
+            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
+        } else if(rotation == 270) {
+            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
+            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
+            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
+        } else if(rotation == 180) {//RICHTIG
+            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
+            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
+            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
+        } else {
+            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
+            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
+            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
+        }
 
         drawLine(point3, point2, 0.5);
         drawLine(point1, point3, 0.5);
@@ -126,13 +149,8 @@ public class Schematic {
             blockLocation.setY(blockLocation.getY()-substractY);
             blockLocation.setZ(blockLocation.getZ()-substractZ);
             blockLocation.setWorld(location.getWorld());
-
-            if(rotation == 0) {
-                blockLocation.add(location.getX(), location.getY(), location.getZ());
-            } else {
-                blockLocation = rotate(blockLocation, rotation);
-                blockLocation.add(location.getX(), location.getY(), location.getZ());
-            }
+            blockLocation = rotate(blockLocation, rotation);
+            blockLocation.add(location.getX(), location.getY(), location.getZ());
 
             blockLocation.getBlock().setType(block.getType());
             BlockData blockData = block.getBlockData();
@@ -186,18 +204,21 @@ public class Schematic {
     }
 
     private Location rotate(Location startLocation, int rotation) {
+        double x = startLocation.getX(), z = startLocation.getZ();
         if(rotation != 0) {
-            double x = startLocation.getX(), z = startLocation.getZ();
             if (rotation == 90) {
-                startLocation.setZ(-x+1);
-                startLocation.setX(z);
+                startLocation.setZ(-x);
+                startLocation.setX(z/*-zLength/2*/);
             } else if (rotation == 180) {
-                startLocation.setZ((z * -1)+1);
-                startLocation.setX((x * -1)+1);
+                startLocation.setZ((z * -1)/*+(zLength/2)*/);
+                startLocation.setX((x * -1));
             } else if (rotation == 270) {
                 startLocation.setZ(x);
-                startLocation.setX(-z+1);
+                startLocation.setX(-z/*+(zLength/2)*/);
             }
+        } else {
+            startLocation.setX(x);
+            startLocation.setZ(z/*-zLength/2*/);
         }
 
         return startLocation;
