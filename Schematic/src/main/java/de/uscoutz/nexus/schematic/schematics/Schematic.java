@@ -1,8 +1,10 @@
 package de.uscoutz.nexus.schematic.schematics;
 
+import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
+import de.uscoutz.nexus.schematic.laser.Laser;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -125,96 +127,137 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation) {
-        for(int i = 0; i < blocks.size(); i++) {
-            Block block = blocks.get(i);
+    public void build(Location location, int rotation, boolean animated) {
 
-            Location blockLocation = block.getLocation().clone();
-            blockLocation.setX(blockLocation.getX()-substractX);
-            blockLocation.setY(blockLocation.getY()-substractY);
-            blockLocation.setZ(blockLocation.getZ()-substractZ);
-            blockLocation.setWorld(location.getWorld());
-            blockLocation = rotate(blockLocation, rotation);
-            blockLocation.add(location.getX(), location.getY(), location.getZ());
+        final int[] i = {0};
+        Laser laser = null;
+        try {
+            if(animated) {
+                Location endCrystal = NexusPlugin.getInstance().getLocationManager().getLocation("nexus-crystal", location.getWorld());
+                laser = new Laser.GuardianLaser(endCrystal, location, -1, 100);
+                laser.start(plugin);
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
 
-            blockLocation.getBlock().setType(block.getType());
-            BlockData blockData = block.getBlockData();
-
-            blockLocation.getBlock().setBlockData(blockData);
-            if(block.getState() instanceof Sign) {
-                Block pastedBlock = blockLocation.getBlock();
-                Sign sign = (Sign) block.getState();
-                Sign pastedSign = (Sign) pastedBlock.getState();
-                for(int l = 0; l < sign.lines().size(); l++) {
-                    pastedSign.line(l, sign.line(l));
+        if(animated) {
+            Laser finalLaser = laser;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if(i[0] < blocks.size()) {
+                        Block block = blocks.get(i[0]);
+                        setBlock(block, rotation, location, finalLaser);
+                        i[0]++;
+                    } else {
+                        finalLaser.stop();
+                        cancel();
+                    }
                 }
-                pastedSign.update();
-                if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
-                    new Collector(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level), plugin).setFilledAction(player1 -> {
-                        player1.sendMessage("§6Wer das liest ist blöd");
-                    }).spawn(pastedSign.getLocation());
+            }.runTaskTimer(plugin, 0, 1);
+        } else {
+            for(int j = 0; j < blocks.size(); j++) {
+                setBlock(blocks.get(j) ,rotation, location, laser);
+            }
+        }
+    }
 
-                    blockLocation.getBlock().setType(Material.AIR);
+    private void setBlock(Block block, int rotation, Location location, Laser laser) {
+        Location blockLocation = block.getLocation().clone();
+        blockLocation.setX(blockLocation.getX()-substractX);
+        blockLocation.setY(blockLocation.getY()-substractY);
+        blockLocation.setZ(blockLocation.getZ()-substractZ);
+        blockLocation.setWorld(location.getWorld());
+        blockLocation = rotate(blockLocation, rotation);
+        blockLocation.add(location.getX(), location.getY(), location.getZ());
+
+        if(laser != null) {
+            try {
+                laser.moveEnd(blockLocation);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        blockLocation.getBlock().setType(block.getType());
+        BlockData blockData = block.getBlockData();
+
+        blockLocation.getBlock().setBlockData(blockData);
+        if(block.getState() instanceof Sign) {
+            Block pastedBlock = blockLocation.getBlock();
+            Sign sign = (Sign) block.getState();
+            Sign pastedSign = (Sign) pastedBlock.getState();
+            for(int l = 0; l < sign.lines().size(); l++) {
+                pastedSign.line(l, sign.line(l));
+            }
+            pastedSign.update();
+            if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
+                new Collector(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level), plugin)
+                        .setFilledAction(player1 -> {
+                            player1.sendMessage("§6Wer das liest ist blöd");
+                        }).spawn(pastedSign.getLocation());
+
+                blockLocation.getBlock().setType(Material.AIR);
+            }
+        } else {
+            Map<Integer, Integer> order = new HashMap<>();
+            order.put(90, 3);
+            order.put(180, 2);
+            order.put(270, 1);
+            List<BlockFace> blockFaces = new ArrayList<>();
+            blockFaces.add(BlockFace.NORTH);
+            blockFaces.add(BlockFace.EAST);
+            blockFaces.add(BlockFace.SOUTH);
+            blockFaces.add(BlockFace.WEST);
+
+            if(block.getBlockData() instanceof MultipleFacing) {
+                MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
+                List<BlockFace> newFaces = new ArrayList<>();
+
+                if (rotation != 0) {
+                    for(BlockFace blockFace : blockFaces) {
+                        if(multipleFacing.hasFace(blockFace)) {
+                            newFaces.add(getBlockFace(blockFace, order.get(rotation)));
+                        }
+                    }
+                    for (BlockFace face : multipleFacing.getFaces()) {
+                        multipleFacing.setFace(face, false);
+                    }
+                    for (BlockFace face : newFaces) {
+                        multipleFacing.setFace(face, true);
+                    }
+                    blockLocation.getBlock().setBlockData(multipleFacing);
                 }
-            } else {
-                Map<Integer, Integer> order = new HashMap<>();
-                order.put(90, 3);
-                order.put(180, 2);
-                order.put(270, 1);
-                List<BlockFace> blockFaces = new ArrayList<>();
-                blockFaces.add(BlockFace.NORTH);
-                blockFaces.add(BlockFace.EAST);
-                blockFaces.add(BlockFace.SOUTH);
-                blockFaces.add(BlockFace.WEST);
+            } else if(blockData instanceof Wall) {
+                Wall wall = (Wall) blockData;
+                Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
 
-                if(block.getBlockData() instanceof MultipleFacing) {
-                    MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
-                    List<BlockFace> newFaces = new ArrayList<>();
-
-                    if (rotation != 0) {
-                        for(BlockFace blockFace : blockFaces) {
-                            if(multipleFacing.hasFace(blockFace)) {
-                                newFaces.add(getBlockFace(blockFace, order.get(rotation)));
-                            }
-                        }
-                        for (BlockFace face : multipleFacing.getFaces()) {
-                            multipleFacing.setFace(face, false);
-                        }
-                        for (BlockFace face : newFaces) {
-                            multipleFacing.setFace(face, true);
-                        }
-                        blockLocation.getBlock().setBlockData(multipleFacing);
+                if (rotation != 0) {
+                    int newRotation = rotation;
+                    if(newRotation == 90) {
+                        newRotation = 270;
+                    } else if(newRotation == 270) {
+                        newRotation = 90;
                     }
-                } else if(blockData instanceof Wall) {
-                    Wall wall = (Wall) blockData;
-                    Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
-
-                    if (rotation != 0) {
-                        int newRotation = rotation;
-                        if(newRotation == 90) {
-                            newRotation = 270;
-                        } else if(newRotation == 270) {
-                            newRotation = 90;
-                        }
-                        for(BlockFace blockFace : blockFaces) {
-                            newFaces.put(blockFace, wall.getHeight(getBlockFace(blockFace,
-                                    order.get(newRotation))));
-                        }
-                        for (BlockFace face : blockFaces) {
-                            wall.setHeight(face, Wall.Height.NONE);
-                        }
-                        for (BlockFace face : newFaces.keySet()) {
-                            wall.setHeight(face, newFaces.get(face));
-                        }
-                        blockLocation.getBlock().setBlockData(wall);
+                    for(BlockFace blockFace : blockFaces) {
+                        newFaces.put(blockFace, wall.getHeight(getBlockFace(blockFace,
+                                order.get(newRotation))));
                     }
-                } else if (blockData instanceof Directional) {
-                    Directional directional = (Directional) blockData;
-
-                    if(rotation != 0) {
-                        directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
-                        blockLocation.getBlock().setBlockData(directional);
+                    for (BlockFace face : blockFaces) {
+                        wall.setHeight(face, Wall.Height.NONE);
                     }
+                    for (BlockFace face : newFaces.keySet()) {
+                        wall.setHeight(face, newFaces.get(face));
+                    }
+                    blockLocation.getBlock().setBlockData(wall);
+                }
+            } else if (blockData instanceof Directional) {
+                Directional directional = (Directional) blockData;
+
+                if(rotation != 0) {
+                    directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
+                    blockLocation.getBlock().setBlockData(directional);
                 }
             }
         }

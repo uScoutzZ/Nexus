@@ -1,4 +1,4 @@
-package de.uscoutz.nexus.schematic.listener;
+package de.uscoutz.nexus.schematic.listener.block;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
@@ -41,7 +41,7 @@ public class BlockPlaceListener implements Listener {
                 String key = dataContainer.get(new NamespacedKey(NexusPlugin.getInstance().getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemMap().get(key);
 
-                schematicItem.getSchematic().build(event.getBlock().getLocation().subtract(0, 1, 0), schematicPlayer.getRotationFromFacing(player.getFacing()));
+                schematicItem.getSchematic().build(event.getBlock().getLocation().subtract(0, 1, 0), schematicPlayer.getRotationFromFacing(player.getFacing()), true);
             }
         }
     }

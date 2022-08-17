@@ -1,7 +1,12 @@
 package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.schematic.listener.*;
+import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
+import de.uscoutz.nexus.schematic.listener.player.PlayerDropListener;
+import de.uscoutz.nexus.schematic.listener.player.PlayerInteractListener;
+import de.uscoutz.nexus.schematic.listener.player.PlayerItemHeldListener;
+import de.uscoutz.nexus.schematic.listener.player.PlayerJoinListener;
+import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
 import de.uscoutz.nexus.schematic.commands.CollectorCommand;
@@ -60,6 +65,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerItemHeldListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new ProfileLoadListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }

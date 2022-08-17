@@ -8,5 +8,5 @@ commands:
   createschematic:
   loadschematic:
   collector:
-softdepend:
+depend:
   - NexusCore

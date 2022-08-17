@@ -31,6 +31,10 @@ public class NexusWorld {
         assign();
     }
 
+    public void loadSchematics() {
+
+    }
+
     public void assign() {
         Block block = world.getSpawnLocation().add(0, 1, 0).getBlock();
         new BukkitRunnable() {

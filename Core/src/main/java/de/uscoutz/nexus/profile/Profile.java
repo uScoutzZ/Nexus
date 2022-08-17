@@ -2,6 +2,7 @@ package de.uscoutz.nexus.profile;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.player.NexusPlayer;
@@ -11,6 +12,7 @@ import eu.thesimplecloud.api.player.ICloudPlayer;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -97,6 +99,7 @@ public class Profile {
         }
 
         plugin.getDatabaseAdapter().delete("playerProfiles", "profileId", profileId);
+        plugin.getDatabaseAdapter().delete("schematics", "profileId", profileId);
         plugin.getDatabaseAdapter().deleteTwo("profiles", "owner", owner, "profileId", profileId);
         new BukkitRunnable() {
             @Override
@@ -152,6 +155,12 @@ public class Profile {
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
                 world = new NexusWorld(this, plugin);
                 plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.getPluginManager().callEvent(new ProfileLoadEvent(Profile.this));
+                    }
+                }.runTask(plugin);
             } else {
                 loading = false;
             }
@@ -179,6 +188,10 @@ public class Profile {
         plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
         plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
+
+        Location location = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
+        String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+        plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "NEXUS", 0, 0, nexusLocation, System.currentTimeMillis());
         this.owner = owner;
     }
 

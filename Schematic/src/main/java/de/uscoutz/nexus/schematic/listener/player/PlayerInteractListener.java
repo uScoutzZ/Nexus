@@ -1,4 +1,4 @@
-package de.uscoutz.nexus.schematic.listener;
+package de.uscoutz.nexus.schematic.listener.player;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
