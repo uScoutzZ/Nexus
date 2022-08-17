@@ -212,14 +212,9 @@ public class Schematic {
                     Directional directional = (Directional) blockData;
 
                     if(rotation != 0) {
-                        for(BlockFace blockFace : blockFaces) {
-                            if(directional.getFacing() == blockFace) {
-                                directional.setFacing(getBlockFace(blockFace, order.get(rotation)));
-                            }
-                        }
+                        directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
+                        blockLocation.getBlock().setBlockData(directional);
                     }
-
-                    blockLocation.getBlock().setBlockData(directional);
                 }
             }
         }
