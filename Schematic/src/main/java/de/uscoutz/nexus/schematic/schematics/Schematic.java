@@ -101,27 +101,10 @@ public class Schematic {
         Location point3;
         Location point4;
 
-        if(rotation == 90) { //RICHTIG
-            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
-            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
-            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
-            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
-        } else if(rotation == 270) {
-            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
-            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
-            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
-            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
-        } else if(rotation == 180) {//RICHTIG
-            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
-            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
-            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
-            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
-        } else {
-            point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
-            point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
-            point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
-            point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
-        }
+        point1 = new Location(location.getWorld(), maxX+0.9, minY+1.2, maxZ+0.9);
+        point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
+        point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
+        point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
 
         drawLine(point3, point2, 0.5);
         drawLine(point1, point3, 0.5);
@@ -173,115 +156,71 @@ public class Schematic {
 
                     blockLocation.getBlock().setType(Material.AIR);
                 }
-            } else if(block.getBlockData() instanceof MultipleFacing) {
-                MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
-                List<BlockFace> newFaces = new ArrayList<>();
-                if (rotation == 180) {
-                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
-                        newFaces.add(BlockFace.SOUTH);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.EAST)) {
-                        newFaces.add(BlockFace.WEST);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
-                        newFaces.add(BlockFace.NORTH);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.WEST)) {
-                        newFaces.add(BlockFace.EAST);
-                    }
-                } else if (rotation == 270) {
-                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
-                        newFaces.add(BlockFace.EAST);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.EAST)) {
-                        newFaces.add(BlockFace.SOUTH);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
-                        newFaces.add(BlockFace.WEST);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.WEST)) {
-                        newFaces.add(BlockFace.NORTH);
-                    }
-                } else if (rotation == 90) {
-                    if (multipleFacing.hasFace(BlockFace.NORTH)) {
-                        newFaces.add(BlockFace.WEST);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.EAST)) {
-                        newFaces.add(BlockFace.NORTH);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.SOUTH)) {
-                        newFaces.add(BlockFace.EAST);
-                    }
-                    if (multipleFacing.hasFace(BlockFace.WEST)) {
-                        newFaces.add(BlockFace.SOUTH);
-                    }
-                }
-                if (rotation != 0) {
-                    for (BlockFace face : multipleFacing.getFaces()) {
-                        multipleFacing.setFace(face, false);
-                    }
-                    for (BlockFace face : newFaces) {
-                        multipleFacing.setFace(face, true);
-                    }
-                    blockLocation.getBlock().setBlockData(multipleFacing);
-                }
-            } else if(blockData instanceof Wall) {
-                Wall wall = (Wall) blockData;
-                Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
-                if (rotation == 180) {
-                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.NORTH));
-                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.EAST));
-                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.SOUTH));
-                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.WEST));
+            } else {
+                Map<Integer, Integer> order = new HashMap<>();
+                order.put(90, 3);
+                order.put(180, 2);
+                order.put(270, 1);
+                List<BlockFace> blockFaces = new ArrayList<>();
+                blockFaces.add(BlockFace.NORTH);
+                blockFaces.add(BlockFace.EAST);
+                blockFaces.add(BlockFace.SOUTH);
+                blockFaces.add(BlockFace.WEST);
 
-                } else if (rotation == 270) {
-                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.NORTH));
-                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.EAST));
-                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.SOUTH));
-                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.WEST));
-                } else if (rotation == 90) {
-                    newFaces.put(BlockFace.WEST, wall.getHeight(BlockFace.NORTH));
-                    newFaces.put(BlockFace.NORTH, wall.getHeight(BlockFace.EAST));
-                    newFaces.put(BlockFace.EAST, wall.getHeight(BlockFace.SOUTH));
-                    newFaces.put(BlockFace.SOUTH, wall.getHeight(BlockFace.WEST));
-                }
-                if (rotation != 0) {
-                    for (BlockFace face : BlockFace.values()) {
-                        if(face == BlockFace.EAST || face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.WEST) {
+                if(block.getBlockData() instanceof MultipleFacing) {
+                    MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
+                    List<BlockFace> newFaces = new ArrayList<>();
+
+                    if (rotation != 0) {
+                        for(BlockFace blockFace : blockFaces) {
+                            if(multipleFacing.hasFace(blockFace)) {
+                                newFaces.add(getBlockFace(blockFace, order.get(rotation)));
+                            }
+                        }
+                        for (BlockFace face : multipleFacing.getFaces()) {
+                            multipleFacing.setFace(face, false);
+                        }
+                        for (BlockFace face : newFaces) {
+                            multipleFacing.setFace(face, true);
+                        }
+                        blockLocation.getBlock().setBlockData(multipleFacing);
+                    }
+                } else if(blockData instanceof Wall) {
+                    Wall wall = (Wall) blockData;
+                    Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
+
+                    if (rotation != 0) {
+                        int newRotation = rotation;
+                        if(newRotation == 90) {
+                            newRotation = 270;
+                        } else if(newRotation == 270) {
+                            newRotation = 90;
+                        }
+                        for(BlockFace blockFace : blockFaces) {
+                            newFaces.put(blockFace, wall.getHeight(getBlockFace(blockFace,
+                                    order.get(newRotation))));
+                        }
+                        for (BlockFace face : blockFaces) {
                             wall.setHeight(face, Wall.Height.NONE);
                         }
+                        for (BlockFace face : newFaces.keySet()) {
+                            wall.setHeight(face, newFaces.get(face));
+                        }
+                        blockLocation.getBlock().setBlockData(wall);
                     }
-                    for (BlockFace face : newFaces.keySet()) {
-                        wall.setHeight(face, newFaces.get(face));
+                } else if (blockData instanceof Directional) {
+                    Directional directional = (Directional) blockData;
+
+                    if(rotation != 0) {
+                        for(BlockFace blockFace : blockFaces) {
+                            if(directional.getFacing() == blockFace) {
+                                directional.setFacing(getBlockFace(blockFace, order.get(rotation)));
+                            }
+                        }
                     }
-                    blockLocation.getBlock().setBlockData(wall);
+
+                    blockLocation.getBlock().setBlockData(directional);
                 }
-            } else if (blockData instanceof Directional) {
-                Directional directional = (Directional) blockData;
-                if(rotation == 180) {
-                    directional.setFacing(directional.getFacing().getOppositeFace());
-                } else if(rotation == 270) {
-                    if(directional.getFacing() == BlockFace.SOUTH) {
-                        directional.setFacing(BlockFace.WEST);
-                    } else if(directional.getFacing() == BlockFace.NORTH) {
-                        directional.setFacing(BlockFace.EAST);
-                    } else if(directional.getFacing() == BlockFace.WEST) {
-                        directional.setFacing(BlockFace.NORTH);
-                    } else if(directional.getFacing() == BlockFace.EAST) {
-                        directional.setFacing(BlockFace.SOUTH);
-                    }
-                } else if(rotation == 90) {
-                    if(directional.getFacing() == BlockFace.SOUTH) {
-                        directional.setFacing(BlockFace.EAST);
-                    } else if(directional.getFacing() == BlockFace.NORTH) {
-                        directional.setFacing(BlockFace.WEST);
-                    } else if(directional.getFacing() == BlockFace.WEST) {
-                        directional.setFacing(BlockFace.SOUTH);
-                    } else if(directional.getFacing() == BlockFace.EAST) {
-                        directional.setFacing(BlockFace.NORTH);
-                    }
-                }
-                blockLocation.getBlock().setBlockData(directional);
             }
         }
     }
@@ -305,5 +244,19 @@ public class Schematic {
         }
 
         return startLocation;
+    }
+
+    private BlockFace getBlockFace(BlockFace blockFace, int rotate) {
+        List<BlockFace> blockFaces = new ArrayList<>();
+        blockFaces.add(BlockFace.NORTH);
+        blockFaces.add(BlockFace.EAST);
+        blockFaces.add(BlockFace.SOUTH);
+        blockFaces.add(BlockFace.WEST);
+        int index = blockFaces.indexOf(blockFace);
+        if(index+rotate >= blockFaces.size()) {
+            return blockFaces.get((index+rotate)-blockFaces.size());
+        } else {
+            return blockFaces.get(index+rotate);
+        }
     }
 }
