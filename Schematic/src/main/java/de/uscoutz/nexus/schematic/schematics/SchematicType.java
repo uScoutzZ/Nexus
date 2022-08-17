@@ -20,10 +20,12 @@ public enum SchematicType {
     private int zDistance;
     @Getter @Setter
     private Location location1, location2;
+    @Getter
+    private FileConfiguration fileConfiguration;
 
     public void loadFile() {
         File file = NexusSchematicPlugin.getInstance().getFileManager().getSchematicFilesMap().get(this);
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        fileConfiguration = YamlConfiguration.loadConfiguration(file);
         if(fileConfiguration.getString("corner1.world") != null) {
             zDistance = fileConfiguration.getInt("zDistance");
             for(int i = 0; i < 2; i++) {

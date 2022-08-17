@@ -31,7 +31,9 @@ public class SchematicManager {
                             .equals(schematicType.getLocation1().getBlock().getType())) {
                         break;
                     } else {
-                        new Schematic(schematicType, i, plugin);
+                        Schematic schematic = new Schematic(schematicType, i, plugin);
+                        long timeToFinish = schematic.getSchematicType().getFileConfiguration().getLong("timesToFinish." + i);
+                        schematic.setTimeToFinish(timeToFinish);
                     }
                 }
             }

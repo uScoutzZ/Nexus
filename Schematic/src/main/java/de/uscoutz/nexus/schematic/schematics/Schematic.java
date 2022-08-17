@@ -1,12 +1,11 @@
 package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
+import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -14,7 +13,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
-import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -22,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Schematic {
 
@@ -35,6 +34,8 @@ public class Schematic {
     private int level, substractX, substractY, substractZ, xLength, zLength;
     @Getter
     private Location corner1, corner2;
+    @Getter @Setter
+    private long timeToFinish;
 
 
     public Schematic(SchematicType schematicType, int level, NexusSchematicPlugin plugin) {
@@ -125,6 +126,29 @@ public class Schematic {
             world.spawnParticle(Particle.DUST_COLOR_TRANSITION, p1.getX(), p1.getY(), p1.getZ(), 1, new Particle.DustTransition(Color.GREEN, Color.LIME, 2));
             length += space;
         }
+    }
+
+    public void build(Location location, int rotation, long timeFinished) {
+        long millis = System.currentTimeMillis()-timeFinished;
+        final String[] counter = {String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))};
+        ArmorStand countdown = (ArmorStand) location.getWorld().spawnEntity(rotate(location.add(0, 0, zLength/2), rotation), EntityType.ARMOR_STAND);
+        countdown.setCustomNameVisible(true);
+        countdown.setCustomName(counter[0]);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                        TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+                countdown.setCustomName(counter[0]);
+            }
+        }.runTaskTimer(plugin, 20, 20);
+
+
+
+        build(location, rotation, true);
     }
 
     public void build(Location location, int rotation, boolean animated) {
