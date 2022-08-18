@@ -80,9 +80,7 @@ public class NexusServer {
         String emptiestServer = getThisServiceName();
         int profileCount = getProfileCount();
         for(String server : profileCountByServer.keySet()) {
-            Bukkit.broadcastMessage("§2" + server + " | " + profileCountByServer.get(server));
             if(profileCountByServer.get(server) < profileCount) {
-                Bukkit.broadcastMessage("§3ja guter count für " + server);
                 emptiestServer = server;
                 profileCount = profileCountByServer.get(server);
             }

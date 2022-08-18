@@ -41,7 +41,7 @@ public class ProfileLoadListener implements Listener {
                         y = Integer.parseInt(stringLocation.split(", ")[1]),
                         z = Integer.parseInt(stringLocation.split(", ")[2]);
                 Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level);
-                schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, false);
+                schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, placed+schematic.getTimeToFinish());
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

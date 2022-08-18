@@ -61,8 +61,8 @@ public class Schematic {
         xLength = maxX-minX;
         zLength = maxZ-minZ;
 
-        for(int i = minX; i <= maxX; i++) {
-            for(int j = minY; j <= maxY; j++) {
+        for(int j = minY; j <= maxY; j++) {
+            for(int i = minX; i <= maxX; i++) {
                 for(int k = minZ; k <= maxZ; k++) {
                     Block block = corner1.getWorld().getBlockAt(i, j, k);
                     if(block.getType() != Material.AIR) {
@@ -115,7 +115,7 @@ public class Schematic {
         drawLine(point2, point4, 0.5);
     }
 
-    public void drawLine(Location point1, Location point2, double space) {
+    private void drawLine(Location point1, Location point2, double space) {
         World world = point1.getWorld();
         double distance = point1.distance(point2);
         Vector p1 = point1.toVector();
@@ -128,62 +128,83 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation, long timeFinished) {
-        long millis = System.currentTimeMillis()-timeFinished;
-        final String[] counter = {String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))};
-        ArmorStand countdown = (ArmorStand) location.getWorld().spawnEntity(rotate(location.add(0, 0, zLength/2), rotation), EntityType.ARMOR_STAND);
-        countdown.setCustomNameVisible(true);
-        countdown.setCustomName(counter[0]);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                        TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-                countdown.setCustomName(counter[0]);
-            }
-        }.runTaskTimer(plugin, 20, 20);
+    public void build(Location location, int rotation, long finished) {
+        Bukkit.broadcastMessage("§ePasting " + blocks.size() + " blocks");
+        if(finished <= System.currentTimeMillis()) {
+            build(location, rotation);
+        } else {
+            final long[] millis = {finished - System.currentTimeMillis()};
 
-
-
-        build(location, rotation, true);
-    }
-
-    public void build(Location location, int rotation, boolean animated) {
-
-        final int[] i = {0};
-        Laser laser = null;
-        try {
-            if(animated) {
-                Location endCrystal = NexusPlugin.getInstance().getLocationManager().getLocation("nexus-crystal", location.getWorld());
-                laser = new Laser.GuardianLaser(endCrystal, location, -1, 100);
-                laser.start(plugin);
-            }
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-
-        if(animated) {
-            Laser finalLaser = laser;
+            final String[] counter = {String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
+                    TimeUnit.MILLISECONDS.toMinutes(millis[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis[0])),
+                    TimeUnit.MILLISECONDS.toSeconds(millis[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis[0])))};
+            double divided = (double)zLength/2;
+            Location asLocation = new Location(location.getWorld(), 0, 0, divided);
+            ArmorStand countdown = (ArmorStand) location.getWorld().spawnEntity(rotate(asLocation, rotation)
+                    .add(location.getX()+0.5, location.getY(), location.getZ()+0.5), EntityType.ARMOR_STAND);
+            countdown.setVisible(false);
+            countdown.setGravity(false);
+            countdown.setCustomNameVisible(true);
+            countdown.setCustomName(counter[0]);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if(i[0] < blocks.size()) {
-                        Block block = blocks.get(i[0]);
-                        setBlock(block, rotation, location, finalLaser);
-                        i[0]++;
-                    } else {
-                        finalLaser.stop();
+                    if(millis[0] <= 0) {
+                        countdown.remove();
                         cancel();
+                    } else {
+                        millis[0] = millis[0]-1000;
+                        counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
+                                TimeUnit.MILLISECONDS.toMinutes(millis[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis[0])),
+                                TimeUnit.MILLISECONDS.toSeconds(millis[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis[0])));
+                        countdown.setCustomName(counter[0]);
                     }
                 }
-            }.runTaskTimer(plugin, 0, 1);
-        } else {
-            for(int j = 0; j < blocks.size(); j++) {
-                setBlock(blocks.get(j) ,rotation, location, laser);
+            }.runTaskTimer(plugin, 20, 20);
+            final int[] i = {0};
+            Laser laser;
+            try {
+                Location endCrystal = NexusPlugin.getInstance().getLocationManager().getLocation("nexus-crystal", location.getWorld());
+                laser = new Laser.GuardianLaser(endCrystal, location, -1, 100);
+                laser.start(plugin);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
             }
+
+            Laser finalLaser = laser;
+            double blocksPerSecond = ((double)TimeUnit.MILLISECONDS.toSeconds(timeToFinish)/blocks.size())*20;
+            double d = Math.pow(10, 0);
+            blocksPerSecond = Math.round(blocksPerSecond * d) / d;
+            double finalBlocksPerSecond = blocksPerSecond;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if(i[0] == 0 && System.currentTimeMillis()+timeToFinish > finished+1000) {
+                        long secondsSinceStart =
+                                TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
+                        double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
+                        for(int j = 0; j < alreadyPlaced; j++) {
+                            setBlock(blocks.get(j) ,rotation, location, null);
+                        }
+                        i[0] = (int) alreadyPlaced;
+                    } else {
+                        if(i[0] < blocks.size()) {
+                            Block block = blocks.get(i[0]);
+                            setBlock(block, rotation, location, finalLaser);
+                            i[0]++;
+                        } else {
+                            finalLaser.stop();
+                            cancel();
+                        }
+                    }
+                }
+            }.runTaskTimer(plugin, 0, (long) blocksPerSecond);
+        }
+    }
+
+    public void build(Location location, int rotation) {
+        for(int j = 0; j < blocks.size(); j++) {
+            setBlock(blocks.get(j) ,rotation, location, null);
         }
     }
 

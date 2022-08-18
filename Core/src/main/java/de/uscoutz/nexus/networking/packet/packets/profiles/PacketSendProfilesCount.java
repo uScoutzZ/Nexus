@@ -21,7 +21,6 @@ public class PacketSendProfilesCount extends Packet {
     @Override
     public Object execute() {
         NexusPlugin.getInstance().getNexusServer().getProfileCountByServer().put(serverName, profileCount);
-        Bukkit.broadcastMessage(serverName + " hat " + profileCount + " Profile geladen");
 
         return this;
     }

@@ -49,7 +49,7 @@ public class BlockPlaceListener implements Listener {
                             schematicPlayer.getRotationFromFacing(player.getFacing()), finished);
                 } else {
                     schematic.build(event.getBlock().getLocation().subtract(0, 1, 0),
-                            schematicPlayer.getRotationFromFacing(player.getFacing()), true);
+                            schematicPlayer.getRotationFromFacing(player.getFacing()));
                 }
             }
         }

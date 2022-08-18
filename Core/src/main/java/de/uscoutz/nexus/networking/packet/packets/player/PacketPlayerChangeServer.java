@@ -25,7 +25,6 @@ public class PacketPlayerChangeServer extends Packet {
         if(nexusPlayer != null) {
             nexusPlayer.setCurrentProfileSlot(profileToLoad);
         }
-        Bukkit.broadcastMessage("Set to load " + profileToLoad);
 
         return this;
     }
