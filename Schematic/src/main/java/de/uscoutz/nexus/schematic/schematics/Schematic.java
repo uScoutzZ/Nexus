@@ -16,9 +16,12 @@ import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -128,10 +131,10 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation, long finished) {
+    public void build(Location location, int rotation, long finished, UUID schematicId) {
         Bukkit.broadcastMessage("§ePasting " + blocks.size() + " blocks");
         if(finished <= System.currentTimeMillis()) {
-            build(location, rotation);
+            build(location, rotation, schematicId);
         } else {
             final long[] millis = {finished - System.currentTimeMillis()};
 
@@ -184,13 +187,13 @@ public class Schematic {
                                 TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
                         double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
                         for(int j = 0; j < alreadyPlaced; j++) {
-                            setBlock(blocks.get(j) ,rotation, location, null);
+                            setBlock(blocks.get(j) ,rotation, location, null, schematicId);
                         }
                         i[0] = (int) alreadyPlaced;
                     } else {
                         if(i[0] < blocks.size()) {
                             Block block = blocks.get(i[0]);
-                            setBlock(block, rotation, location, finalLaser);
+                            setBlock(block, rotation, location, finalLaser, schematicId);
                             i[0]++;
                         } else {
                             finalLaser.stop();
@@ -202,13 +205,13 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation) {
+    public void build(Location location, int rotation, UUID schematicId) {
         for(int j = 0; j < blocks.size(); j++) {
-            setBlock(blocks.get(j) ,rotation, location, null);
+            setBlock(blocks.get(j) ,rotation, location, null, schematicId);
         }
     }
 
-    private void setBlock(Block block, int rotation, Location location, Laser laser) {
+    private void setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {
         Location blockLocation = block.getLocation().clone();
         blockLocation.setX(blockLocation.getX()-substractX);
         blockLocation.setY(blockLocation.getY()-substractY);
@@ -238,10 +241,26 @@ public class Schematic {
             }
             pastedSign.update();
             if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
-                new Collector(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level), plugin)
+                List<ItemStack> neededItems = new ArrayList<>();
+                if(NexusPlugin.getInstance().getDatabaseAdapter().keyExists("collectors", "schematicId", schematicId)) {
+                    ResultSet resultSet = NexusPlugin.getInstance().getDatabaseAdapter().get("collectors", "schematicId", String.valueOf(schematicId));
+                    try {
+                        if(resultSet.next()) {
+                            neededItems = plugin.getCollectorManager().getNeededItemsFromString(resultSet.getString("neededItems"));
+                        }
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                    }
+                } else {
+                    neededItems = new ArrayList<>(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level));
+                    NexusPlugin.getInstance().getDatabaseAdapter().set("collectors", schematicId, Collector.toString(neededItems));
+                }
+
+                Collector collector = new Collector(neededItems, schematicId, plugin)
                         .setFilledAction(player1 -> {
                             player1.sendMessage("§6Wer das liest ist blöd");
-                        }).spawn(pastedSign.getLocation());
+                        });
+                collector.spawn(pastedSign.getLocation());
 
                 blockLocation.getBlock().setType(Material.AIR);
             }

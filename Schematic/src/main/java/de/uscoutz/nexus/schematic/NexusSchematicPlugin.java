@@ -9,7 +9,6 @@ import de.uscoutz.nexus.schematic.listener.player.PlayerJoinListener;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
-import de.uscoutz.nexus.schematic.commands.CollectorCommand;
 import de.uscoutz.nexus.schematic.commands.CreateSchematicCommand;
 import de.uscoutz.nexus.schematic.commands.LoadSchematicCommand;
 import de.uscoutz.nexus.schematic.commands.SchematicWand;
@@ -59,7 +58,6 @@ public class NexusSchematicPlugin extends JavaPlugin {
         getCommand("schematicwand").setExecutor(new SchematicWand(this));
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));
         getCommand("loadschematic").setExecutor(new LoadSchematicCommand(this));
-        getCommand("collector").setExecutor(new CollectorCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);

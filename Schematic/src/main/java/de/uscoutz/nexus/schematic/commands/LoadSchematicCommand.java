@@ -10,6 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public class LoadSchematicCommand implements CommandExecutor {
 
     private NexusSchematicPlugin plugin;
@@ -34,7 +36,7 @@ public class LoadSchematicCommand implements CommandExecutor {
                         if(args.length == 3) {
                             rotation = Integer.parseInt(args[2]);
                         }
-                        schematic.build(player.getLocation(), rotation);
+                        schematic.build(player.getLocation(), rotation, UUID.randomUUID());
                     } catch (IllegalArgumentException exception) {
                         sendHelp(player);
                         exception.printStackTrace();

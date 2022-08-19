@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.collector;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -13,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Collector {
 
@@ -24,17 +22,22 @@ public class Collector {
 
     @Getter
     private Location location;
+    @Getter
+    private boolean destroyed;
 
+    private UUID schematicId;
     private LinkedHashMap<Material, Integer> neededItems;
     private Map<Material, ArmorStand> hologram;
     private Location blockLocation;
     private Material oldBlockType;
     private Consumer<Player> actionOnFull;
 
-    public Collector(List<ItemStack> neededItems, NexusSchematicPlugin plugin) {
+    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         hologram = new HashMap<>();
         this.neededItems = new LinkedHashMap<>();
+        destroyed = false;
+        this.schematicId = schematicId;
 
         for(ItemStack neededItem : neededItems) {
             this.neededItems.put(neededItem.getType(), neededItem.getAmount());
@@ -88,6 +91,7 @@ public class Collector {
                 if(neededItems.size() == 0) {
                     actionOnFull.accept(player);
                     destroy();
+                    NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
                 } else {
                     destroyHolograms();
                     spawnHolograms();
@@ -95,10 +99,39 @@ public class Collector {
             } else {
                 hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
             }
+
+            if(!destroyed) {
+                NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
+                        new DatabaseUpdate("neededItems", toString()));
+            }
         } else {
             player.getInventory().addItem(item.getItemStack());
         }
         item.remove();
+    }
+
+    public String toString() {
+        StringBuilder collector = new StringBuilder();
+        for(Material material : neededItems.keySet()) {
+            if(!collector.toString().equals("")) {
+                collector.append(", ");
+            }
+            collector.append(material).append(":").append(neededItems.get(material));
+        }
+
+        return collector.toString();
+    }
+
+    public static String toString(List<ItemStack> needed) {
+        StringBuilder collector = new StringBuilder();
+        for(ItemStack material : needed) {
+            if(!collector.toString().equals("")) {
+                collector.append(", ");
+            }
+            collector.append(material.getType()).append(":").append(material.getAmount());
+        }
+
+        return collector.toString();
     }
 
     private void destroyHolograms() {
@@ -110,6 +143,7 @@ public class Collector {
     }
 
     public void destroy() {
+        destroyed = true;
         blockLocation.getBlock().setType(oldBlockType);
         destroyHolograms();
     }

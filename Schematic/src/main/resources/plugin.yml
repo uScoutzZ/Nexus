@@ -7,6 +7,5 @@ commands:
   schematicwand:
   createschematic:
   loadschematic:
-  collector:
 depend:
   - NexusCore

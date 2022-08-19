@@ -27,12 +27,9 @@ public class NexusWorld {
         this.plugin = plugin;
         this.profile = profile;
         world = plugin.getWorldManager().getEmptyWorlds().remove(0);
+        plugin.getWorldManager().getWorldProfileMap().put(world, profile);
         spawn = world.getSpawnLocation();
         assign();
-    }
-
-    public void loadSchematics() {
-
     }
 
     public void assign() {

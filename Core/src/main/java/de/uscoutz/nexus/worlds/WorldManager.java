@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.worlds;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.utilities.FileUtilities;
 import lombok.Getter;
 import org.bukkit.World;
@@ -17,11 +18,14 @@ public class WorldManager {
     @Getter
     private List<World> emptyWorlds;
     @Getter
+    private Map<World, Profile> worldProfileMap;
+    @Getter
     private File template;
 
     public WorldManager(NexusPlugin plugin) {
         this.plugin = plugin;
         emptyWorlds = new ArrayList<>();
+        worldProfileMap = new HashMap<>();
         template = new File("template");
         FileUtilities.deleteFolder(Paths.get("template/uid.dat"));
         FileUtilities.deleteFolder(Paths.get("template/session.lock"));

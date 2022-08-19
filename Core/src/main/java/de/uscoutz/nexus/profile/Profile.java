@@ -115,6 +115,7 @@ public class Profile {
                 all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
             }
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
+            plugin.getWorldManager().getWorldProfileMap().remove(world.getWorld());
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
         }
 
