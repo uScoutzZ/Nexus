@@ -1,11 +1,15 @@
 package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.world.entity.item.EntityFallingBlock;
+import net.minecraft.world.level.block.state.IBlockData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -14,8 +18,9 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.type.Wall;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -179,6 +184,7 @@ public class Schematic {
             double d = Math.pow(10, 0);
             blocksPerSecond = Math.round(blocksPerSecond * d) / d;
             double finalBlocksPerSecond = blocksPerSecond;
+            plugin.getSchematicManager().getBuiltSchematics().put(schematicId, new ArrayList<>());
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -187,13 +193,15 @@ public class Schematic {
                                 TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
                         double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
                         for(int j = 0; j < alreadyPlaced; j++) {
-                            setBlock(blocks.get(j) ,rotation, location, null, schematicId);
+                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
+                                    setBlock(blocks.get(j) ,rotation, location, null, schematicId));
                         }
                         i[0] = (int) alreadyPlaced;
                     } else {
                         if(i[0] < blocks.size()) {
                             Block block = blocks.get(i[0]);
-                            setBlock(block, rotation, location, finalLaser, schematicId);
+                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
+                                    setBlock(block, rotation, location, finalLaser, schematicId));
                             i[0]++;
                         } else {
                             finalLaser.stop();
@@ -206,12 +214,14 @@ public class Schematic {
     }
 
     public void build(Location location, int rotation, UUID schematicId) {
+        plugin.getSchematicManager().getBuiltSchematics().put(schematicId, new ArrayList<>());
         for(int j = 0; j < blocks.size(); j++) {
-            setBlock(blocks.get(j) ,rotation, location, null, schematicId);
+            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
+                    setBlock(blocks.get(j) ,rotation, location, null, schematicId));
         }
     }
 
-    private void setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {
+    private Location setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {
         Location blockLocation = block.getLocation().clone();
         blockLocation.setX(blockLocation.getX()-substractX);
         blockLocation.setY(blockLocation.getY()-substractY);
@@ -258,9 +268,22 @@ public class Schematic {
 
                 Collector collector = new Collector(neededItems, schematicId, plugin)
                         .setFilledAction(player1 -> {
-                            player1.sendMessage("§6Wer das liest ist blöd");
+                            destroy(schematicId, plugin);
+                            Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level+1);
+                            nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId);
+                            NexusPlugin.getInstance().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
+                                    NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld()).getProfileId(),
+                                    "schematicId", schematicId,
+                                    new DatabaseUpdate("level", level+1),
+                                    new DatabaseUpdate("placed", System.currentTimeMillis()));
                         });
                 collector.spawn(pastedSign.getLocation());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.broadcastMessage(schematicType + ": " + collector.toString());
+                    }
+                }.runTaskLater(plugin, 60);
 
                 blockLocation.getBlock().setType(Material.AIR);
             }
@@ -325,6 +348,8 @@ public class Schematic {
                 }
             }
         }
+
+        return blockLocation;
     }
 
     private Location rotate(Location startLocation, int rotation) {
@@ -359,6 +384,32 @@ public class Schematic {
             return blockFaces.get((index+rotate)-blockFaces.size());
         } else {
             return blockFaces.get(index+rotate);
+        }
+    }
+
+    public static void destroy(UUID schematicId, NexusSchematicPlugin plugin) {
+
+        int minHeight = plugin.getSchematicManager().getBuiltSchematics().get(schematicId).get(0).getBlockY();
+        List<Location> toRemove = new ArrayList<>();
+        for (Location blockLocation : plugin.getSchematicManager().getBuiltSchematics().get(schematicId)) {
+            if (blockLocation.getBlockY() == minHeight) {
+                toRemove.add(blockLocation);
+            }
+        }
+
+        plugin.getSchematicManager().getBuiltSchematics().get(schematicId).removeAll(toRemove);
+
+        for (Location location : plugin.getSchematicManager().getBuiltSchematics().get(schematicId)) {
+            BlockData blockData = location.getBlock().getBlockData();
+            location.getBlock().setType(Material.AIR);
+
+            FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location, blockData);
+            /*double x = -0.25+new Random().nextDouble(0.5);
+            double z = -0.25+new Random().nextDouble(0.5);*/
+            double x = 0;
+            double z = 0;
+            fallingBlock.setVelocity(new Vector(x, 0.8, z));
+            fallingBlock.setDropItem(false);
         }
     }
 }

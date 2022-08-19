@@ -14,7 +14,10 @@ public enum SchematicType {
 
     NEXUS,
     TOWER,
-    WALL;
+    WALL,
+    WORKSHOP,
+    HOME,
+    PORTAL;
 
     @Getter
     private int zDistance;

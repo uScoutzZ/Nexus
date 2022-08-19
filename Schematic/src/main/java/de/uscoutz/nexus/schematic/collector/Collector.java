@@ -136,7 +136,10 @@ public class Collector {
 
     private void destroyHolograms() {
         for(ArmorStand armorStand : hologram.values()) {
-            armorStand.getPassengers().get(0).remove();
+            if(armorStand.getPassengers().size() != 0) {
+                armorStand.getPassengers().get(0).remove();
+            }
+
             armorStand.remove();
         }
         hologram.clear();

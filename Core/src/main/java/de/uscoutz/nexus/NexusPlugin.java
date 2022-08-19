@@ -79,6 +79,7 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("deletedata").setExecutor(new DeleteDataCommand(this));
         getCommand("checkplayer").setExecutor(new CheckPlayerCommand(this));
         getCommand("setlocation").setExecutor(new SetLocationCommand(this));
+        getCommand("profileunload").setExecutor(new ProfileUnloadCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
     }

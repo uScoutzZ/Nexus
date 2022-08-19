@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class SchematicPlayer {
     @Getter
     private Player player;
 
+    private BukkitTask task;
+
     public SchematicPlayer(UUID playerUUID, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         this.playerUUID = playerUUID;
@@ -37,10 +40,10 @@ public class SchematicPlayer {
     }
 
     public void startPreview(ItemStack itemStack, SchematicItem schematicItem) {
-        new BukkitRunnable() {
+        task = new BukkitRunnable() {
             @Override
             public void run() {
-                if(!Objects.equals(player.getInventory().getItem(player.getInventory().getHeldItemSlot()), itemStack)) {
+                if(!player.isOnline() || !Objects.equals(player.getInventory().getItem(player.getInventory().getHeldItemSlot()), itemStack)) {
                     cancel();
                 } else {
                     Block block = player.getTargetBlock(5);

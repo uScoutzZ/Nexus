@@ -4,9 +4,12 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class SchematicManager {
 
@@ -14,10 +17,13 @@ public class SchematicManager {
 
     @Getter
     private Map<SchematicType, Map<Integer, Schematic>> schematicsMap;
+    @Getter
+    private Map<UUID, List<Location>> builtSchematics;
 
     public SchematicManager(NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         schematicsMap = new HashMap<>();
+        builtSchematics = new HashMap<>();
         for(SchematicType schematicType : SchematicType.values()) {
             schematicsMap.put(schematicType, new HashMap<>());
         }

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.listeners.block;
 
 import de.uscoutz.nexus.NexusPlugin;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -23,6 +24,10 @@ public class BlockBreakListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
 
+        if(player.getGameMode() == GameMode.CREATIVE) {
+            event.setCancelled(false);
+            return;
+        }
         event.getPlayer().getInventory().getItemInMainHand();
         ItemMeta itemMeta = event.getPlayer().getInventory().getItemInMainHand().getItemMeta();
         int blockResistance, breakingPower = 0;

@@ -1,11 +1,12 @@
 package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.schematic.listener.block.BlockGrowListener;
+import de.uscoutz.nexus.schematic.listener.block.BlockPhysicsListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
-import de.uscoutz.nexus.schematic.listener.player.PlayerDropListener;
-import de.uscoutz.nexus.schematic.listener.player.PlayerInteractListener;
-import de.uscoutz.nexus.schematic.listener.player.PlayerItemHeldListener;
-import de.uscoutz.nexus.schematic.listener.player.PlayerJoinListener;
+import de.uscoutz.nexus.schematic.listener.block.BlockSpreadListener;
+import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
+import de.uscoutz.nexus.schematic.listener.player.*;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
@@ -64,6 +65,11 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerItemHeldListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         Bukkit.getPluginManager().registerEvents(new ProfileLoadListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new EntityChangeBlockListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new BlockPhysicsListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new BlockSpreadListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new BlockGrowListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }

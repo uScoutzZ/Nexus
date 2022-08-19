@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class NexusWorld {
@@ -30,6 +31,12 @@ public class NexusWorld {
         plugin.getWorldManager().getWorldProfileMap().put(world, profile);
         spawn = world.getSpawnLocation();
         assign();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                world.spawnEntity(plugin.getLocationManager().getLocation("nexus-crystal", world), EntityType.ENDER_CRYSTAL);
+            }
+        }.runTask(plugin);
     }
 
     public void assign() {
