@@ -415,14 +415,7 @@ public class Schematic {
         }
     }
 
-    public static void destroy(UUID schematicId, NexusSchematicPlugin plugin, SchematicType schematicType) {
-
-        World world = plugin.getSchematicManager().getBuiltSchematics().get(schematicId).get(0).getWorld();
-        Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(world);
-        if(schematicType == SchematicType.WORKSHOP) {
-            profile.saveStorages();
-        }
-
+    public static void destroy(UUID schematicId, NexusSchematicPlugin plugin, boolean animated) {
         int minHeight = plugin.getSchematicManager().getBuiltSchematics().get(schematicId).get(0).getBlockY();
         List<Location> toRemove = new ArrayList<>();
         for (Location blockLocation : plugin.getSchematicManager().getBuiltSchematics().get(schematicId)) {
@@ -437,13 +430,31 @@ public class Schematic {
             BlockData blockData = location.getBlock().getBlockData();
             location.getBlock().setType(Material.AIR);
 
-            FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location, blockData);
-            /*double x = -0.25+new Random().nextDouble(0.5);
-            double z = -0.25+new Random().nextDouble(0.5);*/
-            double x = 0;
-            double z = 0;
-            fallingBlock.setVelocity(new Vector(x, 0.8, z));
-            fallingBlock.setDropItem(false);
+            if(animated) {
+                FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location, blockData);
+                /*double x = -0.25+new Random().nextDouble(0.5);
+                double z = -0.25+new Random().nextDouble(0.5);*/
+                double x = 0;
+                double z = 0;
+                fallingBlock.setVelocity(new Vector(x, 0.8, z));
+                fallingBlock.setDropItem(false);
+            }
         }
+
+        if(!animated) {
+            for(Location location : toRemove) {
+                location.getBlock().setType(Material.GRASS_BLOCK);
+            }
+        }
+    }
+
+    public static void destroy(UUID schematicId, NexusSchematicPlugin plugin, SchematicType schematicType) {
+        World world = plugin.getSchematicManager().getBuiltSchematics().get(schematicId).get(0).getWorld();
+        Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(world);
+        if(schematicType == SchematicType.WORKSHOP) {
+            profile.saveStorages();
+        }
+
+        destroy(schematicId, plugin, true);
     }
 }

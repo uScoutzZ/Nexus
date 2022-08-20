@@ -7,6 +7,7 @@ import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockSpreadListener;
 import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
 import de.uscoutz.nexus.schematic.listener.player.*;
+import de.uscoutz.nexus.schematic.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
@@ -65,6 +66,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerItemHeldListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         Bukkit.getPluginManager().registerEvents(new ProfileLoadListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new ProfileCheckoutListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityChangeBlockListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockPhysicsListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockSpreadListener(this), this);

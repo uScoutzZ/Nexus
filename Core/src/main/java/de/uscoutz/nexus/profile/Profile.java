@@ -2,6 +2,7 @@ package de.uscoutz.nexus.profile;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
@@ -46,6 +47,8 @@ public class Profile {
     private NexusWorld world;
     @Getter
     private boolean loading;
+    @Getter
+    private List<UUID> schematicIds;
 
     @Getter
     private int[] timeToCheckout;
@@ -58,6 +61,7 @@ public class Profile {
         members = new HashMap<>();
         storages = new HashMap<>();
         storageBlocks = new HashMap<>();
+        schematicIds = new ArrayList<>();
         if(exists()) {
             prepare();
         }
@@ -125,6 +129,7 @@ public class Profile {
             for(Player all : world.getWorld().getPlayers()) {
                 all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
             }
+            Bukkit.getPluginManager().callEvent(new ProfileCheckoutEvent(Profile.this));
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
             plugin.getWorldManager().getWorldProfileMap().remove(world.getWorld());
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
