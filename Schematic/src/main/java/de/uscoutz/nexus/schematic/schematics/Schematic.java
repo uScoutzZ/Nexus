@@ -43,7 +43,7 @@ public class Schematic {
     @Getter
     private Map<Integer, Block> blocks;
     @Getter
-    private int level, substractX, substractY, substractZ, xLength, zLength;
+    private int level, substractX, substractY, substractZ, xLength, zLength, minX, maxX, minZ, maxZ;
     @Getter
     private Location corner1, corner2;
     @Getter @Setter
@@ -59,7 +59,7 @@ public class Schematic {
         corner1 = schematicType.getLocation1().clone().add(0, 0, schematicType.getZDistance()*level);
         corner2 = schematicType.getLocation2().clone().add(0, 0, schematicType.getZDistance()*level);
 
-        int minX, minY, minZ, maxX, maxY, maxZ;
+        int minY, maxY;
         minX = Math.min(corner1.getBlockX()+1, corner2.getBlockX()+1);
         minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
         minZ = Math.min(corner1.getBlockZ()+1, corner2.getBlockZ()+1);
@@ -174,6 +174,10 @@ public class Schematic {
                     if(millis[0] <= 0) {
                         countdown.remove();
                         cancel();
+                        Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+                        if(schematicType == SchematicType.NEXUS) {
+                            profile.setNexusLevel(level);
+                        }
                     } else {
                         millis[0] = millis[0]-1000;
                         counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
@@ -233,6 +237,11 @@ public class Schematic {
             plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
                     setBlock(blocks.get(j) ,rotation, location, null, schematicId));
         }
+
+        Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+        if(schematicType == SchematicType.NEXUS) {
+            profile.setNexusLevel(level);
+        }
     }
 
     private Location setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {
@@ -279,13 +288,14 @@ public class Schematic {
                     NexusPlugin.getInstance().getDatabaseAdapter().set("collectors", schematicId, Collector.toString(neededItems));
                 }
 
-                Collector collector = new Collector(neededItems, schematicId, plugin)
+                Collector collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)))
                         .setFilledAction(player1 -> {
                             destroy(schematicId, plugin, schematicType);
                             Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level+1);
+                            Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
                             nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId);
                             NexusPlugin.getInstance().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
-                                    NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld()).getProfileId(),
+                                    profile.getProfileId(),
                                     "schematicId", schematicId,
                                     new DatabaseUpdate("level", level+1),
                                     new DatabaseUpdate("placed", System.currentTimeMillis()));

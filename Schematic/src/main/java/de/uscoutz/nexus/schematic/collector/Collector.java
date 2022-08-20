@@ -31,13 +31,15 @@ public class Collector {
     private Location blockLocation;
     private Material oldBlockType;
     private Consumer<Player> actionOnFull;
+    private int requiredNexusLevel;
 
-    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin) {
+    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel) {
         this.plugin = plugin;
         hologram = new HashMap<>();
         this.neededItems = new LinkedHashMap<>();
         destroyed = false;
         this.schematicId = schematicId;
+        this.requiredNexusLevel = requiredNexusLevel;
 
         for(ItemStack neededItem : neededItems) {
             this.neededItems.put(neededItem.getType(), neededItem.getAmount());
@@ -77,32 +79,36 @@ public class Collector {
     public void collect(Player player, Item item) {
         ItemStack itemStack = item.getItemStack();
         if(neededItems.containsKey(itemStack.getType())) {
-            int neededAmount = neededItems.get(itemStack.getType());
-            if(neededAmount >= itemStack.getAmount()) {
-                neededItems.replace(itemStack.getType(), neededAmount- itemStack.getAmount());
-            } else if(neededAmount < itemStack.getAmount()) {
-                neededItems.replace(itemStack.getType(), 0);
-                itemStack.setAmount(itemStack.getAmount()-neededAmount);
-                player.getInventory().addItem(itemStack);
-            }
-            neededAmount = neededItems.get(itemStack.getType());
-            if(neededAmount == 0) {
-                neededItems.remove(itemStack.getType());
-                if(neededItems.size() == 0) {
-                    actionOnFull.accept(player);
-                    destroy();
-                    NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+            if(requiredNexusLevel <= NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
+                int neededAmount = neededItems.get(itemStack.getType());
+                if(neededAmount >= itemStack.getAmount()) {
+                    neededItems.replace(itemStack.getType(), neededAmount- itemStack.getAmount());
+                } else if(neededAmount < itemStack.getAmount()) {
+                    neededItems.replace(itemStack.getType(), 0);
+                    itemStack.setAmount(itemStack.getAmount()-neededAmount);
+                    player.getInventory().addItem(itemStack);
+                }
+                neededAmount = neededItems.get(itemStack.getType());
+                if(neededAmount == 0) {
+                    neededItems.remove(itemStack.getType());
+                    if(neededItems.size() == 0) {
+                        actionOnFull.accept(player);
+                        destroy();
+                        NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+                    } else {
+                        destroyHolograms();
+                        spawnHolograms();
+                    }
                 } else {
-                    destroyHolograms();
-                    spawnHolograms();
+                    hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
+                }
+
+                if(!destroyed) {
+                    NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
+                            new DatabaseUpdate("neededItems", toString()));
                 }
             } else {
-                hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
-            }
-
-            if(!destroyed) {
-                NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
-                        new DatabaseUpdate("neededItems", toString()));
+                player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "collector_wrong-level"));
             }
         } else {
             player.getInventory().addItem(item.getItemStack());

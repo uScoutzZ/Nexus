@@ -12,6 +12,7 @@ import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
 import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,7 +40,7 @@ public class Profile {
     private Map<String, String> storages;
     @Getter
     private Map<String, Container> storageBlocks;
-    @Getter
+    @Getter @Setter
     private int nexusLevel;
     @Getter
     private long start, lastActivity;
