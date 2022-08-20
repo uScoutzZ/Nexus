@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.schematics;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
@@ -98,27 +99,25 @@ public class Schematic {
         plugin.getSchematicManager().getSchematicsMap().get(schematicType).put(level, this);
     }
 
-    public void preview(Location location, int rotation) {
-        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE
-                , maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
-        for(int i = 0; i < blocks.size(); i++) {
-            Block block = blocks.get(i);
+    public boolean preview(Location location, int rotation, boolean set) {
+        int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
 
-            Location blockLocation = block.getLocation().clone();
-            blockLocation.setX(blockLocation.getX() - substractX);
-            blockLocation.setY(blockLocation.getY() - substractY);
-            blockLocation.setZ(blockLocation.getZ() - substractZ);
-            blockLocation.setWorld(location.getWorld());
+        int minY = location.getBlockY();
 
-            blockLocation = rotate(blockLocation, rotation);
-            blockLocation.add(location.getX(), location.getY(), location.getZ());
+        List<Location> points = new ArrayList<>();
+        points.add(new Location(location.getWorld(), this.maxX-substractX, minY, this.maxZ-substractZ));
+        points.add(new Location(location.getWorld(), this.minX-substractX, minY, this.minZ-substractZ));
+        points.add(new Location(location.getWorld(), this.minX-substractX, minY, this.maxZ-substractZ));
+        points.add(new Location(location.getWorld(), this.maxX-substractX, minY, this.minZ-substractZ));
 
-            minX = Math.min(minX, blockLocation.getBlockX());
-            minY = Math.min(minY, blockLocation.getBlockY());
-            minZ = Math.min(minZ, blockLocation.getBlockZ());
-            maxX = Math.max(maxX, blockLocation.getBlockX());
-            maxY = Math.max(maxY, blockLocation.getBlockY());
-            maxZ = Math.max(maxZ, blockLocation.getBlockZ());
+        for(Location pointX : points) {
+            points.set(points.indexOf(pointX), rotate(pointX, rotation));
+            pointX.add(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+            minX = Math.min(minX, pointX.getBlockX());
+            minZ = Math.min(minZ, pointX.getBlockZ());
+            maxX = Math.max(maxX, pointX.getBlockX());
+            maxZ = Math.max(maxZ, pointX.getBlockZ());
         }
 
         Location point1;
@@ -131,13 +130,36 @@ public class Schematic {
         point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
         point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
 
-        drawLine(point3, point2, 0.5);
-        drawLine(point1, point3, 0.5);
-        drawLine(point1, point4, 0.5);
-        drawLine(point2, point4, 0.5);
+        Color color1, color2;
+        boolean overlap = false;
+        Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+        for(Region profileRegion : profile.getRegions()) {
+            if(profileRegion.overlap(minX, maxX, minZ, maxZ)) {
+                overlap = true;
+                break;
+            }
+        }
+
+        if(overlap) {
+            color1 = Color.RED;
+            color2 = Color.RED;
+        } else {
+            color1 = Color.GREEN;
+            color2 = Color.LIME;
+            if(set) {
+                profile.getRegions().add(new Region(location.getWorld(), minX, maxX, minZ, maxZ));
+            }
+        }
+
+        drawLine(point3, point2, 0.5, color1, color2);
+        drawLine(point1, point3, 0.5, color1, color2);
+        drawLine(point1, point4, 0.5, color1, color2);
+        drawLine(point2, point4, 0.5, color1, color2);
+
+        return overlap;
     }
 
-    private void drawLine(Location point1, Location point2, double space) {
+    private void drawLine(Location point1, Location point2, double space, Color color1, Color color2) {
         World world = point1.getWorld();
         double distance = point1.distance(point2);
         Vector p1 = point1.toVector();
@@ -145,7 +167,7 @@ public class Schematic {
         Vector vector = p2.clone().subtract(p1).normalize().multiply(space);
         double length = 0;
         for (; length < distance; p1.add(vector)) {
-            world.spawnParticle(Particle.DUST_COLOR_TRANSITION, p1.getX(), p1.getY(), p1.getZ(), 1, new Particle.DustTransition(Color.GREEN, Color.LIME, 2));
+            world.spawnParticle(Particle.DUST_COLOR_TRANSITION, p1.getX(), p1.getY(), p1.getZ(), 1, new Particle.DustTransition(color1, color2, 2));
             length += space;
         }
     }
@@ -202,6 +224,12 @@ public class Schematic {
             double d = Math.pow(10, 0);
             blocksPerSecond = Math.round(blocksPerSecond * d) / d;
             double finalBlocksPerSecond = blocksPerSecond;
+
+            final int[] minX = {Integer.MAX_VALUE};
+            final int[] minZ = { Integer.MAX_VALUE };
+            final int[] maxX = { Integer.MIN_VALUE };
+            final int[] maxZ = { Integer.MIN_VALUE };
+
             plugin.getSchematicManager().getBuiltSchematics().put(schematicId, new ArrayList<>());
             new BukkitRunnable() {
                 @Override
@@ -211,15 +239,23 @@ public class Schematic {
                                 TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
                         double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
                         for(int j = 0; j < alreadyPlaced; j++) {
-                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
-                                    setBlock(blocks.get(j) ,rotation, location, null, schematicId));
+                            Location block = setBlock(blocks.get(j) ,rotation, location, null, schematicId);
+                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(block);
+                            minX[0] = Math.min(minX[0], block.getBlockX());
+                            minZ[0] = Math.min(minZ[0], block.getBlockZ());
+                            maxX[0] = Math.max(maxX[0], block.getBlockX());
+                            maxZ[0] = Math.max(maxZ[0], block.getBlockZ());
                         }
                         i[0] = (int) alreadyPlaced;
                     } else {
                         if(i[0] < blocks.size()) {
                             Block block = blocks.get(i[0]);
-                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
-                                    setBlock(block, rotation, location, finalLaser, schematicId));
+                            Location setBlock = setBlock(block, rotation, location, finalLaser, schematicId);
+                            minX[0] = Math.min(minX[0], setBlock.getBlockX());
+                            minZ[0] = Math.min(minZ[0], setBlock.getBlockZ());
+                            maxX[0] = Math.max(maxX[0], setBlock.getBlockX());
+                            maxZ[0] = Math.max(maxZ[0], setBlock.getBlockZ());
+                            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(setBlock);
                             i[0]++;
                         } else {
                             finalLaser.stop();
@@ -233,9 +269,14 @@ public class Schematic {
 
     public void build(Location location, int rotation, UUID schematicId) {
         plugin.getSchematicManager().getBuiltSchematics().put(schematicId, new ArrayList<>());
+        int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
         for(int j = 0; j < blocks.size(); j++) {
-            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(
-                    setBlock(blocks.get(j) ,rotation, location, null, schematicId));
+            Location block = setBlock(blocks.get(j) ,rotation, location, null, schematicId);
+            minX = Math.min(minX, block.getBlockX());
+            minZ = Math.min(minZ, block.getBlockZ());
+            maxX = Math.max(maxX, block.getBlockX());
+            maxZ = Math.max(maxZ, block.getBlockZ());
+            plugin.getSchematicManager().getBuiltSchematics().get(schematicId).add(block);
         }
 
         Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());

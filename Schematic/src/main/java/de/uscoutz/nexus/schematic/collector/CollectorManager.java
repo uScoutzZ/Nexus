@@ -54,12 +54,6 @@ public class CollectorManager {
                 collectorNeededMap.get(schematicType).put(schematic.getLevel(), getNeededItemsFromString(needed));
             }
         }
-
-        try {
-            fileConfiguration.save(schematicCollectorsFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public List<ItemStack> getNeededItemsFromString(String needed) {
@@ -70,7 +64,11 @@ public class CollectorManager {
                 Bukkit.getConsoleSender().sendMessage("[NexusSchematic] " + stringMaterial);
                 int amount = Integer.parseInt(stringMaterial.split(":")[1]);
                 Material material = Material.getMaterial(stringMaterial.split(":")[0]);
-                neededItems.add(new ItemStack(material, amount));
+                try {
+                    neededItems.add(new ItemStack(material, amount));
+                } catch (IllegalArgumentException exception) {
+                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Material " + stringMaterial +" not found");
+                }
             }
         }
 

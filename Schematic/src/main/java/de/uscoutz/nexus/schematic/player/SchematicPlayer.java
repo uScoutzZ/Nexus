@@ -53,7 +53,7 @@ public class SchematicPlayer {
                         }
 
                         int rotation = getRotationFromFacing(player.getFacing());
-                        schematicItem.getSchematic().preview(block.getLocation(), rotation);
+                        schematicItem.getSchematic().preview(block.getLocation(), rotation, false);
                     }
                 }
             }

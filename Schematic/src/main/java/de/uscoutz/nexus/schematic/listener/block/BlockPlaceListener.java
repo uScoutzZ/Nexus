@@ -49,16 +49,20 @@ public class BlockPlaceListener implements Listener {
                 UUID schematicId = UUID.randomUUID();
                 Location location = event.getBlock().getLocation().subtract(0, 1, 0);
                 int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                if(schematic.getTimeToFinish() != 0) {
-                    long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
-                    schematic.build(location, rotation, finished, schematicId);
+                if(!schematicItem.getSchematic().preview(location, rotation, true)) {
+                    if(schematic.getTimeToFinish() != 0) {
+                        long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
+                        schematic.build(location, rotation, finished, schematicId);
+                    } else {
+                        schematic.build(location, rotation, schematicId);
+                    }
+                    String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+                    NexusPlugin.getInstance().getDatabaseAdapter().set("schematics",
+                            NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
+                            schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
                 } else {
-                    schematic.build(location, rotation, schematicId);
+                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                 }
-                String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-                NexusPlugin.getInstance().getDatabaseAdapter().set("schematics",
-                        NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
-                        schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
             }
         }
     }

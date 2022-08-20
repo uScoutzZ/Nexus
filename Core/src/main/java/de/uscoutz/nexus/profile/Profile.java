@@ -7,6 +7,7 @@ import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.player.NexusPlayer;
+import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.utilities.InventorySerializer;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
@@ -50,6 +51,8 @@ public class Profile {
     private boolean loading;
     @Getter
     private List<UUID> schematicIds;
+    @Getter
+    private List<Region> regions;
 
     @Getter
     private int[] timeToCheckout;
@@ -63,6 +66,7 @@ public class Profile {
         storages = new HashMap<>();
         storageBlocks = new HashMap<>();
         schematicIds = new ArrayList<>();
+        regions = new ArrayList<>();
         if(exists()) {
             prepare();
         }
