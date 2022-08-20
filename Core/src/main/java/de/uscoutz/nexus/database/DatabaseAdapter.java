@@ -241,6 +241,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36), currentProfile int, firstLogin bigint, playtime bigint, gameprofile text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS schematics (profileId VARCHAR(36), schematicId VARCHAR(36), schematicType text, level int, rotation int, location text, placed bigint)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS collectors (schematicId VARCHAR(36), neededItems text)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS storages (profileId VARCHAR(36), storageId text, inventory text)");
     }
 }
 

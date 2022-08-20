@@ -1,9 +1,14 @@
 package de.uscoutz.nexus.schematic.listener.player;
 
+import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import lombok.Getter;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +29,7 @@ public class PlayerInteractListener implements Listener {
         Player player = event.getPlayer();
         SchematicPlayer schematicPlayer = plugin.getPlayerManager().getPlayerMap().get(player.getUniqueId());
 
-        if(player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
+        if(player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE && player.getGameMode() == GameMode.CREATIVE) {
             event.setCancelled(true);
             int i = 0;
             if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -45,6 +50,17 @@ public class PlayerInteractListener implements Listener {
             if(i != 0) {
                 player.sendMessage("§6Position " + i + " set to " + event.getClickedBlock().getX() + ", " +
                         event.getClickedBlock().getY() + ", " + event.getClickedBlock().getZ());
+            }
+
+            if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                Block storage = event.getClickedBlock();
+                if(storage.getState() instanceof Container) {
+                    Container container = (Container) storage.getState();
+                    Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                    if(!profile.getStorageBlocks().containsValue(container)) {
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
     }

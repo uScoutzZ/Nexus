@@ -6,6 +6,7 @@ import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.player.NexusPlayer;
+import de.uscoutz.nexus.utilities.InventorySerializer;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
@@ -13,7 +14,11 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -29,6 +34,10 @@ public class Profile {
     private UUID profileId, owner;
     @Getter
     private Map<UUID, ProfilePlayer> members;
+    @Getter
+    private Map<String, String> storages;
+    @Getter
+    private Map<String, Container> storageBlocks;
     @Getter
     private int nexusLevel;
     @Getter
@@ -46,7 +55,9 @@ public class Profile {
     public Profile(UUID profileId, NexusPlugin plugin) {
         this.plugin = plugin;
         this.profileId = profileId;
-        this.members = new HashMap<>();
+        members = new HashMap<>();
+        storages = new HashMap<>();
+        storageBlocks = new HashMap<>();
         if(exists()) {
             prepare();
         }
@@ -131,6 +142,17 @@ public class Profile {
         }.runTaskLater(plugin, 3);
     }
 
+    public void saveStorages() {
+        for(String storageId : storageBlocks.keySet()) {
+            String contents = InventorySerializer.toBase64(storageBlocks.get(storageId).getInventory());
+            plugin.getDatabaseAdapter().updateTwo("storages", "profileId", profileId,
+                    "storageId", storageId,
+                    new DatabaseUpdate("inventory", contents));
+            storages.replace(storageId, contents);
+        }
+        storageBlocks.clear();
+    }
+
     public void loadMembers() {
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("playerProfiles", "profileId", String.valueOf(profileId));
 
@@ -154,6 +176,19 @@ public class Profile {
         if(!loading) {
             loading = true;
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
+                ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("storages", "profileId", String.valueOf(profileId));
+
+                try {
+                    while(resultSet.next()) {
+                        String storageId = resultSet.getString("storageId");
+                        String inventory = resultSet.getString("inventory");
+                        storages.put(storageId, inventory);
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+
+
                 world = new NexusWorld(this, plugin);
                 plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
                 new BukkitRunnable() {
