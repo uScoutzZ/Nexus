@@ -51,15 +51,15 @@ public class PlayerInteractListener implements Listener {
                 player.sendMessage("§6Position " + i + " set to " + event.getClickedBlock().getX() + ", " +
                         event.getClickedBlock().getY() + ", " + event.getClickedBlock().getZ());
             }
+        }
 
-            if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                Block storage = event.getClickedBlock();
-                if(storage.getState() instanceof Container) {
-                    Container container = (Container) storage.getState();
-                    Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
-                    if(!profile.getStorageBlocks().containsValue(container)) {
-                        event.setCancelled(true);
-                    }
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block storage = event.getClickedBlock();
+            if(storage.getState() instanceof Container) {
+                Container container = (Container) storage.getState();
+                Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                if(!profile.getStorageBlocks().containsValue(container)) {
+                    event.setCancelled(true);
                 }
             }
         }

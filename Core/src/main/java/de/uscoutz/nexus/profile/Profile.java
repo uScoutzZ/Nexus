@@ -128,11 +128,11 @@ public class Profile {
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
             plugin.getWorldManager().getWorldProfileMap().remove(world.getWorld());
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
+            plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
+                    new DatabaseUpdate("nexusLevel", nexusLevel),
+                    new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
+            saveStorages();
         }
-
-        plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
-                new DatabaseUpdate("nexusLevel", nexusLevel),
-                new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
 
         new BukkitRunnable() {
             @Override
