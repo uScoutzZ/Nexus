@@ -17,6 +17,5 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         SchematicPlayer schematicPlayer = plugin.getPlayerManager().getPlayerMap().get(event.getPlayer().getUniqueId());
-
     }
 }

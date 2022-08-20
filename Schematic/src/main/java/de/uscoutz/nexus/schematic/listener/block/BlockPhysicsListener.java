@@ -2,6 +2,9 @@ package de.uscoutz.nexus.schematic.listener.block;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -16,6 +19,18 @@ public class BlockPhysicsListener implements Listener {
 
     @EventHandler
     public void onBlockPhysics(BlockPhysicsEvent event) {
-        event.setCancelled(true);
+        if(event.getChangedBlockData() instanceof Door) {
+            Door door = (Door) event.getChangedBlockData();
+            if(door.getHalf() == Bisected.Half.TOP) {
+                Door down = (Door) event.getBlock().getLocation().clone().subtract(0, 1, 0).getBlock().getBlockData();
+                if(down.isOpen() != door.isOpen()) {
+                    event.setCancelled(false);
+                } else {
+                    event.setCancelled(true);
+                }
+            }
+        } else {
+            event.setCancelled(true);
+        }
     }
 }

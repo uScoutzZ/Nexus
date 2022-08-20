@@ -69,15 +69,25 @@ public class Schematic {
         xLength = maxX-minX;
         zLength = maxZ-minZ;
 
+        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN);
+        List<Block> toAdd = new ArrayList<>();
         for(int j = minY; j <= maxY; j++) {
             for(int i = minX; i <= maxX; i++) {
                 for(int k = minZ; k <= maxZ; k++) {
                     Block block = corner1.getWorld().getBlockAt(i, j, k);
                     if(block.getType() != Material.AIR) {
-                        blocks.put(blocks.size(), block);
+                        if(spawnLater.contains(block.getType())) {
+                            toAdd.add(block);
+                        } else {
+                            blocks.put(blocks.size(), block);
+                        }
                     }
                 }
             }
+        }
+
+        for(Block block : toAdd) {
+            blocks.put(blocks.size(), block);
         }
 
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level);
@@ -238,7 +248,6 @@ public class Schematic {
             }
         }
 
-        blockLocation.getBlock().setType(block.getType());
         BlockData blockData = block.getBlockData();
 
         blockLocation.getBlock().setBlockData(blockData);
@@ -343,8 +352,11 @@ public class Schematic {
                 Directional directional = (Directional) blockData;
 
                 if(rotation != 0) {
-                    directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
-                    blockLocation.getBlock().setBlockData(directional);
+                    if(directional.getFacing() != BlockFace.UP && directional.getFacing() != BlockFace.DOWN) {
+                        directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
+                        blockLocation.getBlock().setBlockData(directional);
+                    }
+
                 }
             }
         }
