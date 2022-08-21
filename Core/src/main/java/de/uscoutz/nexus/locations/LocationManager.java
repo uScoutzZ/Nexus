@@ -53,10 +53,10 @@ public class LocationManager {
         }
     }
 
-    public Location getLocation(String path, World world) {
+    public Location getLocation(FileConfiguration fileConfiguration, String path, World world) {
         Location location = null;
 
-        if(fileConfiguration.getString(path + ".world") != null) {
+        if(fileConfiguration.getString(path + ".x") != null) {
             location = new Location(
                     world,
                     fileConfiguration.getDouble(path + ".x"),
@@ -67,5 +67,9 @@ public class LocationManager {
         }
 
         return  location;
+    }
+
+    public Location getLocation(String path, World world) {
+        return getLocation(fileConfiguration, path, world);
     }
 }

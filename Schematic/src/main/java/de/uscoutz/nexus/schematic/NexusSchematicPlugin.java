@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
+import de.uscoutz.nexus.schematic.gateways.GatewayManager;
 import de.uscoutz.nexus.schematic.listener.block.BlockGrowListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPhysicsListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
@@ -39,6 +40,8 @@ public class NexusSchematicPlugin extends JavaPlugin {
     private CollectorManager collectorManager;
     @Getter
     private SchematicItemManager schematicItemManager;
+    @Getter
+    private GatewayManager gatewayManager;
 
     @Getter
     private final String NO_PERMISSION = "§cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.";
@@ -57,6 +60,8 @@ public class NexusSchematicPlugin extends JavaPlugin {
         schematicItemManager = new SchematicItemManager(this, NexusPlugin.getInstance(),
                 new File("/home/networksync/nexus/schematicitems.yml"));
         schematicItemManager.loadItems();
+        gatewayManager = new GatewayManager(new File("/home/networksync/nexus/gateways.yml"), this);
+        gatewayManager.loadGateways();
 
         getCommand("schematicwand").setExecutor(new SchematicWand(this));
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));

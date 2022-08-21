@@ -8,8 +8,12 @@ import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,5 +51,22 @@ public class ProfileLoadListener implements Listener {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                World world = profile.getWorld().getWorld();
+                for(int i = 1; i < plugin.getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).size()-1; i++) {
+                    Material material = Material.AIR;
+                    if(i > profile.getNexusLevel()) {
+                        material = Material.RED_STAINED_GLASS;
+                    }
+                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Gateway " + i + ": " + material +" for nexus " + profile.getNexusLevel());
+                    for(Block block : plugin.getGatewayManager().getGateways().get(i).getBlocksInRegion(world)) {
+                        block.setType(material);
+                    }
+                }
+            }
+        }.runTaskLater(plugin, 5);
     }
 }

@@ -44,9 +44,7 @@ public class Region {
         for(int y = minY; y <= maxY; y++) {
             for(int x = minX; x <= maxX; x++) {
                 for(int z = minZ; z <= maxZ; z++) {
-                    if(world.getBlockAt(x, y, z).getType() != Material.AIR) {
-                        blocks.add(world.getBlockAt(x, y, z));
-                    }
+                    blocks.add(world.getBlockAt(x, y, z));
                 }
             }
         }

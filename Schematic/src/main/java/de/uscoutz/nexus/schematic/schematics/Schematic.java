@@ -230,6 +230,9 @@ public class Schematic {
                         FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
                         if(schematicType == SchematicType.NEXUS) {
                             profile.setNexusLevel(level);
+                            for(Block block : plugin.getGatewayManager().getGateways().get(level).getBlocksInRegion(profile.getWorld().getWorld())) {
+                                block.setType(Material.AIR);
+                            }
                         }
                         countdown.remove();
                         cancel();
