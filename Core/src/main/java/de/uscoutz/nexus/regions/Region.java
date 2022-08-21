@@ -18,13 +18,13 @@ public class Region {
         maxZ += 1;
         boundingBox = new BoundingBox(minX, 0, minZ, maxX, 100, maxZ);
 
-        ArmorStand min = (ArmorStand) world.spawnEntity(new Location(world, minX, -50, minZ), EntityType.ARMOR_STAND);
+        /*ArmorStand min = (ArmorStand) world.spawnEntity(new Location(world, minX, -50, minZ), EntityType.ARMOR_STAND);
         min.setCustomNameVisible(true);
         min.customName(Component.text("min" + s));
 
         ArmorStand max = (ArmorStand) world.spawnEntity(new Location(world, maxX, -50, maxZ), EntityType.ARMOR_STAND);
         max.setCustomNameVisible(true);
-        max.customName(Component.text("max " + s));
+        max.customName(Component.text("max " + s));*/
     }
 
     public boolean overlap(int minX, int maxX, int minZ, int maxZ) {
