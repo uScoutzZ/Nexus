@@ -6,6 +6,7 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventorySerializer;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,11 +21,11 @@ public class ProfilePlayer {
 
     @Getter
     private Profile profile;
-    @Getter
+    @Getter @Setter
     private long playtime, joinedProfile;
     @Getter
     private UUID playerUUID;
-    @Getter
+    @Getter @Setter
     private String inventoryBase64;
     @Getter
     private GameProfile gameProfile;

@@ -144,12 +144,12 @@ public class Profile {
             saveStorages();
         }
 
-        new BukkitRunnable() {
+       /* new BukkitRunnable() {
             @Override
             public void run() {
                 plugin.getProfileManager().getProfilesMap().remove(profileId);
             }
-        }.runTaskLater(plugin, 3);
+        }.runTaskLater(plugin, 3);*/
     }
 
     public void saveStorages() {
@@ -174,6 +174,10 @@ public class Profile {
                 String inventory = resultSet.getString("inventory");
                 if(!members.containsKey(player)) {
                     new ProfilePlayer(this, player, profilePlaytime, joinedProfile, inventory, plugin);
+                } else {
+                    ProfilePlayer profilePlayer = members.get(player);
+                    profilePlayer.setInventoryBase64(inventory);
+                    profilePlayer.setPlaytime(profilePlaytime);
                 }
             }
             plugin.getProfileManager().getProfilesMap().put(profileId, this);
@@ -185,6 +189,7 @@ public class Profile {
     public void load() {
         if(!loading) {
             loading = true;
+            loadMembers();
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
                 ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("storages", "profileId", String.valueOf(profileId));
 
