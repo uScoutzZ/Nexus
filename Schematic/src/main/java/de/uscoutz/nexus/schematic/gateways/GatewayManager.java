@@ -43,7 +43,6 @@ public class GatewayManager {
         fileConfiguration = YamlConfiguration.loadConfiguration(gatewayFile);
         int nexusLevels = plugin.getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).size();
         for(int i = 1; i < nexusLevels-1; i++) {
-            Bukkit.getConsoleSender().sendMessage("get " + i);
             Location location1, location2;
             location1 = NexusPlugin.getInstance().getLocationManager().getLocation(fileConfiguration, i + ".location1", Bukkit.getWorlds().get(0));
             location2 = NexusPlugin.getInstance().getLocationManager().getLocation(fileConfiguration, i + ".location2", Bukkit.getWorlds().get(0));

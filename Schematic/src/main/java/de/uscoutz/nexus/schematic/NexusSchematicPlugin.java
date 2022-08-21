@@ -56,7 +56,6 @@ public class NexusSchematicPlugin extends JavaPlugin {
         schematicManager.loadSchematics();
         collectorManager = new CollectorManager(new File("/home/networksync/nexus/schematiccollectors.yml"), this);
         collectorManager.loadCollectors();
-        Bukkit.getConsoleSender().sendMessage(NexusPlugin.getInstance() +": " + Bukkit.getPluginManager().isPluginEnabled("NexusCore"));
         schematicItemManager = new SchematicItemManager(this, NexusPlugin.getInstance(),
                 new File("/home/networksync/nexus/schematicitems.yml"));
         schematicItemManager.loadItems();

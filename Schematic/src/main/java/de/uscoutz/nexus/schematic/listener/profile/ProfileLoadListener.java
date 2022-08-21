@@ -61,7 +61,6 @@ public class ProfileLoadListener implements Listener {
                     if(i > profile.getNexusLevel()) {
                         material = Material.RED_STAINED_GLASS;
                     }
-                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Gateway " + i + ": " + material +" for nexus " + profile.getNexusLevel());
                     for(Block block : plugin.getGatewayManager().getGateways().get(i).getBlocksInRegion(world)) {
                         block.setType(material);
                     }
