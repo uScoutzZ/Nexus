@@ -5,7 +5,6 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
-import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.utilities.InventorySerializer;
@@ -17,11 +16,8 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -42,7 +38,7 @@ public class Profile {
     @Getter
     private Map<String, Container> storageBlocks;
     @Getter @Setter
-    private int nexusLevel;
+    private int nexusLevel, concurrentlyBuilding;
     @Getter
     private long start, lastActivity;
     @Getter

@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.collector;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -80,38 +81,46 @@ public class Collector {
     public void collect(Player player, Item item) {
         ItemStack itemStack = item.getItemStack();
         if(neededItems.containsKey(itemStack.getType())) {
-            if(requiredNexusLevel <= NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
-                int neededAmount = neededItems.get(itemStack.getType());
-                if(neededAmount >= itemStack.getAmount()) {
-                    neededItems.replace(itemStack.getType(), neededAmount- itemStack.getAmount());
-                } else if(neededAmount < itemStack.getAmount()) {
-                    neededItems.replace(itemStack.getType(), 0);
-                    itemStack.setAmount(itemStack.getAmount()-neededAmount);
-                    player.getInventory().addItem(itemStack);
-                }
-                neededAmount = neededItems.get(itemStack.getType());
-                if(neededAmount == 0) {
-                    neededItems.remove(itemStack.getType());
-                    if(neededItems.size() == 0) {
-                        actionOnFull.accept(player);
-                        destroy();
-                        NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+            int maxConcurrentBuildings = NexusPlugin.getInstance().getConfig().getInt("concurrently-building");
+            Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+            if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
+                player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                player.getInventory().addItem(item.getItemStack());
+            } else {
+                if(requiredNexusLevel <= NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
+                    int neededAmount = neededItems.get(itemStack.getType());
+                    if(neededAmount >= itemStack.getAmount()) {
+                        neededItems.replace(itemStack.getType(), neededAmount- itemStack.getAmount());
+                    } else if(neededAmount < itemStack.getAmount()) {
+                        neededItems.replace(itemStack.getType(), 0);
+                        itemStack.setAmount(itemStack.getAmount()-neededAmount);
+                        player.getInventory().addItem(itemStack);
+                    }
+                    neededAmount = neededItems.get(itemStack.getType());
+                    if(neededAmount == 0) {
+                        neededItems.remove(itemStack.getType());
+                        if(neededItems.size() == 0) {
+                            actionOnFull.accept(player);
+                            destroy();
+                            NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+                        } else {
+                            destroyHolograms();
+                            spawnHolograms();
+                        }
                     } else {
-                        destroyHolograms();
-                        spawnHolograms();
+                        hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
+                    }
+
+                    if(!destroyed) {
+                        NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
+                                new DatabaseUpdate("neededItems", toString()));
                     }
                 } else {
-                    hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
+                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "collector_wrong-level"));
+                    player.getInventory().addItem(item.getItemStack());
                 }
-
-                if(!destroyed) {
-                    NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
-                            new DatabaseUpdate("neededItems", toString()));
-                }
-            } else {
-                player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "collector_wrong-level"));
-                player.getInventory().addItem(item.getItemStack());
             }
+
         } else {
             player.getInventory().addItem(item.getItemStack());
         }

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
 import de.uscoutz.nexus.schematic.listener.block.BlockGrowListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPhysicsListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
@@ -60,6 +61,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         getCommand("schematicwand").setExecutor(new SchematicWand(this));
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));
         getCommand("loadschematic").setExecutor(new LoadSchematicCommand(this));
+        getCommand("getupgradeitems").setExecutor(new GetUpgradeItemsCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);

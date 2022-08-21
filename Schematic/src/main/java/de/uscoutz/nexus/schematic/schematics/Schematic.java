@@ -226,6 +226,7 @@ public class Schematic {
                         for(Player player : profile.getWorld().getWorld().getPlayers()) {
                             player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_finished-building"));
                         }
+                        profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()-1);
                         FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
                         if(schematicType == SchematicType.NEXUS) {
                             profile.setNexusLevel(level);
@@ -297,6 +298,7 @@ public class Schematic {
                 }
             }.runTaskTimer(plugin, 0, (long) blocksPerSecond);
             Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+            profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()+1);
             if(minX[0] != Integer.MAX_VALUE) {
                 profile.getRegions().add(new Region(location.getWorld(), minX[0], maxX[0], minZ[0], maxZ[0], schematicType.toString()));
             }

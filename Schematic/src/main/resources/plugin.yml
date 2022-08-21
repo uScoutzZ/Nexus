@@ -7,5 +7,6 @@ commands:
   schematicwand:
   createschematic:
   loadschematic:
+  getupgradeitems:
 depend:
   - NexusCore

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.listener.block;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
@@ -49,19 +50,25 @@ public class BlockPlaceListener implements Listener {
                 UUID schematicId = UUID.randomUUID();
                 Location location = event.getBlock().getLocation().subtract(0, 1, 0);
                 int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                if(!schematicItem.getSchematic().preview(location, rotation, true)) {
-                    if(schematic.getTimeToFinish() != 0) {
-                        long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
-                        schematic.build(location, rotation, finished, schematicId);
-                    } else {
-                        schematic.build(location, rotation, schematicId);
-                    }
-                    String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-                    NexusPlugin.getInstance().getDatabaseAdapter().set("schematics",
-                            NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
-                            schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
+                int maxConcurrentBuildings = NexusPlugin.getInstance().getConfig().getInt("concurrently-building");
+                Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
+                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                 } else {
-                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                    if(!schematicItem.getSchematic().preview(location, rotation, true)) {
+                        if(schematic.getTimeToFinish() != 0) {
+                            long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
+                            schematic.build(location, rotation, finished, schematicId);
+                        } else {
+                            schematic.build(location, rotation, schematicId);
+                        }
+                        String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+                        NexusPlugin.getInstance().getDatabaseAdapter().set("schematics",
+                                NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
+                                schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
+                    } else {
+                        player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                    }
                 }
             }
         }
