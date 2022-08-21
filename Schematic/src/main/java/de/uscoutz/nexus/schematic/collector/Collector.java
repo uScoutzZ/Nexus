@@ -65,6 +65,7 @@ public class Collector {
             Item item = (Item) location.getWorld().spawnEntity(armorStand.getLocation(), EntityType.DROPPED_ITEM);
             item.setItemStack(new ItemStack(needed));
             item.setCanPlayerPickup(false);
+            item.setUnlimitedLifetime(true);
 
             armorStand.setSmall(true);
             armorStand.addPassenger(item);
@@ -109,6 +110,7 @@ public class Collector {
                 }
             } else {
                 player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "collector_wrong-level"));
+                player.getInventory().addItem(item.getItemStack());
             }
         } else {
             player.getInventory().addItem(item.getItemStack());

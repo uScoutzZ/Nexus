@@ -7,6 +7,7 @@ import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
+import de.uscoutz.nexus.utilities.FireworkUtilities;
 import de.uscoutz.nexus.utilities.InventorySerializer;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,7 +75,7 @@ public class Schematic {
         xLength = maxX-minX;
         zLength = maxZ-minZ;
 
-        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.BARREL);
+        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.BEACON, Material.LANTERN, Material.TORCH, Material.LAVA);
         List<Block> toAdd = new ArrayList<>();
         for(int j = minY; j <= maxY; j++) {
             for(int i = minX; i <= maxX; i++) {
@@ -97,6 +98,33 @@ public class Schematic {
 
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level);
         plugin.getSchematicManager().getSchematicsMap().get(schematicType).put(level, this);
+    }
+
+    private List<Integer> getMinMaxByLocation(Location location, int rotation) {
+        int minY = location.getBlockY();
+
+        List<Integer> point = new ArrayList<>();
+        List<Location> points = new ArrayList<>();
+        points.add(new Location(location.getWorld(), this.maxX-substractX, minY, this.maxZ-substractZ));
+        points.add(new Location(location.getWorld(), this.minX-substractX, minY, this.minZ-substractZ));
+        points.add(new Location(location.getWorld(), this.minX-substractX, minY, this.maxZ-substractZ));
+        points.add(new Location(location.getWorld(), this.maxX-substractX, minY, this.minZ-substractZ));
+        for(Location pointX : points) {
+            points.set(points.indexOf(pointX), rotate(pointX, rotation));
+            pointX.add(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+            minX = Math.min(minX, pointX.getBlockX());
+            minZ = Math.min(minZ, pointX.getBlockZ());
+            maxX = Math.max(maxX, pointX.getBlockX());
+            maxZ = Math.max(maxZ, pointX.getBlockZ());
+        }
+
+        point.add(minX);
+        point.add(minZ);
+        point.add(maxX);
+        point.add(maxZ);
+
+        return point;
     }
 
     public boolean preview(Location location, int rotation, boolean set) {
@@ -147,7 +175,7 @@ public class Schematic {
             color1 = Color.GREEN;
             color2 = Color.LIME;
             if(set) {
-                profile.getRegions().add(new Region(location.getWorld(), minX, maxX, minZ, maxZ));
+                profile.getRegions().add(new Region(location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString()));
             }
         }
 
@@ -194,12 +222,16 @@ public class Schematic {
                 @Override
                 public void run() {
                     if(millis[0] <= 0) {
-                        countdown.remove();
-                        cancel();
                         Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+                        for(Player player : profile.getWorld().getWorld().getPlayers()) {
+                            player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_finished-building"));
+                        }
+                        FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
                         if(schematicType == SchematicType.NEXUS) {
                             profile.setNexusLevel(level);
                         }
+                        countdown.remove();
+                        cancel();
                     } else {
                         millis[0] = millis[0]-1000;
                         counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
@@ -264,6 +296,10 @@ public class Schematic {
                     }
                 }
             }.runTaskTimer(plugin, 0, (long) blocksPerSecond);
+            Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
+            if(minX[0] != Integer.MAX_VALUE) {
+                profile.getRegions().add(new Region(location.getWorld(), minX[0], maxX[0], minZ[0], maxZ[0], schematicType.toString()));
+            }
         }
     }
 
@@ -271,7 +307,7 @@ public class Schematic {
         plugin.getSchematicManager().getBuiltSchematics().put(schematicId, new ArrayList<>());
         int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
         for(int j = 0; j < blocks.size(); j++) {
-            Location block = setBlock(blocks.get(j) ,rotation, location, null, schematicId);
+            Location block = setBlock(blocks.get(j), rotation, location, null, schematicId);
             minX = Math.min(minX, block.getBlockX());
             minZ = Math.min(minZ, block.getBlockZ());
             maxX = Math.max(maxX, block.getBlockX());
@@ -283,6 +319,10 @@ public class Schematic {
         if(schematicType == SchematicType.NEXUS) {
             profile.setNexusLevel(level);
         }
+
+        assert minX != Integer.MAX_VALUE;
+
+        profile.getRegions().add(new Region(location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString()));
     }
 
     private Location setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {

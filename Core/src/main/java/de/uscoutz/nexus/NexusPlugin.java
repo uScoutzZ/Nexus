@@ -73,6 +73,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new AsyncPlayerChatListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));
