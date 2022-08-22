@@ -18,6 +18,7 @@ import eu.thesimplecloud.api.service.ICloudService;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
@@ -100,8 +101,11 @@ public class NexusPlayer {
         }
         joinedProfile = System.currentTimeMillis();
         //ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Set active profile");
         if(profile.isPrepared()) {
+            Bukkit.getConsoleSender().sendMessage("[Nexus] Prepared");
             if(!profile.loaded()) {
+                Bukkit.getConsoleSender().sendMessage("[Nexus] Not loaded");
                 if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
                     String server = plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId());
                     if(!server.equals(plugin.getNexusServer().getThisServiceName())) {
@@ -124,6 +128,7 @@ public class NexusPlayer {
                         return setActiveProfile(profileSlot, join);
                     }
                 } else {
+                    Bukkit.getConsoleSender().sendMessage("[Nexus] Load..");
                     profile.load();
                     /*if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
                         profile.load(player);
@@ -132,7 +137,11 @@ public class NexusPlayer {
                         CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);
                     }*/
                 }
+            } else {
+                Bukkit.getConsoleSender().sendMessage("[Nexus] Profile already loaded");
             }
+        } else {
+            Bukkit.getConsoleSender().sendMessage("[Nexus] Not prepared");
         }
 
         if(profile.loaded()) {
@@ -231,6 +240,7 @@ public class NexusPlayer {
     }
 
     public void loadProfiles() {
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Loading profiles");
         profilesMap.clear();
         ResultSet resultSet = plugin.getDatabaseAdapter().get("playerProfiles", "player", String.valueOf(uuid));
         try {
@@ -239,9 +249,11 @@ public class NexusPlayer {
                 int slot = resultSet.getInt("slot");
                 Profile profile;
                 if(plugin.getProfileManager().getProfilesMap().containsKey(profileId)) {
+                    Bukkit.getConsoleSender().sendMessage("[Nexus] Profile already prepared");
                     profile = plugin.getProfileManager().getProfilesMap().get(profileId);
                 } else {
                     profile = new Profile(profileId, plugin);
+                    Bukkit.getConsoleSender().sendMessage("[Nexus] Gonna prepare profile");
                 }
                 profilesMap.put(slot, profile);
             }

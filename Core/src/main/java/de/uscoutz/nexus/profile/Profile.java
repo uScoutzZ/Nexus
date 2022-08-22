@@ -138,6 +138,8 @@ public class Profile {
                     new DatabaseUpdate("nexusLevel", nexusLevel),
                     new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
             saveStorages();
+            world = null;
+            loading = false;
         }
 
        /* new BukkitRunnable() {
@@ -183,6 +185,7 @@ public class Profile {
     }
 
     public void load() {
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Now loading profile");
         if(!loading) {
             loading = true;
             loadMembers();
@@ -199,8 +202,8 @@ public class Profile {
                     exception.printStackTrace();
                 }
 
-
                 world = new NexusWorld(this, plugin);
+                Bukkit.getConsoleSender().sendMessage("[Nexus] Set world");
                 plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
                 new BukkitRunnable() {
                     @Override
@@ -215,6 +218,7 @@ public class Profile {
     }
 
     public void prepare() {
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Preparing");
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("profiles", "profileId", String.valueOf(profileId));
 
         try {
