@@ -11,6 +11,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 
 public class InventorySerializer {
@@ -45,7 +46,11 @@ public class InventorySerializer {
             }
 
             for(int i = 0; i < inventory.getSize(); ++i) {
-                inventory.setItem(i, (ItemStack)dataInput.readObject());
+                try {
+                    inventory.setItem(i, (ItemStack)dataInput.readObject());
+                } catch (EOFException exception) {
+                    //
+                }
             }
 
             dataInput.close();

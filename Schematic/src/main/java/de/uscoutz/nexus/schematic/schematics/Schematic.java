@@ -23,6 +23,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.type.Wall;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.*;
@@ -75,7 +76,7 @@ public class Schematic {
         xLength = maxX-minX;
         zLength = maxZ-minZ;
 
-        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.BEACON, Material.LANTERN, Material.TORCH, Material.LAVA);
+        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.OAK_WALL_SIGN, Material.BEACON, Material.LANTERN, Material.TORCH, Material.LAVA);
         List<Block> toAdd = new ArrayList<>();
         for(int j = minY; j <= maxY; j++) {
             for(int i = minX; i <= maxX; i++) {
@@ -350,6 +351,68 @@ public class Schematic {
         BlockData blockData = block.getBlockData();
 
         blockLocation.getBlock().setBlockData(blockData);
+        Map<Integer, Integer> order = new HashMap<>();
+        order.put(90, 3);
+        order.put(180, 2);
+        order.put(270, 1);
+        List<BlockFace> blockFaces = new ArrayList<>();
+        blockFaces.add(BlockFace.NORTH);
+        blockFaces.add(BlockFace.EAST);
+        blockFaces.add(BlockFace.SOUTH);
+        blockFaces.add(BlockFace.WEST);
+
+        if(block.getBlockData() instanceof MultipleFacing) {
+            MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
+            List<BlockFace> newFaces = new ArrayList<>();
+
+            if (rotation != 0) {
+                for(BlockFace blockFace : blockFaces) {
+                    if(multipleFacing.hasFace(blockFace)) {
+                        newFaces.add(getBlockFace(blockFace, order.get(rotation)));
+                    }
+                }
+                for (BlockFace face : multipleFacing.getFaces()) {
+                    multipleFacing.setFace(face, false);
+                }
+                for (BlockFace face : newFaces) {
+                    multipleFacing.setFace(face, true);
+                }
+                blockLocation.getBlock().setBlockData(multipleFacing);
+            }
+        } else if(blockData instanceof Wall) {
+            Wall wall = (Wall) blockData;
+            Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
+
+            if (rotation != 0) {
+                int newRotation = rotation;
+                if(newRotation == 90) {
+                    newRotation = 270;
+                } else if(newRotation == 270) {
+                    newRotation = 90;
+                }
+                for(BlockFace blockFace : blockFaces) {
+                    newFaces.put(blockFace, wall.getHeight(getBlockFace(blockFace,
+                            order.get(newRotation))));
+                }
+                for (BlockFace face : blockFaces) {
+                    wall.setHeight(face, Wall.Height.NONE);
+                }
+                for (BlockFace face : newFaces.keySet()) {
+                    wall.setHeight(face, newFaces.get(face));
+                }
+                blockLocation.getBlock().setBlockData(wall);
+            }
+        } else if (blockData instanceof Directional) {
+            Directional directional = (Directional) blockData;
+
+            if(rotation != 0) {
+                if(directional.getFacing() != BlockFace.UP && directional.getFacing() != BlockFace.DOWN) {
+                    directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
+                    blockLocation.getBlock().setBlockData(directional);
+                }
+            }
+        }
+
         if(block.getState() instanceof Sign) {
             Block pastedBlock = blockLocation.getBlock();
             Sign sign = (Sign) block.getState();
@@ -390,9 +453,28 @@ public class Schematic {
 
                 blockLocation.getBlock().setType(Material.AIR);
             } else if(pastedSign.getLine(0).equals("[STORAGE]")) {
+                Block storage;
+                if(block.getBlockData() instanceof WallSign) {
+                    WallSign wallSign = (WallSign) blockLocation.getBlock().getBlockData();
+
+                    if(wallSign.getFacing() == BlockFace.SOUTH) {
+                        storage = blockLocation.clone().subtract(0, 0, 1).getBlock();
+                    } else if(wallSign.getFacing() == BlockFace.WEST) {
+                        storage = blockLocation.clone().add(1, 0, 0).getBlock();
+                    } else if(wallSign.getFacing() == BlockFace.NORTH) {
+                        storage = blockLocation.clone().add(0, 0, 1).getBlock();
+                    } else {
+                        storage = blockLocation.clone().subtract(1, 0, 0).getBlock();
+                    }
+                    if(storage.getType() == Material.AIR) {
+                        Bukkit.getConsoleSender().sendMessage(storage.getLocation() +" ");
+                    }
+                } else {
+                    storage = blockLocation.clone().subtract(0, 1, 0).getBlock();
+                }
                 String storageId = pastedSign.getLine(1);
                 Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(location.getWorld());
-                Block storage = blockLocation.clone().subtract(0, 1, 0).getBlock();
+
                 if(storage.getState() instanceof Container) {
                     Container container = (Container) storage.getState();
                     if(!profile.getStorages().containsKey(storageId)) {
@@ -403,75 +485,21 @@ public class Schematic {
                     String contents = profile.getStorages().get(storageId);
                     profile.getStorageBlocks().put(storageId, container);
                     if(!contents.equals("")) {
-                        container.getInventory().setContents(InventorySerializer.fromBase64(contents).getContents());
+                        try {
+                            container.getInventory().setContents(InventorySerializer.fromBase64(contents).getContents());
+                        } catch (IllegalArgumentException exception) {
+                            for(ItemStack itemStack : InventorySerializer.fromBase64(contents).getContents()) {
+                                if(itemStack != null) {
+                                    container.getInventory().addItem(itemStack);
+                                }
+                            }
+                        }
                     }
                 }
                 pastedSign.getBlock().setType(Material.AIR);
             }
-        } else {
-            Map<Integer, Integer> order = new HashMap<>();
-            order.put(90, 3);
-            order.put(180, 2);
-            order.put(270, 1);
-            List<BlockFace> blockFaces = new ArrayList<>();
-            blockFaces.add(BlockFace.NORTH);
-            blockFaces.add(BlockFace.EAST);
-            blockFaces.add(BlockFace.SOUTH);
-            blockFaces.add(BlockFace.WEST);
-
-            if(block.getBlockData() instanceof MultipleFacing) {
-                MultipleFacing multipleFacing = (MultipleFacing) block.getBlockData();
-                List<BlockFace> newFaces = new ArrayList<>();
-
-                if (rotation != 0) {
-                    for(BlockFace blockFace : blockFaces) {
-                        if(multipleFacing.hasFace(blockFace)) {
-                            newFaces.add(getBlockFace(blockFace, order.get(rotation)));
-                        }
-                    }
-                    for (BlockFace face : multipleFacing.getFaces()) {
-                        multipleFacing.setFace(face, false);
-                    }
-                    for (BlockFace face : newFaces) {
-                        multipleFacing.setFace(face, true);
-                    }
-                    blockLocation.getBlock().setBlockData(multipleFacing);
-                }
-            } else if(blockData instanceof Wall) {
-                Wall wall = (Wall) blockData;
-                Map<BlockFace, Wall.Height> newFaces = new HashMap<>();
-
-                if (rotation != 0) {
-                    int newRotation = rotation;
-                    if(newRotation == 90) {
-                        newRotation = 270;
-                    } else if(newRotation == 270) {
-                        newRotation = 90;
-                    }
-                    for(BlockFace blockFace : blockFaces) {
-                        newFaces.put(blockFace, wall.getHeight(getBlockFace(blockFace,
-                                order.get(newRotation))));
-                    }
-                    for (BlockFace face : blockFaces) {
-                        wall.setHeight(face, Wall.Height.NONE);
-                    }
-                    for (BlockFace face : newFaces.keySet()) {
-                        wall.setHeight(face, newFaces.get(face));
-                    }
-                    blockLocation.getBlock().setBlockData(wall);
-                }
-            } else if (blockData instanceof Directional) {
-                Directional directional = (Directional) blockData;
-
-                if(rotation != 0) {
-                    if(directional.getFacing() != BlockFace.UP && directional.getFacing() != BlockFace.DOWN) {
-                        directional.setFacing(getBlockFace(directional.getFacing(), order.get(rotation)));
-                        blockLocation.getBlock().setBlockData(directional);
-                    }
-
-                }
-            }
         }
+
 
         return blockLocation;
     }

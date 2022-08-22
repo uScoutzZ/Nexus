@@ -8,6 +8,7 @@ import de.uscoutz.nexus.schematic.listener.block.BlockPhysicsListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
 import de.uscoutz.nexus.schematic.listener.block.BlockSpreadListener;
 import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
+import de.uscoutz.nexus.schematic.listener.inventory.InventoryOpenListener;
 import de.uscoutz.nexus.schematic.listener.player.*;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
@@ -78,6 +79,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockSpreadListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockGrowListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryOpenListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }
