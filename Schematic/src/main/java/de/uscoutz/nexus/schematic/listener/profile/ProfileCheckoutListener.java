@@ -1,10 +1,10 @@
 package de.uscoutz.nexus.schematic.listener.profile;
 
 import de.uscoutz.nexus.events.ProfileCheckoutEvent;
-import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
+import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -25,7 +25,7 @@ public class ProfileCheckoutListener implements Listener {
         Profile profile = event.getProfile();
 
         for(UUID schematicId : profile.getSchematicIds()) {
-            Schematic.destroy(schematicId, plugin, false);
+            Schematic.destroy(profile, schematicId, plugin, false);
         }
 
         for(Entity entity : profile.getWorld().getWorld().getEntities()) {
@@ -33,5 +33,7 @@ public class ProfileCheckoutListener implements Listener {
                 entity.remove();
             }
         }
+
+        plugin.getSchematicManager().getSchematicProfileMap().remove(profile.getProfileId());
     }
 }

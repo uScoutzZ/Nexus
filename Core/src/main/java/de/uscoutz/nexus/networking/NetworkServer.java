@@ -2,7 +2,6 @@ package de.uscoutz.nexus.networking;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.networking.packet.packets.PacketHandler;
-import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -43,15 +42,4 @@ public class NetworkServer {
 
         }).start();
     }
-
-    /*private void setupDatabase() {
-        plugin.getDatabaseAdapter().query("CREATE TABLE IF NOT EXISTS serviceInfo (servername VARCHAR(30), servicePort INT(5))");
-
-        if(plugin.getDatabaseAdapter().keyExists("serviceInfo", "servicePort", port)) {
-            plugin.getDatabaseAdapter().delete("serviceInfo", "servicePort", port);
-        }
-
-        plugin.getDatabaseAdapter().set("serviceinfo", Bukkit.getServer().getName(), port);
-    }*/
-
 }

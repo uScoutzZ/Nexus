@@ -34,7 +34,7 @@ public class PaginatedInventory extends SimpleInventory {
             this.dynamicSlots.add(i);
         }
         Collections.sort(this.dynamicSlots);
-        if (this.dynamicSlots.size() <= 0) {
+        if (this.dynamicSlots.size() == 0) {
             return;
         }
         if (this.dynamicSlots.get(0) < 0) {

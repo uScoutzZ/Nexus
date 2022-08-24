@@ -7,7 +7,6 @@ import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.service.ICloudService;
 import eu.thesimplecloud.plugin.startup.CloudPlugin;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.redisson.Redisson;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
@@ -65,7 +64,7 @@ public class NexusServer {
 
     public int getProfileCount() {
         int count = 0;
-        for(Profile profile : NexusPlugin.getInstance().getProfileManager().getProfilesMap().values()) {
+        for(Profile profile : plugin.getProfileManager().getProfilesMap().values()) {
             if(profile.loaded()) {
                 count++;
             }

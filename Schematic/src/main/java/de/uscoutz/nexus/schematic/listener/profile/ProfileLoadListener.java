@@ -5,6 +5,7 @@ import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
+import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,7 +32,8 @@ public class ProfileLoadListener implements Listener {
     public void onProfileLoad(ProfileLoadEvent event) {
         Profile profile = event.getProfile();
 
-        ResultSet resultSet = NexusPlugin.getInstance().getDatabaseAdapter().getAsync("schematics", "profileId",
+        plugin.getSchematicManager().getSchematicProfileMap().put(profile.getProfileId(), new SchematicProfile(profile, plugin));
+        ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().getAsync("schematics", "profileId",
                 String.valueOf(profile.getProfileId()));
         try {
             while(resultSet.next()) {
@@ -56,10 +58,11 @@ public class ProfileLoadListener implements Listener {
             @Override
             public void run() {
                 World world = profile.getWorld().getWorld();
-                for(int i = 1; i < plugin.getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).size()-1; i++) {
-                    Material material = Material.AIR;
-                    if(i > profile.getNexusLevel()) {
-                        material = Material.RED_STAINED_GLASS;
+                for(int i = 0; i < plugin.getSchematicManager().getSchematicsMap().get(SchematicType.TOWER).size()-1; i++) {
+                    Material material = Material.RED_STAINED_GLASS;
+                    Bukkit.getConsoleSender().sendMessage("[Nexus] Highest tower: " + profile.getHighestTower());
+                    if(i <= profile.getHighestTower()) {
+                        material = Material.AIR;
                     }
                     for(Block block : plugin.getGatewayManager().getGateways().get(i).getBlocksInRegion(world)) {
                         block.setType(material);

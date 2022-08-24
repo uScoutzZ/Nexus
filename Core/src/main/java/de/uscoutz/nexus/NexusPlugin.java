@@ -5,12 +5,14 @@ import de.uscoutz.nexus.database.DatabaseAdapter;
 import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
 import de.uscoutz.nexus.inventory.InventoryListener;
 import de.uscoutz.nexus.listeners.block.BlockBreakListener;
+import de.uscoutz.nexus.listeners.entity.EntityDamageByEntityListener;
 import de.uscoutz.nexus.listeners.player.*;
 import de.uscoutz.nexus.locations.LocationManager;
 import de.uscoutz.nexus.networking.NetworkServer;
 import de.uscoutz.nexus.networking.NexusServer;
 import de.uscoutz.nexus.player.PlayerManager;
 import de.uscoutz.nexus.profile.ProfileManager;
+import de.uscoutz.nexus.regions.RegionManager;
 import de.uscoutz.nexus.utilities.LocaleManager;
 import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
@@ -41,7 +43,8 @@ public class NexusPlugin extends JavaPlugin {
     private LocationManager locationManager;
     @Getter
     private ToolManager toolManager;
-
+    @Getter
+    private RegionManager regionManager;
 
     private NetworkServer networkServer;
 
@@ -62,6 +65,7 @@ public class NexusPlugin extends JavaPlugin {
                 new File("/home/networksync/nexus/blockresistance.yml"));
         toolManager.loadTools();
         toolManager.loadBlockResistances();
+        regionManager = new RegionManager(this);
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
@@ -74,6 +78,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InventoryListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
         Bukkit.getPluginManager().registerEvents(new AsyncPlayerChatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));

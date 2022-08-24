@@ -9,7 +9,6 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -17,23 +16,19 @@ import org.bukkit.persistence.PersistentDataContainer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SchematicItemManager {
 
-    private NexusPlugin plugin;
-    private NexusSchematicPlugin schematicPlugin;
+    private NexusSchematicPlugin plugin;
 
     @Getter
     private Map<String, SchematicItem> schematicItemMap;
     private File itemsFile;
     private FileConfiguration itemsConfig;
 
-    public SchematicItemManager(NexusSchematicPlugin schematicPlugin, NexusPlugin plugin, File itemsFile) {
-        this.schematicPlugin = schematicPlugin;
+    public SchematicItemManager(NexusSchematicPlugin plugin, File itemsFile) {
         this.plugin = plugin;
         schematicItemMap = new HashMap<>();
         this.itemsFile = itemsFile;
@@ -52,7 +47,7 @@ public class SchematicItemManager {
             Material material = Material.getMaterial(itemsConfig.getString(key + ".material"));
             SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
             int level = itemsConfig.getInt(key + ".level");
-            Schematic schematic = schematicPlugin.getSchematicManager()
+            Schematic schematic = plugin.getSchematicManager()
                     .getSchematicsMap().get(schematicType).get(level);
             if(schematic == null) {
                 Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
@@ -70,7 +65,7 @@ public class SchematicItemManager {
 
     public boolean isSchematicItem(ItemMeta itemMeta) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(NexusPlugin.getInstance().getName().toLowerCase(), "schematictype");
+        NamespacedKey namespacedKey = new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "schematictype");
         return dataContainer.has(namespacedKey);
     }
 }

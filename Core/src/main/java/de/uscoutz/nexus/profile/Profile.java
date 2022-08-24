@@ -16,6 +16,8 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,7 +40,7 @@ public class Profile {
     @Getter
     private Map<String, Container> storageBlocks;
     @Getter @Setter
-    private int nexusLevel, concurrentlyBuilding;
+    private int nexusLevel, concurrentlyBuilding, highestTower = -1;
     @Getter
     private long start, lastActivity;
     @Getter
@@ -141,13 +143,6 @@ public class Profile {
             world = null;
             loading = false;
         }
-
-       /* new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getProfileManager().getProfilesMap().remove(profileId);
-            }
-        }.runTaskLater(plugin, 3);*/
     }
 
     public void saveStorages() {

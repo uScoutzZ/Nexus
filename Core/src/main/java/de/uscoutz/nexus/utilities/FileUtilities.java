@@ -44,8 +44,6 @@ public class FileUtilities {
             if(path.toFile().exists()) {
                 Files.delete(path);
             }
-        } catch (NoSuchFileException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

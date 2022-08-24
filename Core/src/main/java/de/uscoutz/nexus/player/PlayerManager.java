@@ -2,7 +2,6 @@ package de.uscoutz.nexus.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;

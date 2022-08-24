@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-public class ProfileSchematic {
+public class BuiltSchematic {
 
     private NexusSchematicPlugin plugin;
 
@@ -13,10 +13,10 @@ public class ProfileSchematic {
     private Schematic schematic;
     @Getter
     private UUID schematicId;
-    @Getter
-    private long placed;
 
-    public ProfileSchematic(NexusSchematicPlugin plugin) {
+    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, UUID schematicId) {
         this.plugin = plugin;
+        this.schematic = schematic;
+        this.schematicId = schematicId;
     }
 }

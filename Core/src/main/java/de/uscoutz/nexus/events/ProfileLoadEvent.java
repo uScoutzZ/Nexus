@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList;
 public class ProfileLoadEvent extends Event {
 
     @Getter
-    public static HandlerList handlerList = new HandlerList();;
+    public static HandlerList handlerList = new HandlerList();
 
     @Getter
     private Profile profile;

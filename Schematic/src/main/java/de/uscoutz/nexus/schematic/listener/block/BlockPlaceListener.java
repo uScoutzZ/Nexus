@@ -7,14 +7,10 @@ import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -43,17 +39,17 @@ public class BlockPlaceListener implements Listener {
             if(plugin.getSchematicItemManager().isSchematicItem(itemMeta)) {
                 event.setCancelled(true);
                 PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                String key = dataContainer.get(new NamespacedKey(NexusPlugin.getInstance().getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                String key = dataContainer.get(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemMap().get(key);
                 Schematic schematic = schematicItem.getSchematic();
 
                 UUID schematicId = UUID.randomUUID();
                 Location location = event.getBlock().getLocation().subtract(0, 1, 0);
                 int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                int maxConcurrentBuildings = NexusPlugin.getInstance().getConfig().getInt("concurrently-building");
-                Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+                Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
                 if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
-                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                 } else {
                     if(!schematicItem.getSchematic().preview(location, rotation, true)) {
                         if(schematic.getTimeToFinish() != 0) {
@@ -63,11 +59,11 @@ public class BlockPlaceListener implements Listener {
                             schematic.build(location, rotation, schematicId);
                         }
                         String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-                        NexusPlugin.getInstance().getDatabaseAdapter().set("schematics",
-                                NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
+                        plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
+                                plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
                                 schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
                     } else {
-                        player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                        player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                     }
                 }
             }

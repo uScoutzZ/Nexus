@@ -3,10 +3,7 @@ package de.uscoutz.nexus.schematic;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
 import de.uscoutz.nexus.schematic.gateways.GatewayManager;
-import de.uscoutz.nexus.schematic.listener.block.BlockGrowListener;
-import de.uscoutz.nexus.schematic.listener.block.BlockPhysicsListener;
-import de.uscoutz.nexus.schematic.listener.block.BlockPlaceListener;
-import de.uscoutz.nexus.schematic.listener.block.BlockSpreadListener;
+import de.uscoutz.nexus.schematic.listener.block.*;
 import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
 import de.uscoutz.nexus.schematic.listener.inventory.InventoryOpenListener;
 import de.uscoutz.nexus.schematic.listener.player.*;
@@ -30,6 +27,8 @@ public class NexusSchematicPlugin extends JavaPlugin {
 
     @Getter
     private static NexusSchematicPlugin instance;
+    @Getter
+    private NexusPlugin nexusPlugin;
 
     @Getter
     private SchematicPlayerManager playerManager;
@@ -50,6 +49,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        nexusPlugin = NexusPlugin.getInstance();
         playerManager = new SchematicPlayerManager(this);
         fileManager = new FileManager(this);
         fileManager.loadSchematicFiles();
@@ -57,7 +57,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         schematicManager.loadSchematics();
         collectorManager = new CollectorManager(new File("/home/networksync/nexus/schematiccollectors.yml"), this);
         collectorManager.loadCollectors();
-        schematicItemManager = new SchematicItemManager(this, NexusPlugin.getInstance(),
+        schematicItemManager = new SchematicItemManager(this,
                 new File("/home/networksync/nexus/schematicitems.yml"));
         schematicItemManager.loadItems();
         gatewayManager = new GatewayManager(new File("/home/networksync/nexus/gateways.yml"), this);
@@ -72,6 +72,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerItemHeldListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
         Bukkit.getPluginManager().registerEvents(new ProfileLoadListener(this), this);
         Bukkit.getPluginManager().registerEvents(new ProfileCheckoutListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityChangeBlockListener(this), this);

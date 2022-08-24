@@ -13,3 +13,4 @@ commands:
   profileunload:
 loadbefore:
   - NexusSchematic
+  - NexusWave

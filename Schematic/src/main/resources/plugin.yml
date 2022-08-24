@@ -10,3 +10,5 @@ commands:
   getupgradeitems:
 depend:
   - NexusCore
+loadbefore:
+  - NexusWave

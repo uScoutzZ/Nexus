@@ -5,6 +5,7 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -70,6 +71,7 @@ public class Collector {
 
             armorStand.setSmall(true);
             armorStand.addPassenger(item);
+            //armorStand.customName(Component.text("§7" + neededItems.get(needed) + "x " + item.getItemStack().getI18NDisplayName()));
             armorStand.setCustomName("§7" + neededItems.get(needed) + "x " + item.getItemStack().getI18NDisplayName());
             armorStand.setCustomNameVisible(true);
             armorStand.setVisible(false);
@@ -81,13 +83,13 @@ public class Collector {
     public void collect(Player player, Item item) {
         ItemStack itemStack = item.getItemStack();
         if(neededItems.containsKey(itemStack.getType())) {
-            int maxConcurrentBuildings = NexusPlugin.getInstance().getConfig().getInt("concurrently-building");
-            Profile profile = NexusPlugin.getInstance().getWorldManager().getWorldProfileMap().get(player.getWorld());
+            int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+            Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
             if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
-                player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                 player.getInventory().addItem(item.getItemStack());
             } else {
-                if(requiredNexusLevel <= NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
+                if(requiredNexusLevel <= plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
                     int neededAmount = neededItems.get(itemStack.getType());
                     if(neededAmount >= itemStack.getAmount()) {
                         neededItems.replace(itemStack.getType(), neededAmount- itemStack.getAmount());
@@ -102,21 +104,22 @@ public class Collector {
                         if(neededItems.size() == 0) {
                             actionOnFull.accept(player);
                             destroy();
-                            NexusPlugin.getInstance().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+                            plugin.getNexusPlugin().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
                         } else {
                             destroyHolograms();
                             spawnHolograms();
                         }
                     } else {
+                        //hologram.get(itemStack.getType()).customName(Component.text("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName()));
                         hologram.get(itemStack.getType()).setCustomName("§7" + neededAmount + "x " + item.getItemStack().getI18NDisplayName());
                     }
 
                     if(!destroyed) {
-                        NexusPlugin.getInstance().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
+                        plugin.getNexusPlugin().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
                                 new DatabaseUpdate("neededItems", toString()));
                     }
                 } else {
-                    player.sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "collector_wrong-level"));
+                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "collector_wrong-level"));
                     player.getInventory().addItem(item.getItemStack());
                 }
             }

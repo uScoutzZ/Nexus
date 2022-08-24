@@ -41,12 +41,12 @@ public class GatewayManager {
 
     public void loadGateways() {
         fileConfiguration = YamlConfiguration.loadConfiguration(gatewayFile);
-        int nexusLevels = plugin.getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).size();
-        for(int i = 1; i < nexusLevels-1; i++) {
+        int nexusLevels = plugin.getSchematicManager().getSchematicsMap().get(SchematicType.TOWER).size();
+        for(int i = 0; i < nexusLevels-1; i++) {
             Location location1, location2;
-            location1 = NexusPlugin.getInstance().getLocationManager().getLocation(fileConfiguration, i + ".location1", Bukkit.getWorlds().get(0));
-            location2 = NexusPlugin.getInstance().getLocationManager().getLocation(fileConfiguration, i + ".location2", Bukkit.getWorlds().get(0));
-            Region region = new Region(Math.min(location1.getBlockX(), location2.getBlockX()),
+            location1 = plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location1", Bukkit.getWorlds().get(0));
+            location2 = plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location2", Bukkit.getWorlds().get(0));
+            Region region = new Region(plugin.getNexusPlugin(), Math.min(location1.getBlockX(), location2.getBlockX()),
                     Math.max(location1.getBlockX(), location2.getBlockX()),
                     Math.min(location1.getBlockY(), location2.getBlockY()),
                     Math.max(location1.getBlockY(), location2.getBlockY()),

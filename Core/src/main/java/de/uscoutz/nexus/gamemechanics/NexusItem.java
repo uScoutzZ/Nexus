@@ -1,7 +1,6 @@
 package de.uscoutz.nexus.gamemechanics;
 
 import de.uscoutz.nexus.NexusPlugin;
-import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.item.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;

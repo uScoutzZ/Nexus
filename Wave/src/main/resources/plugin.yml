@@ -1,0 +1,10 @@
+name: NexusWave
+author: uScoutz
+version: 1.0
+main: de.uscoutz.nexus.wave.NexusWavePlugin
+api-version: 1.19
+commands:
+  spawnentity:
+depend:
+  - NexusCore
+  - NexusSchematic

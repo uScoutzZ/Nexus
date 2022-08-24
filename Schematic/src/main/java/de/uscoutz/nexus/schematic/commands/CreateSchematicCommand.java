@@ -3,7 +3,6 @@ package de.uscoutz.nexus.schematic.commands;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
-import lombok.Getter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

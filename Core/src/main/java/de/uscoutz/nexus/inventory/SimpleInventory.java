@@ -3,6 +3,7 @@ package de.uscoutz.nexus.inventory;
 import de.uscoutz.nexus.item.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,7 +39,7 @@ public class SimpleInventory implements Cloneable{
     }
 
     SimpleInventory(int size, String title) {
-        inventory = Bukkit.createInventory(null, size, title);
+        inventory = Bukkit.createInventory(null, size, Component.text(title));
     }
 
     SimpleInventory(int size) {
@@ -50,7 +51,7 @@ public class SimpleInventory implements Cloneable{
     }
 
     SimpleInventory(InventoryType type, String title) {
-        inventory = Bukkit.createInventory(null, type, title);
+        inventory = Bukkit.createInventory(null, type, Component.text(title));
     }
 
     public SimpleInventory setItem(int slot, ItemStack item, Consumer<InventoryClickEvent> eventConsumer) {

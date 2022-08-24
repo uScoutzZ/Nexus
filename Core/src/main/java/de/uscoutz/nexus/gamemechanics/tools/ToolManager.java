@@ -88,10 +88,6 @@ public class ToolManager {
     public boolean isTool(ItemMeta itemMeta) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
-        if(dataContainer.has(namespacedKey)) {
-            return true;
-        } else {
-            return false;
-        }
+        return dataContainer.has(namespacedKey);
     }
 }

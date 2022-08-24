@@ -4,7 +4,6 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.networking.packet.Packet;
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;

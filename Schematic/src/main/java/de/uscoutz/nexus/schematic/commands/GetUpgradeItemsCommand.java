@@ -1,8 +1,6 @@
 package de.uscoutz.nexus.schematic.commands;
 
-import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
-import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class GetUpgradeItemsCommand implements CommandExecutor {
 

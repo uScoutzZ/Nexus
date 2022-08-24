@@ -3,11 +3,9 @@ package de.uscoutz.nexus.schematic.laser;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Constructor;
@@ -18,7 +16,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -692,17 +689,17 @@ public abstract class Laser {
             private final String teamSetCollision;
             private final String teamGetPlayers;
 
-            private ProtocolMappings(int major, ProtocolMappings parent) {
+            ProtocolMappings(int major, ProtocolMappings parent) {
                 this(major, parent.watcherFlags, parent.watcherSpikes, parent.watcherTargetEntity, parent.watcherTargetLocation, parent.watcherBasePlate, parent.squidID, parent.guardianID, parent.guardianTypeName, parent.squidTypeName, parent.crystalTypeName, parent.teamSetCollision, parent.teamGetPlayers);
             }
 
-            private ProtocolMappings(int major,
+            ProtocolMappings(int major,
                                      String watcherFlags, String watcherSpikes, String watcherTargetEntity, String watcherTargetLocation, String watcherBasePlate,
                                      int squidID, int guardianID) {
                 this(major, watcherFlags, watcherSpikes, watcherTargetEntity, watcherTargetLocation, watcherBasePlate, squidID, guardianID, null, "SQUID", "END_CRYSTAL", null, null);
             }
 
-            private ProtocolMappings(int major,
+            ProtocolMappings(int major,
                                      String watcherFlags, String watcherSpikes, String watcherTargetEntity, String watcherTargetLocation, String watcherBasePlate,
                                      int squidID, int guardianID,
                                      String guardianTypeName, String squidTypeName, String crystalTypeName, String teamSetCollision, String teamGetPlayers) {

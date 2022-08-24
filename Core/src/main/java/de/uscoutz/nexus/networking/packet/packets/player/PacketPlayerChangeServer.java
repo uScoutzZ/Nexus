@@ -3,7 +3,6 @@ package de.uscoutz.nexus.networking.packet.packets.player;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.networking.packet.Packet;
 import de.uscoutz.nexus.player.NexusPlayer;
-import org.bukkit.Bukkit;
 
 import java.util.UUID;
 

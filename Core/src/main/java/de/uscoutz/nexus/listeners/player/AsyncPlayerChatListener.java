@@ -2,22 +2,21 @@ package de.uscoutz.nexus.listeners.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.networking.packet.packets.player.PacketPlayerChat;
-import de.uscoutz.nexus.networking.packet.packets.profiles.PacketRequestProfilesCount;
 import eu.thesimplecloud.api.service.ICloudService;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AsyncPlayerChatListener implements Listener {
 
-    private NexusPlugin plugin;
+    private final NexusPlugin plugin;
 
     public AsyncPlayerChatListener(NexusPlugin plugin) {
         this.plugin = plugin;
@@ -28,6 +27,7 @@ public class AsyncPlayerChatListener implements Listener {
         event.setCancelled(true);
         TextComponent messageComponent = (TextComponent) event.message();
         String message = messageComponent.content();
+        String displayName = ChatColor.translateAlternateColorCodes('&', LegacyComponentSerializer.legacyAmpersand().serialize(event.getPlayer().displayName()));
 
         if(message.startsWith("@")) {
             Map<String, Integer> substringCommand = new HashMap<>();
@@ -52,14 +52,14 @@ public class AsyncPlayerChatListener implements Listener {
                 }
                 if(!message.equals("")) {
                     for(Player all : event.getPlayer().getWorld().getPlayers()) {
-                        all.sendMessage("§7[§aCoop§7] " + event.getPlayer().getDisplayName() +"§7: §f" + message);
+                        all.sendMessage("§7[§aCoop§7] " + displayName +"§7: §f" + message);
                     }
                 }
                 return;
             }
         }
         for(ICloudService iCloudService : plugin.getNexusServer().getNexusServers()) {
-            new PacketPlayerChat("123", event.getPlayer().getDisplayName(), message).send(iCloudService);
+            new PacketPlayerChat("123", displayName, message).send(iCloudService);
         }
     }
 }

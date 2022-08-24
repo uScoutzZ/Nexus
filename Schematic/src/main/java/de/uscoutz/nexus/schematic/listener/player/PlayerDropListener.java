@@ -1,6 +1,5 @@
 package de.uscoutz.nexus.schematic.listener.player;
 
-import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import org.bukkit.Material;

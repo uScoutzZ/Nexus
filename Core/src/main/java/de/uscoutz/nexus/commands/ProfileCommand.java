@@ -24,24 +24,6 @@ public class ProfileCommand implements CommandExecutor {
             NexusPlayer nexusPlayer = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId());
 
             nexusPlayer.openProfiles();
-
-            /*if(args.length == 0) {
-                nexusPlayer.openProfiles();
-            } else {
-                if(args[0].equalsIgnoreCase("delete")) {
-                    if(args.length > 1) {
-                        if(args.length == 3) {
-
-                        } else if(args.length == 2) {
-
-                        }
-                    } else {
-                        sendHelp(player);
-                    }
-                } else {
-                    sendHelp(player);
-                }
-            }*/
         }
         return false;
     }

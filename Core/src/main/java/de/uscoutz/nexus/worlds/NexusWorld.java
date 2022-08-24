@@ -4,7 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,6 +30,7 @@ public class NexusWorld {
         world = plugin.getWorldManager().getEmptyWorlds().remove(0);
         plugin.getWorldManager().getWorldProfileMap().put(world, profile);
         spawn = world.getSpawnLocation();
+        world.setDifficulty(Difficulty.HARD);
         assign();
         new BukkitRunnable() {
             @Override

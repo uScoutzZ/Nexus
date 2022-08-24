@@ -3,7 +3,6 @@ package de.uscoutz.nexus.utilities;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -40,9 +39,9 @@ public class InventorySerializer {
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
 
             try {
-                inventory = Bukkit.createInventory(null, dataInput.readInt(), " ");
+                inventory = Bukkit.createInventory(null, dataInput.readInt(), Component.text(" "));
             } catch (Exception var6) {
-                inventory = Bukkit.createInventory(null, 36, " ");
+                inventory = Bukkit.createInventory(null, 36, Component.text(" "));
             }
 
             for(int i = 0; i < inventory.getSize(); ++i) {

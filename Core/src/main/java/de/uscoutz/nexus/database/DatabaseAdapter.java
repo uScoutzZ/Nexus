@@ -63,9 +63,7 @@ public class DatabaseAdapter {
 
         try {
             return future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -84,16 +82,16 @@ public class DatabaseAdapter {
 
         for(Object data : value) {
             if(value.length == i) {
-                stringBuilder.append("'" + data.toString() + "')");
+                stringBuilder.append("'").append(data.toString()).append("')");
             } else {
-                stringBuilder.append("'" + data.toString() + "', ");
+                stringBuilder.append("'").append(data.toString()).append("', ");
             }
             i++;
         }
 
         System.out.println(Arrays.toString(value));
 
-        System.out.println(stringBuilder.toString());
+        System.out.println(stringBuilder);
 
         this.mySQL.queryUpdate(stringBuilder.toString());
     }
@@ -212,9 +210,7 @@ public class DatabaseAdapter {
 
         try {
             return result.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -226,9 +222,7 @@ public class DatabaseAdapter {
 
         try {
             return result.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -279,7 +273,7 @@ class MySQL {
         try {
             connection.close();
         } catch (SQLException e) {
-
+            e.printStackTrace();
         }
     }
 

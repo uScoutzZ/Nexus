@@ -2,9 +2,7 @@ package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 import java.util.*;
 
@@ -15,15 +13,16 @@ public class SchematicManager {
     @Getter
     private Map<SchematicType, Map<Integer, Schematic>> schematicsMap;
     @Getter
-    private Map<UUID, List<Location>> builtSchematics;
+    private Map<UUID, SchematicProfile> schematicProfileMap;
+
 
     public SchematicManager(NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         schematicsMap = new HashMap<>();
-        builtSchematics = new HashMap<>();
         for(SchematicType schematicType : SchematicType.values()) {
             schematicsMap.put(schematicType, new HashMap<>());
         }
+        schematicProfileMap = new HashMap<>();
     }
 
     public void loadSchematics() {

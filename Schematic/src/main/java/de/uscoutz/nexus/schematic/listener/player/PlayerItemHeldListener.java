@@ -32,7 +32,7 @@ public class PlayerItemHeldListener implements Listener {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if(plugin.getSchematicItemManager().isSchematicItem(itemMeta)) {
                 PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                String key = dataContainer.get(new NamespacedKey(NexusPlugin.getInstance().getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                String key = dataContainer.get(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemMap().get(key);
                 schematicPlayer.startPreview(itemStack, schematicItem);
             }

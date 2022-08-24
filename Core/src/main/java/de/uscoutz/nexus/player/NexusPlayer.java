@@ -286,7 +286,7 @@ public class NexusPlayer {
                         if(memberCount == profile.getMembers().size()) {
                             members.append(profilePlayer.getGameProfile().getName());
                         } else {
-                            members.append(profilePlayer.getGameProfile().getName() + "§7, §6");
+                            members.append(profilePlayer.getGameProfile().getName()).append("§7, §6");
                         }
                     }
                     lore = Arrays.asList(" ", plugin.getLocaleManager().translate("de_DE", "profiles_owner", profile.getMembers().get(profile.getOwner()).getGameProfile().getName()),

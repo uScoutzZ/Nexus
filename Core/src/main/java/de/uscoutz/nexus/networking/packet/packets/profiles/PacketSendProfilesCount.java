@@ -3,7 +3,6 @@ package de.uscoutz.nexus.networking.packet.packets.profiles;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.networking.packet.Packet;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 public class PacketSendProfilesCount extends Packet {
 
