@@ -218,31 +218,36 @@ public class Schematic {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if(millis[0] <= 0) {
-                        for(Player player : profile.getWorld().getWorld().getPlayers()) {
-                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_finished-building"));
-                        }
-                        profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()-1);
-                        FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
-                        if(schematicType == SchematicType.NEXUS) {
-                            profile.setNexusLevel(level);
-                        } else if(schematicType == SchematicType.TOWER) {
-                            if(profile.getHighestTower() < level) {
-                                profile.setHighestTower(level);
-                                for(Block block : plugin.getGatewayManager().getGateways().get(level).getBlocksInRegion(profile.getWorld().getWorld())) {
-                                    block.setType(Material.AIR);
+                    if(profile.loaded()) {
+                        if(millis[0] <= 0) {
+
+                            for(Player player : profile.getWorld().getWorld().getPlayers()) {
+                                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_finished-building"));
+                            }
+                            profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()-1);
+                            FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
+                            if(schematicType == SchematicType.NEXUS) {
+                                profile.setNexusLevel(level);
+                            } else if(schematicType == SchematicType.TOWER) {
+                                if(profile.getHighestTower() < level) {
+                                    profile.setHighestTower(level);
+                                    for(Block block : plugin.getGatewayManager().getGateways().get(level).getBlocksInRegion(profile.getWorld().getWorld())) {
+                                        block.setType(Material.AIR);
+                                    }
                                 }
                             }
-                        }
 
-                        countdown.remove();
-                        cancel();
+                            countdown.remove();
+                            cancel();
+                        } else {
+                            millis[0] = millis[0]-1000;
+                            counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
+                                    TimeUnit.MILLISECONDS.toMinutes(millis[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis[0])),
+                                    TimeUnit.MILLISECONDS.toSeconds(millis[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis[0])));
+                            countdown.customName(Component.text(counter[0]));
+                        }
                     } else {
-                        millis[0] = millis[0]-1000;
-                        counter[0] = String.format("§e§lFINISHED IN: §7%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis[0]),
-                                TimeUnit.MILLISECONDS.toMinutes(millis[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis[0])),
-                                TimeUnit.MILLISECONDS.toSeconds(millis[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis[0])));
-                        countdown.customName(Component.text(counter[0]));
+                        cancel();
                     }
                 }
             }.runTaskTimer(plugin, 20, 20);
@@ -271,33 +276,38 @@ public class Schematic {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if(i[0] == 0 && System.currentTimeMillis()+timeToFinish > finished+1000) {
-                        long secondsSinceStart =
-                                TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
-                        double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
-                        for(int j = 0; j < alreadyPlaced; j++) {
-                            Location block = setBlock(blocks.get(j) ,rotation, location, null, schematicId);
-                            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(block);
-                            minX[0] = Math.min(minX[0], block.getBlockX());
-                            minZ[0] = Math.min(minZ[0], block.getBlockZ());
-                            maxX[0] = Math.max(maxX[0], block.getBlockX());
-                            maxZ[0] = Math.max(maxZ[0], block.getBlockZ());
-                        }
-                        i[0] = (int) alreadyPlaced;
-                    } else {
-                        if(i[0] < blocks.size()) {
-                            Block block = blocks.get(i[0]);
-                            Location setBlock = setBlock(block, rotation, location, finalLaser, schematicId);
-                            minX[0] = Math.min(minX[0], setBlock.getBlockX());
-                            minZ[0] = Math.min(minZ[0], setBlock.getBlockZ());
-                            maxX[0] = Math.max(maxX[0], setBlock.getBlockX());
-                            maxZ[0] = Math.max(maxZ[0], setBlock.getBlockZ());
-                            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(setBlock);
-                            i[0]++;
+                    if(profile.loaded()) {
+                        if(i[0] == 0 && System.currentTimeMillis()+timeToFinish > finished+1000) {
+                            long secondsSinceStart =
+                                    TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
+                            double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
+                            for(int j = 0; j < alreadyPlaced; j++) {
+                                Location block = setBlock(blocks.get(j), rotation, location, null, schematicId);
+                                plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(block);
+                                minX[0] = Math.min(minX[0], block.getBlockX());
+                                minZ[0] = Math.min(minZ[0], block.getBlockZ());
+                                maxX[0] = Math.max(maxX[0], block.getBlockX());
+                                maxZ[0] = Math.max(maxZ[0], block.getBlockZ());
+                            }
+                            i[0] = (int) alreadyPlaced;
                         } else {
-                            finalLaser.stop();
-                            cancel();
+                            if(i[0] < blocks.size()) {
+                                Block block = blocks.get(i[0]);
+                                Location setBlock = setBlock(block, rotation, location, finalLaser, schematicId);
+                                minX[0] = Math.min(minX[0], setBlock.getBlockX());
+                                minZ[0] = Math.min(minZ[0], setBlock.getBlockZ());
+                                maxX[0] = Math.max(maxX[0], setBlock.getBlockX());
+                                maxZ[0] = Math.max(maxZ[0], setBlock.getBlockZ());
+                                plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(setBlock);
+                                i[0]++;
+                            } else {
+                                finalLaser.stop();
+                                cancel();
+                            }
                         }
+                    } else {
+                        cancel();
+                        finalLaser.stop();
                     }
                 }
             }.runTaskTimer(plugin, 0, (long) blocksPerSecond);
