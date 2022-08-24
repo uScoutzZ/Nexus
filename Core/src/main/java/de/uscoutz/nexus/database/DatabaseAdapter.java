@@ -201,6 +201,10 @@ public class DatabaseAdapter {
         return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "'");
     }
 
+    public ResultSet get(String table, String whereKey, String setkey, String orderBy) {
+        return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "' ORDER BY " + orderBy);
+    }
+
     public ResultSet getTwo(String table, String whereKey, String setkey, String secWhereKey, String secSetKey) {
         return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "' AND " + secWhereKey + "='" + secSetKey + "'");
     }
@@ -229,6 +233,18 @@ public class DatabaseAdapter {
         return null;
     }
 
+    public ResultSet getAsync(String table, String whereKey, String setKey, String orderBy) {
+        Future<ResultSet> result = this.executorService.submit(() -> get(table, whereKey, setKey, orderBy));
+
+        try {
+            return result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     private void createTables() {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS profiles (profileId VARCHAR(36), owner VARCHAR(36), nexusLevel int, start bigint, lastActivity bigint)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS playerProfiles (player VARCHAR(36), profileId VARCHAR(36), slot int, joinedProfile bigint, playtime bigint, inventory text)");
@@ -236,6 +252,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS schematics (profileId VARCHAR(36), schematicId VARCHAR(36), schematicType text, level int, rotation int, location text, placed bigint)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS collectors (schematicId VARCHAR(36), neededItems text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS storages (profileId VARCHAR(36), storageId text, inventory text)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS raids (profileId VARCHAR(36), raidId VARCHAR(36), ended bigint)");
     }
 }
 
