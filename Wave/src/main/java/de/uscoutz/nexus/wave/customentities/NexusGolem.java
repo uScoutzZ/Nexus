@@ -19,7 +19,7 @@ public class NexusGolem extends IronGolem {
         this.setCanPickUpLoot(false); // Can Pick up Loot
         this.setAggressive(true); // Aggressive
         this.setCustomNameVisible(true); // Custom Name Visible
-        this.setCustomName(Component.literal("testZombie")); // Custom Name
+        this.setCustomName(Component.literal("testGolem")); // Custom Name
         new BukkitRunnable() {
             @Override
             public void run() {

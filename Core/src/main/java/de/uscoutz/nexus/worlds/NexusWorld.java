@@ -53,7 +53,23 @@ public class NexusWorld {
         }.runTask(plugin);
     }
 
-    public void unload() {
-
+    /*13000 = RUNNING,
+    6000 = TAG*/
+    public void changeTime(int time) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if((time == 13000 && time <= world.getTime()) || (time == 6000 && time >= world.getTime())) {
+                    world.setTime(time);
+                    cancel();
+                    return;
+                }
+                if(time > world.getTime()) {
+                    world.setTime(world.getTime()+100);
+                } else {
+                    world.setTime(world.getTime()-100);
+                }
+            }
+        }.runTaskTimer(plugin, 0, 1);
     }
 }

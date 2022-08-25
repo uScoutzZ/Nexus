@@ -2,10 +2,18 @@ package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import de.uscoutz.nexus.wave.customentities.NexusEntityType;
+import de.uscoutz.nexus.wave.customentities.NexusZombie;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -18,14 +26,13 @@ public class Raid {
 
     @Getter
     private Profile profile;
-    @Getter
+
     private long started;
-    @Getter
     private BossBar bossBar;
-    @Getter
     private List<Player> players;
-    @Getter
     private RaidType raidType;
+    private int wave;
+
 
     public Raid(RaidType raidType, Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
@@ -48,7 +55,7 @@ public class Raid {
                     if(countdown[0] == 0) {
                         for(Player all : profile.getWorld().getWorld().getPlayers()) {
                             all.hideBossBar(bossBar);
-                            all.sendMessage("§aRaid started");
+                            startWave(1);
                             cancel();
                         }
                     } else {
@@ -72,5 +79,45 @@ public class Raid {
                 }
             }
         }.runTaskTimer(plugin, 0, 20);
+    }
+
+    public void startWave(int wave) {
+        this.wave = wave;
+        profile.getWorld().changeTime(13000);
+        for(Player player : players) {
+            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raids_wave-start", wave));
+        }
+
+        final int[] mobs = {raidType.getMobsPerWave().get(wave)};
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(mobs[0] != 0) {
+                    spawnRandomMonster();
+                    mobs[0]--;
+                } else {
+                    players.forEach(player -> player.sendMessage("§aWave ended"));
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0, 20);
+    }
+
+    private void spawnRandomMonster() {
+        players.forEach(player -> player.sendMessage("§eSpawning monster"));
+        NexusEntityType nexusEntityType = raidType.getMobsByWave().get(wave).get((int)(Math.random() * raidType.getMobsByWave().get(wave).size()));
+        ServerLevel world = ((CraftWorld) profile.getWorld().getWorld()).getHandle();
+        Location randomLocation = plugin.getRaidManager().getSpawnLocations().get((int)(Math.random() * plugin.getRaidManager().getSpawnLocations().size()));
+        randomLocation.setWorld(profile.getWorld().getWorld());
+        Entity entity = null;
+        if(nexusEntityType == NexusEntityType.ZOMBIE) {
+            entity = new NexusZombie(randomLocation, plugin);
+        } else if(nexusEntityType == NexusEntityType.GOLEM) {
+            entity = new NexusZombie(randomLocation, plugin);
+        }
+
+        players.forEach(player -> player.teleport(randomLocation));
+        world.tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
     }
 }

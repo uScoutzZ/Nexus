@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.utilities.FileUtilities;
 import lombok.Getter;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -36,7 +37,9 @@ public class WorldManager {
         for(int i = 0; i < plugin.getConfig().getInt("blank-worlds"); i++) {
             File playerWorld = new File("nexusmap_" + (i+1));
             FileUtilities.copyFolder(template, playerWorld);
-            emptyWorlds.add(new WorldCreator("nexusmap_" + (i+1)).createWorld());
+            World world = new WorldCreator("nexusmap_" + (i+1)).createWorld();
+            world.setGameRule(GameRule.DO_MOB_SPAWNING, true);
+            emptyWorlds.add(world);
         }
     }
 }

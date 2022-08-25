@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +56,18 @@ public class RaidProfile {
         new BukkitRunnable() {
             @Override
             public void run() {
-                new Raid(profile, plugin).schedule();
+                if(profile.getNexusLevel() != 0) {
+                    List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
+                    RaidType raidType = null;
+                    try {
+                        raidType = raidTypes.get((int)(Math.random() * raidTypes.size())).clone();
+                    } catch (CloneNotSupportedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    new Raid(raidType, profile, plugin).schedule();
+                } else {
+                    scheduleRaid();
+                }
             }
         }.runTaskLater(plugin, TimeUnit.MILLISECONDS.toSeconds(startIn)*20);
     }
