@@ -101,7 +101,7 @@ public class Raid {
                     cancel();
                 }
             }
-        }.runTaskTimer(plugin, 0, 20);
+        }.runTaskTimer(plugin, 40, 20);
     }
 
     private void spawnRandomMonster() {

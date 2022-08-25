@@ -10,7 +10,9 @@ import de.uscoutz.nexus.wave.customentities.goals.MoveToNexusGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -37,6 +39,7 @@ public class NexusZombie extends Zombie {
         this.setCustomName(Component.literal("testZombie")); // Custom Name
         this.setPersistenceRequired(true);
 
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -47,17 +50,9 @@ public class NexusZombie extends Zombie {
 
     @Override
     public void registerGoals() {
-        this.goalSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(0, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1, false));
         this.goalSelector.addGoal(1, new MoveToNexusGoal(this));
-    }
-
-    private void setNewGoal(World world) {
-        Profile profile = NexusSchematicPlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(world);
-        SchematicProfile schematicProfile = NexusSchematicPlugin.getInstance().getSchematicManager().getSchematicProfileMap()
-                .get(profile.getProfileId());
-
-        //Location moveTo = schematicProfile.getSchematics().get(SchematicType.NEXUS).get(0).getBoundingBox().getCenter().toLocation(world);
-
-
     }
 }
