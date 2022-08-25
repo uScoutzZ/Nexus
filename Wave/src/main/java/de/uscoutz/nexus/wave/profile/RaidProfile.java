@@ -66,7 +66,9 @@ public class RaidProfile {
                     }
                     new Raid(raidType, profile, plugin).schedule();
                 } else {
-                    scheduleRaid();
+                    if(profile.loaded()) {
+                        scheduleRaid();
+                    }
                 }
             }
         }.runTaskLater(plugin, TimeUnit.MILLISECONDS.toSeconds(startIn)*20);
