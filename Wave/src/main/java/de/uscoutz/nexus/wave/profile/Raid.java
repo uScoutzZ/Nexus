@@ -53,9 +53,9 @@ public class Raid {
             public void run() {
                 if(profile.loaded()) {
                     if(countdown[0] == 0) {
+                        startWave(1);
                         for(Player all : profile.getWorld().getWorld().getPlayers()) {
                             all.hideBossBar(bossBar);
-                            startWave(1);
                             cancel();
                         }
                     } else {
