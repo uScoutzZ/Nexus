@@ -3,6 +3,7 @@ package de.uscoutz.nexus.wave.profile;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -23,6 +24,8 @@ public class RaidProfile {
     private UUID profileId;
     @Getter
     private long lastRaid;
+    @Getter @Setter
+    private Raid raid;
 
     public RaidProfile(Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
@@ -56,15 +59,16 @@ public class RaidProfile {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(profile.getNexusLevel() != 0) {
+                if(profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
-                    RaidType raidType = null;
+                    RaidType raidType;
                     try {
                         raidType = raidTypes.get((int)(Math.random() * raidTypes.size())).clone();
                     } catch (CloneNotSupportedException e) {
                         throw new RuntimeException(e);
                     }
-                    new Raid(raidType, profile, plugin).schedule();
+                    raid = new Raid(raidType, profile, plugin);
+                    raid.schedule();
                 } else {
                     if(profile.loaded()) {
                         scheduleRaid();

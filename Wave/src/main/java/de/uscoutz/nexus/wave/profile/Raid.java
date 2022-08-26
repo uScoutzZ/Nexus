@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.NexusEntityType;
 import de.uscoutz.nexus.wave.customentities.NexusZombie;
@@ -42,6 +43,16 @@ public class Raid {
         players = new ArrayList<>();
     }
 
+    public void end() {
+        for(BuiltSchematic builtSchematic : plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().values()) {
+            builtSchematic.saveDamage();
+        }
+        plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);
+        if(profile.getActivePlayers().size() == 0) {
+            profile.scheduleCheckout();
+        }
+    }
+
     public void schedule() {
         long raidCounter = plugin.getConfig().getLong("raid-counter");
         int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(raidCounter);
@@ -52,6 +63,7 @@ public class Raid {
             @Override
             public void run() {
                 if(profile.loaded()) {
+                    profile.cancelCheckout();
                     if(countdown[0] == 0) {
                         startWave(1);
                         for(Player all : profile.getWorld().getWorld().getPlayers()) {

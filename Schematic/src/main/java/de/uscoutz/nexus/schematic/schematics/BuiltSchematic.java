@@ -1,5 +1,6 @@
 package de.uscoutz.nexus.schematic.schematics;
 
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 
@@ -14,18 +15,26 @@ public class BuiltSchematic {
     @Getter
     private UUID schematicId;
     @Getter
-    private Condition condition;
+    private int damage;
 
     public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, int damage, UUID schematicId) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
+        this.damage = damage;
+    }
+
+    public Condition getCondition() {
         if(damage == 0) {
-            condition = Condition.INTACT;
+            return Condition.INTACT;
         } else if(damage >= 50) {
-            condition = Condition.DAMAGED;
+            return Condition.DESTROYED;
         } else {
-            condition = Condition.DESTROYED;
+            return Condition.DAMAGED;
         }
+    }
+
+    public void saveDamage() {
+        plugin.getNexusPlugin().getDatabaseAdapter().updateAsync("schematics", "schematicId", schematic, new DatabaseUpdate("damage", damage));
     }
 }

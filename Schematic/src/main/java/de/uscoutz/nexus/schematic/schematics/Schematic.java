@@ -46,8 +46,7 @@ public class Schematic {
     private Location corner1, corner2;
     @Getter @Setter
     private long timeToFinish;
-
-
+    
     public Schematic(SchematicType schematicType, int level, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         this.schematicType = schematicType;
