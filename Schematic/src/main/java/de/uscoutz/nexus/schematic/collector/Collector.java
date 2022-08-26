@@ -34,14 +34,16 @@ public class Collector {
     private Material oldBlockType;
     private Consumer<Player> actionOnFull;
     private int requiredNexusLevel;
+    private Material blockType;
 
-    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel) {
+    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel, Material blockType) {
         this.plugin = plugin;
         hologram = new HashMap<>();
         this.neededItems = new LinkedHashMap<>();
         destroyed = false;
         this.schematicId = schematicId;
         this.requiredNexusLevel = requiredNexusLevel;
+        this.blockType = blockType;
 
         for(ItemStack neededItem : neededItems) {
             this.neededItems.put(neededItem.getType(), neededItem.getAmount());
@@ -54,7 +56,7 @@ public class Collector {
         blockLocation = location.clone().subtract(0, 1, 0);
         Block block = blockLocation.getBlock();
         oldBlockType = block.getType();
-        block.setType(Material.EMERALD_BLOCK);
+        block.setType(blockType);
 
         plugin.getCollectorManager().getCollectors().put(block, this);
     }

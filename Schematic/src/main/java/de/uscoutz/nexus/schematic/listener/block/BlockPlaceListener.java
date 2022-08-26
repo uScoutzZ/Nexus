@@ -54,14 +54,14 @@ public class BlockPlaceListener implements Listener {
                     if(!schematicItem.getSchematic().preview(location, rotation, true)) {
                         if(schematic.getTimeToFinish() != 0) {
                             long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
-                            schematic.build(location, rotation, finished, schematicId);
+                            schematic.build(location, rotation, finished, schematicId, 0);
                         } else {
-                            schematic.build(location, rotation, schematicId);
+                            schematic.build(location, rotation, schematicId, 0);
                         }
                         String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
                         plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
                                 plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
-                                schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis());
+                                schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
                     } else {
                         player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                     }

@@ -41,13 +41,14 @@ public class ProfileLoadListener implements Listener {
                 SchematicType schematicType = SchematicType.valueOf(resultSet.getString("schematicType"));
                 int level = resultSet.getInt("level");
                 int rotation = resultSet.getInt("rotation");
+                int damage = resultSet.getInt("damage");
                 String stringLocation = resultSet.getString("location");
                 long placed = resultSet.getLong("placed");
                 int x = Integer.parseInt(stringLocation.split(", ")[0]),
                         y = Integer.parseInt(stringLocation.split(", ")[1]),
                         z = Integer.parseInt(stringLocation.split(", ")[2]);
                 Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level);
-                schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, placed+schematic.getTimeToFinish(), schematicId);
+                schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, placed+schematic.getTimeToFinish(), schematicId, damage);
                 profile.getSchematicIds().add(schematicId);
             }
         } catch (SQLException e) {

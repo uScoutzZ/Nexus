@@ -237,7 +237,7 @@ public class Profile {
 
         Location location = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
         String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-        plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "NEXUS", 0, 0, nexusLocation, System.currentTimeMillis());
+        plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "NEXUS", 0, 0, nexusLocation, System.currentTimeMillis(), 0);
         this.owner = owner;
     }
 

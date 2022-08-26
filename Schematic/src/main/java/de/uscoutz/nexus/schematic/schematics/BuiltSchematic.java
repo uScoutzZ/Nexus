@@ -13,10 +13,19 @@ public class BuiltSchematic {
     private Schematic schematic;
     @Getter
     private UUID schematicId;
+    @Getter
+    private Condition condition;
 
-    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, UUID schematicId) {
+    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, int damage, UUID schematicId) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
+        if(damage == 0) {
+            condition = Condition.INTACT;
+        } else if(damage >= 50) {
+            condition = Condition.DAMAGED;
+        } else {
+            condition = Condition.DESTROYED;
+        }
     }
 }
