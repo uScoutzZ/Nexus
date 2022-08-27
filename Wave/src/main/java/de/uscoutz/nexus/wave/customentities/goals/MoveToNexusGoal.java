@@ -1,9 +1,8 @@
 package de.uscoutz.nexus.wave.customentities.goals;
 
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
-import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
-import de.uscoutz.nexus.schematic.schematics.Schematic;
-import de.uscoutz.nexus.schematic.schematics.SchematicType;
+import de.uscoutz.nexus.schematic.schematics.*;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
@@ -23,8 +22,7 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
     private boolean shouldStop;
     private int tries;
 
-    private Location nexusLocation, nearest;
-    private double distance = Double.MAX_VALUE;
+    private Location nexusLocation;
 
     public MoveToNexusGoal(PathfinderMob mob) {
         super(mob, 1.0, 100, 20);
@@ -49,7 +47,23 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
             valid = location.distance(nexusLocation) < mob.getBukkitEntity().getLocation().distance(nexusLocation);
             tries = 0;
         } else {
-            valid = region[0] != null && schematics.containsKey(region[0]) && schematics.get(region[0]).getSchematic().getSchematicType() == SchematicType.NEXUS;
+            if(region[0] != null) {
+                if(region[0].getBoundingBox().clone().expand(2, 2, 2, 2, 2, 2).contains(
+                        mob.getX(), mob.getY(), mob.getZ())) {
+                    valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() != location.getBlockY();
+                } else {
+                    if(schematics.containsKey(region[0])) {
+                        Profile profile = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(mob.getBukkitEntity().getWorld());
+                        SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+                        valid = schematicProfile.getSchematicsByRegion().get(region[0]).getCondition() != Condition.DESTROYED;
+                    } else {
+                        valid = false;
+                    }
+                }
+            } else {
+                valid = false;
+            }
+
         }
         tries++;
 
