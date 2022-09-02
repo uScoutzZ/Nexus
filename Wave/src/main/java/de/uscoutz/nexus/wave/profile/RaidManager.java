@@ -1,5 +1,6 @@
 package de.uscoutz.nexus.wave.profile;
 
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import lombok.Getter;
@@ -33,7 +34,7 @@ public class RaidManager {
         raidProfileMap = new HashMap<>();
         raidTypesByNexuslevel = new HashMap<>();
         spawnLocations = new ArrayList<>();
-        for(int i = 0; i < plugin.getSchematicPlugin().getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).size(); i++) {
+        for(int i = 0; i < plugin.getSchematicPlugin().getSchematicManager().getSchematicsMap().get(SchematicType.NEXUS).get(Condition.INTACT).size(); i++) {
             raidTypesByNexuslevel.put(i, new ArrayList<>());
         }
     }

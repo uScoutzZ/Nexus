@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.gateways;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -41,7 +42,7 @@ public class GatewayManager {
 
     public void loadGateways() {
         fileConfiguration = YamlConfiguration.loadConfiguration(gatewayFile);
-        int nexusLevels = plugin.getSchematicManager().getSchematicsMap().get(SchematicType.TOWER).size();
+        int nexusLevels = plugin.getSchematicManager().getSchematicsMap().get(SchematicType.TOWER).get(Condition.INTACT).size();
         for(int i = 0; i < nexusLevels-1; i++) {
             Location location1, location2;
             location1 = plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location1", Bukkit.getWorlds().get(0));

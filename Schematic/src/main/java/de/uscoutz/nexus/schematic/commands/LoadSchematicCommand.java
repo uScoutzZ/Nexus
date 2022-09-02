@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.commands;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.command.Command;
@@ -29,12 +30,29 @@ public class LoadSchematicCommand implements CommandExecutor {
                 if(args.length >= 2) {
                     try {
                         SchematicType schematicType = SchematicType.valueOf(args[0]);
+                        Condition condition = Condition.INTACT;
+                        if(args.length == 4) {
+                            try {
+                                condition = Condition.valueOf(args[3]);
+                            } catch (Exception exception) {
+                                player.sendMessage("§cCondition does not exist");
+                            }
+                        }
                         int level = Integer.parseInt(args[1]);
-                        Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level);
+                        Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
                         player.sendMessage("§ePasting " + schematic.getBlocks().size() +" blocks");
                         int rotation = 0;
                         if(args.length == 3) {
-                            rotation = Integer.parseInt(args[2]);
+                            try {
+                                rotation = Integer.parseInt(args[2]);
+                            } catch (Exception exception) {
+                                player.sendMessage("§cRotation not a number");
+                                try {
+                                    condition = Condition.valueOf(args[3]);
+                                } catch (Exception exception2) {
+                                    player.sendMessage("§cCondition does not exist");
+                                }
+                            }
                         }
                         schematic.build(player.getLocation(), rotation, UUID.randomUUID(), 0);
                     } catch (IllegalArgumentException exception) {
@@ -53,6 +71,6 @@ public class LoadSchematicCommand implements CommandExecutor {
     }
 
     private void sendHelp(Player player) {
-        player.sendMessage("§cSyntax: /loadschematic <SchematicType> <Level> [Rotation]");
+        player.sendMessage("§cSyntax: /loadschematic <SchematicType> <Level> [Rotation] [Condition]");
     }
 }

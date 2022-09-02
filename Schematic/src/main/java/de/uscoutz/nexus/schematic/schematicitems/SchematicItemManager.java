@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.schematicitems;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
@@ -48,7 +49,7 @@ public class SchematicItemManager {
             SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
             int level = itemsConfig.getInt(key + ".level");
             Schematic schematic = plugin.getSchematicManager()
-                    .getSchematicsMap().get(schematicType).get(level);
+                    .getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
             if(schematic == null) {
                 Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
             } else {

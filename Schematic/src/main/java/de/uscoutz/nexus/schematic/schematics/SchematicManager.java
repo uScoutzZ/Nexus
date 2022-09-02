@@ -11,7 +11,7 @@ public class SchematicManager {
     private NexusSchematicPlugin plugin;
 
     @Getter
-    private Map<SchematicType, Map<Integer, Schematic>> schematicsMap;
+    private Map<SchematicType, Map<Condition, Map<Integer, Schematic>>> schematicsMap;
     @Getter
     private Map<UUID, SchematicProfile> schematicProfileMap;
 
@@ -21,6 +21,9 @@ public class SchematicManager {
         schematicsMap = new HashMap<>();
         for(SchematicType schematicType : SchematicType.values()) {
             schematicsMap.put(schematicType, new HashMap<>());
+            for(Condition condition : Condition.values()) {
+                schematicsMap.get(schematicType).put(condition, new HashMap<>());
+            }
         }
         schematicProfileMap = new HashMap<>();
     }
@@ -33,9 +36,11 @@ public class SchematicManager {
                             .equals(schematicType.getLocation1().getBlock().getType())) {
                         break;
                     } else {
-                        Schematic schematic = new Schematic(schematicType, i, plugin);
-                        long timeToFinish = schematic.getSchematicType().getFileConfiguration().getLong("timesToFinish." + i);
-                        schematic.setTimeToFinish(timeToFinish);
+                        for(Condition condition : Condition.values()) {
+                            Schematic schematic = new Schematic(schematicType, i, condition, plugin);
+                            long timeToFinish = schematic.getSchematicType().getFileConfiguration().getLong("timesToFinish." + i);
+                            schematic.setTimeToFinish(timeToFinish);
+                        }
                     }
                 }
             }

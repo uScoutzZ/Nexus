@@ -47,7 +47,7 @@ public class Schematic {
     @Getter @Setter
     private long timeToFinish;
     
-    public Schematic(SchematicType schematicType, int level, NexusSchematicPlugin plugin) {
+    public Schematic(SchematicType schematicType, int level, Condition condition, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
         this.schematicType = schematicType;
         this.level = level;
@@ -63,6 +63,15 @@ public class Schematic {
         maxX = Math.max(corner1.getBlockX()-1, corner2.getBlockX()-1);
         maxY = Math.max(corner1.getBlockY(), corner2.getBlockY());
         maxZ = Math.max(corner1.getBlockZ()-1, corner2.getBlockZ()-1);
+
+        if(condition == Condition.DAMAGED) {
+            minY += 64;
+            maxY += 64;
+        } else if(condition == Condition.DESTROYED){
+            minY += 127;
+            maxY += 127;
+        }
+
         substractX = minX;
         substractY = minY;
         substractZ = minZ;
@@ -91,8 +100,8 @@ public class Schematic {
             blocks.put(blocks.size(), block);
         }
 
-        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level);
-        plugin.getSchematicManager().getSchematicsMap().get(schematicType).put(level, this);
+        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level + " condition " + condition);
+        plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).put(level, this);
     }
 
     private List<Integer> getMinMaxByLocation(Location location, int rotation) {
@@ -462,7 +471,7 @@ public class Schematic {
                         .setFilledAction(player1 -> {
                             Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
                             destroy(profile, schematicId, plugin, schematicType);
-                            Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(level+1);
+                            Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
                             nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId, 0);
                             plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
                                     profile.getProfileId(),

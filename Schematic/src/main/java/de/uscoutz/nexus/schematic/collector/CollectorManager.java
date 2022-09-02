@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.collector;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
@@ -48,10 +49,12 @@ public class CollectorManager {
 
     public void loadCollectors() {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(schematicCollectorsFile);
-        for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
-            for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).values()) {
-                String needed = fileConfiguration.getString(schematicType.toString().toLowerCase() + "." + schematic.getLevel());
-                collectorNeededMap.get(schematicType).put(schematic.getLevel(), getNeededItemsFromString(needed));
+        for(Condition condition : Condition.values()) {
+            for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
+                for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).values()) {
+                    String needed = fileConfiguration.getString(schematicType.toString().toLowerCase() + "." + schematic.getLevel());
+                    collectorNeededMap.get(schematicType).put(schematic.getLevel(), getNeededItemsFromString(needed));
+                }
             }
         }
     }
