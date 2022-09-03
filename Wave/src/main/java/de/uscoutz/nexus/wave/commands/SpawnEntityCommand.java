@@ -24,7 +24,7 @@ public class SpawnEntityCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
-            NexusZombie nexusZombie = new NexusZombie(player.getLocation(), plugin);
+            NexusZombie nexusZombie = new NexusZombie(player.getLocation(), plugin, 0.5);
             world.tryAddFreshEntityWithPassengers(nexusZombie);
         }
         return false;

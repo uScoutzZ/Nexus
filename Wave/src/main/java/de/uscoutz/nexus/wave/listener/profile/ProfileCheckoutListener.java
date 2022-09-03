@@ -9,6 +9,7 @@ import de.uscoutz.nexus.wave.profile.RaidProfile;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class ProfileCheckoutListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onProfileCheckout(ProfileCheckoutEvent event) {
         Profile profile = event.getProfile();
         RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());

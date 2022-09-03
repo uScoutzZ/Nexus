@@ -45,7 +45,7 @@ public class Schematic {
     @Getter
     private Location corner1, corner2;
     @Getter @Setter
-    private long timeToFinish;
+    private long timeToFinish, durability;
     
     public Schematic(SchematicType schematicType, int level, Condition condition, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
@@ -100,7 +100,6 @@ public class Schematic {
             blocks.put(blocks.size(), block);
         }
 
-        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Add " + schematicType + " level " + level + " condition " + condition);
         plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).put(level, this);
     }
 
@@ -204,7 +203,7 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation, long finished, UUID schematicId, int damage) {
+    public void build(Location location, int rotation, long finished, UUID schematicId, double damage) {
         Bukkit.broadcastMessage("§ePasting " + blocks.size() + " blocks");
         if(finished <= System.currentTimeMillis()) {
             build(location, rotation, schematicId, damage);
@@ -330,7 +329,7 @@ public class Schematic {
         }
     }
 
-    public void build(Location location, int rotation, UUID schematicId, int damage) {
+    public void build(Location location, int rotation, UUID schematicId, double damage) {
         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, new ArrayList<>());
         int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;

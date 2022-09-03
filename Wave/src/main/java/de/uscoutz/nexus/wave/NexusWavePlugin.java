@@ -5,6 +5,7 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
 import de.uscoutz.nexus.wave.commands.SpawnEntityCommand;
 import de.uscoutz.nexus.wave.listener.creature.CreatureSpawnListener;
+import de.uscoutz.nexus.wave.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.wave.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.wave.profile.RaidManager;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class NexusWavePlugin extends JavaPlugin {
         raidManager.loadRaidTypes();
 
         Bukkit.getPluginManager().registerEvents(new ProfileLoadListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new ProfileCheckoutListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CreatureSpawnListener(this), this);
         getCommand("spawnentity").setExecutor(new SpawnEntityCommand(this));
         Bukkit.getConsoleSender().sendMessage("[NexusWave] Enabled");

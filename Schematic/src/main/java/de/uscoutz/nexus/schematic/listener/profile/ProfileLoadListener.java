@@ -42,7 +42,7 @@ public class ProfileLoadListener implements Listener {
                 SchematicType schematicType = SchematicType.valueOf(resultSet.getString("schematicType"));
                 int level = resultSet.getInt("level");
                 int rotation = resultSet.getInt("rotation");
-                int damage = resultSet.getInt("damage");
+                double damage = resultSet.getDouble("damage");
                 String stringLocation = resultSet.getString("location");
                 long placed = resultSet.getLong("placed");
                 int x = Integer.parseInt(stringLocation.split(", ")[0]),

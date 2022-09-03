@@ -59,7 +59,7 @@ public class ProfilePlayer {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(profile.getActivePlayers().size() == 0) {
+                if(profile.getWorld() != null && profile.getWorld().getWorld() != null && profile.getActivePlayers().size() == 0) {
                     profile.scheduleCheckout();
                 }
             }

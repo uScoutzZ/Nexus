@@ -27,6 +27,8 @@ public class BlockBreakListener implements Listener {
             player.sendMessage("no region " + plugin.getNexusPlugin().getRegionManager().getRegions().size());
         } else {
             player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + "");
+            player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getDamage());
+            player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
         }
 
 

@@ -87,7 +87,7 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
     }
 
     @Override
-    protected boolean isReachedTarget() {
+    public boolean isReachedTarget() {
         return super.isReachedTarget() || NexusWavePlugin.getInstance().getSchematicPlugin().getNexusPlugin().getRegionManager().getRegion(mob.getBukkitEntity().getLocation()) != null;
     }
 

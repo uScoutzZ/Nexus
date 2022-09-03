@@ -64,7 +64,6 @@ public class CollectorManager {
 
         if(needed != null && !needed.equals("")) {
             for(String stringMaterial : needed.split(", ")) {
-                Bukkit.getConsoleSender().sendMessage("[NexusSchematic] " + stringMaterial);
                 int amount = Integer.parseInt(stringMaterial.split(":")[1]);
                 Material material = Material.getMaterial(stringMaterial.split(":")[0]);
                 try {

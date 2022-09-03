@@ -4,6 +4,8 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.NexusEntityType;
+import de.uscoutz.nexus.wave.customentities.NexusGolem;
+import de.uscoutz.nexus.wave.customentities.NexusMob;
 import de.uscoutz.nexus.wave.customentities.NexusZombie;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
@@ -27,6 +29,8 @@ public class Raid {
 
     @Getter
     private Profile profile;
+    @Getter
+    private List<Entity> mobs;
 
     private long started;
     private BossBar bossBar;
@@ -34,18 +38,18 @@ public class Raid {
     private RaidType raidType;
     private int wave;
 
-
     public Raid(RaidType raidType, Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
         this.raidType = raidType;
         this.profile = profile;
         started = System.currentTimeMillis();
         players = new ArrayList<>();
+        mobs = new ArrayList<>();
     }
 
     public void end() {
-        for(BuiltSchematic builtSchematic : plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().values()) {
-            builtSchematic.saveDamage();
+        for(Entity entity : mobs) {
+            entity.remove(Entity.RemovalReason.KILLED);
         }
         plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);
         if(profile.getActivePlayers().size() == 0) {
@@ -124,12 +128,13 @@ public class Raid {
         randomLocation.setWorld(profile.getWorld().getWorld());
         Entity entity = null;
         if(nexusEntityType == NexusEntityType.ZOMBIE) {
-            entity = new NexusZombie(randomLocation, plugin);
+            entity = new NexusZombie(randomLocation, plugin, 1);
         } else if(nexusEntityType == NexusEntityType.GOLEM) {
-            entity = new NexusZombie(randomLocation, plugin);
+            entity = new NexusGolem(randomLocation, plugin, 2);
         }
 
         players.forEach(player -> player.teleport(randomLocation));
         world.tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        mobs.add(entity);
     }
 }

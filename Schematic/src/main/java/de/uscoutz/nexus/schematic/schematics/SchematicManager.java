@@ -40,6 +40,10 @@ public class SchematicManager {
                             Schematic schematic = new Schematic(schematicType, i, condition, plugin);
                             long timeToFinish = schematic.getSchematicType().getFileConfiguration().getLong("timesToFinish." + i);
                             schematic.setTimeToFinish(timeToFinish);
+                            schematic.setDurability(schematic.getSchematicType().getFileConfiguration().getLong("durabilities." + i));
+                            if(schematic.getDurability() == 0) {
+                                schematic.setDurability(1);
+                            }
                         }
                     }
                 }
