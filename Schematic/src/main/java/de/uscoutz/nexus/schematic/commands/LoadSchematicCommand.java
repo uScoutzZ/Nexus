@@ -48,7 +48,7 @@ public class LoadSchematicCommand implements CommandExecutor {
                             } catch (Exception exception) {
                                 player.sendMessage("§cRotation not a number");
                                 try {
-                                    condition = Condition.valueOf(args[3]);
+                                    condition = Condition.valueOf(args[2]);
                                 } catch (Exception exception2) {
                                     player.sendMessage("§cCondition does not exist");
                                 }
