@@ -65,11 +65,11 @@ public class Schematic {
         maxZ = Math.max(corner1.getBlockZ()-1, corner2.getBlockZ()-1);
 
         if(condition == Condition.DAMAGED) {
-            minY += 64;
-            maxY += 64;
+            minY += 63;
+            maxY += 63;
         } else if(condition == Condition.DESTROYED){
-            minY += 127;
-            maxY += 127;
+            minY += 126;
+            maxY += 126;
         }
 
         substractX = minX;

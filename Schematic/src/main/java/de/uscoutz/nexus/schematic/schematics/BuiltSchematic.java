@@ -14,14 +14,12 @@ public class BuiltSchematic {
     private Schematic schematic;
     @Getter
     private UUID schematicId;
-    @Getter
-    private double damage, percentDamage;
+    private double damage;
 
     public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
-        this.percentDamage = percentDamage;
         damage = percentDamage*schematic.getDurability();
     }
 
@@ -29,17 +27,25 @@ public class BuiltSchematic {
         this.damage += damage;
     }
 
-    public Condition getCondition() {
-        if(damage == 0) {
+    public void saveDamage() {
+        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", damage/schematic.getDurability()));
+    }
+
+    public double getDamage() {
+        return damage;
+    }
+
+    public double getPercentDamage() {
+        return damage/schematic.getDurability();
+    }
+
+    public static Condition getCondition(double percentageDamage) {
+        if(percentageDamage == 0) {
             return Condition.INTACT;
-        } else if(damage >= 50) {
+        } else if(percentageDamage >= 50) {
             return Condition.DESTROYED;
         } else {
             return Condition.DAMAGED;
         }
-    }
-
-    public void saveDamage() {
-        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", damage/schematic.getDurability()));
     }
 }

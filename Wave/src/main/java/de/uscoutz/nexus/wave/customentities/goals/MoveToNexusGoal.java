@@ -55,7 +55,8 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
                     if(schematics.containsKey(region[0])) {
                         Profile profile = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(mob.getBukkitEntity().getWorld());
                         SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
-                        valid = schematicProfile.getSchematicsByRegion().get(region[0]).getCondition() != Condition.DESTROYED;
+                        BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
+                        valid = BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;
                     } else {
                         valid = false;
                     }
