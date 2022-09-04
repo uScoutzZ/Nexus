@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -35,6 +36,7 @@ public class Collector {
     private Consumer<Player> actionOnFull;
     private int requiredNexusLevel;
     private Material blockType;
+    private Block block;
 
     public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel, Material blockType) {
         this.plugin = plugin;
@@ -54,7 +56,7 @@ public class Collector {
         this.location = location;
         spawnHolograms();
         blockLocation = location.clone().subtract(0, 1, 0);
-        Block block = blockLocation.getBlock();
+        block = blockLocation.getBlock();
         oldBlockType = block.getType();
         block.setType(blockType);
 
@@ -91,6 +93,7 @@ public class Collector {
                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                 player.getInventory().addItem(item.getItemStack());
             } else {
+                int b = blockType == Material.EMERALD_BLOCK ? 1:0;
                 if(requiredNexusLevel <= plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getNexusLevel()) {
                     int neededAmount = neededItems.get(itemStack.getType());
                     if(neededAmount >= itemStack.getAmount()) {
@@ -104,9 +107,9 @@ public class Collector {
                     if(neededAmount == 0) {
                         neededItems.remove(itemStack.getType());
                         if(neededItems.size() == 0) {
-                            actionOnFull.accept(player);
                             destroy();
-                            plugin.getNexusPlugin().getDatabaseAdapter().delete("collectors", "schematicId", schematicId);
+                            actionOnFull.accept(player);
+                            plugin.getNexusPlugin().getDatabaseAdapter().deleteTwo("collectors", "schematicId", schematicId, "intact", b);
                         } else {
                             destroyHolograms();
                             spawnHolograms();
@@ -117,8 +120,8 @@ public class Collector {
                     }
 
                     if(!destroyed) {
-                        plugin.getNexusPlugin().getDatabaseAdapter().updateAsync("collectors", "schematicId", schematicId,
-                                new DatabaseUpdate("neededItems", toString()));
+                        plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("collectors", "schematicId", schematicId,
+                                "intact", b, new DatabaseUpdate("neededItems", toString()));
                     }
                 } else {
                     player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "collector_wrong-level"));
@@ -169,6 +172,7 @@ public class Collector {
 
     public void destroy() {
         destroyed = true;
+        plugin.getCollectorManager().getCollectors().remove(block);
         blockLocation.getBlock().setType(oldBlockType);
         destroyHolograms();
     }

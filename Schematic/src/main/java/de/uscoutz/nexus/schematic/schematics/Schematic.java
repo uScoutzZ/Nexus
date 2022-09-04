@@ -206,7 +206,7 @@ public class Schematic {
     public void build(Location location, int rotation, long finished, UUID schematicId, double damage) {
         Bukkit.broadcastMessage("§ePasting " + blocks.size() + " blocks");
         if(finished <= System.currentTimeMillis()) {
-            build(location, rotation, schematicId, damage);
+            build(location, rotation, schematicId, damage, false);
         } else {
             Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
             final long[] millis = {finished - System.currentTimeMillis()};
@@ -289,7 +289,7 @@ public class Schematic {
                                     TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis()+timeToFinish)-finished);
                             double alreadyPlaced = secondsSinceStart/(finalBlocksPerSecond/20);
                             for(int j = 0; j < alreadyPlaced; j++) {
-                                Location block = setBlock(blocks.get(j), rotation, location, null, schematicId);
+                                Location block = setBlock(blocks.get(j), rotation, location, null, schematicId, damage);
                                 plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(block);
                                 minX[0] = Math.min(minX[0], block.getBlockX());
                                 minZ[0] = Math.min(minZ[0], block.getBlockZ());
@@ -300,7 +300,7 @@ public class Schematic {
                         } else {
                             if(i[0] < blocks.size()) {
                                 Block block = blocks.get(i[0]);
-                                Location setBlock = setBlock(block, rotation, location, finalLaser, schematicId);
+                                Location setBlock = setBlock(block, rotation, location, finalLaser, schematicId, damage);
                                 minX[0] = Math.min(minX[0], setBlock.getBlockX());
                                 minZ[0] = Math.min(minZ[0], setBlock.getBlockZ());
                                 maxX[0] = Math.max(maxX[0], setBlock.getBlockX());
@@ -320,22 +320,17 @@ public class Schematic {
             }.runTaskTimer(plugin, 0, (long) blocksPerSecond);
             profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()+1);
             if(minX[0] != Integer.MAX_VALUE) {
-                Region region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX[0], maxX[0], minZ[0], maxZ[0], schematicType.toString());
-                profile.getRegions().add(region);
-                plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematics().get(schematicType).add(region);
-                Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Added region, now trying to add Schematic to region (time included method)");
-                plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
-                        new BuiltSchematic(plugin, this, damage, schematicId));
+                finish(profile, location, minX[0], maxX[0], minZ[0], maxZ[0], rotation, damage, schematicId);
             }
         }
     }
 
-    public void build(Location location, int rotation, UUID schematicId, double damage) {
+    public void build(Location location, int rotation, UUID schematicId, double damage, boolean update) {
         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, new ArrayList<>());
         int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
         for(int j = 0; j < blocks.size(); j++) {
-            Location block = setBlock(blocks.get(j), rotation, location, null, schematicId);
+            Location block = setBlock(blocks.get(j), rotation, location, null, schematicId, damage);
             minX = Math.min(minX, block.getBlockX());
             minZ = Math.min(minZ, block.getBlockZ());
             maxX = Math.max(maxX, block.getBlockX());
@@ -343,26 +338,36 @@ public class Schematic {
             plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).add(block);
         }
 
-        if(schematicType == SchematicType.NEXUS) {
-            profile.setNexusLevel(level);
-        } else if(schematicType == SchematicType.TOWER) {
-            if(profile.getHighestTower() < level) {
-                profile.setHighestTower(level);
+        if(!update) {
+            if(schematicType == SchematicType.NEXUS) {
+                profile.setNexusLevel(level);
+            } else if(schematicType == SchematicType.TOWER) {
+                if(profile.getHighestTower() < level) {
+                    profile.setHighestTower(level);
+                }
             }
+
+            assert minX != Integer.MAX_VALUE;
+            finish(profile, location, minX, maxX, minZ, maxZ, rotation, damage, schematicId);
+        } else {
+            Bukkit.broadcastMessage("update: " + damage);
+            Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
+            BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(
+                    profile.getProfileId()).getSchematicsByRegion().get(region);
+            builtSchematic.setDamage(damage);
+            builtSchematic.setSchematic(this);
         }
+    }
 
-
-        assert minX != Integer.MAX_VALUE;
-
+    private void finish(Profile profile, Location location, int minX, int maxX, int minZ, int maxZ, int rotation, double damage, UUID schematicId) {
         Region region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString());
         profile.getRegions().add(region);
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematics().get(schematicType).add(region);
-        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Added region, now trying to add Schematic to region (no time method)");
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
-                new BuiltSchematic(plugin, this, damage, schematicId));
+                new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location));
     }
 
-    private Location setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId) {
+    private Location setBlock(Block block, int rotation, Location location, Laser laser, UUID schematicId, double damage) {
         Location blockLocation = block.getLocation().clone();
         blockLocation.setX(blockLocation.getX()-substractX);
         blockLocation.setY(blockLocation.getY()-substractY);
@@ -444,6 +449,7 @@ public class Schematic {
             }
         }
 
+        Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
         if(block.getState() instanceof Sign) {
             Block pastedBlock = blockLocation.getBlock();
             Sign sign = (Sign) block.getState();
@@ -453,9 +459,12 @@ public class Schematic {
             }
             pastedSign.update();
             if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
+                double percentDamage = damage/durability;
+                Condition condition = BuiltSchematic.getCondition(percentDamage);
                 List<ItemStack> neededItems = new ArrayList<>();
-                if(plugin.getNexusPlugin().getDatabaseAdapter().keyExists("collectors", "schematicId", schematicId)) {
-                    ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().get("collectors", "schematicId", String.valueOf(schematicId));
+                int b = condition == Condition.INTACT ? 1:0;
+                if(plugin.getNexusPlugin().getDatabaseAdapter().keyExistsTwo("collectors", "schematicId", schematicId, "intact", b)) {
+                    ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().getTwo("collectors", "schematicId", String.valueOf(schematicId), "intact", String.valueOf(b));
                     try {
                         if(resultSet.next()) {
                             neededItems = plugin.getCollectorManager().getNeededItemsFromString(resultSet.getString("neededItems"));
@@ -464,22 +473,38 @@ public class Schematic {
                         exception.printStackTrace();
                     }
                 } else {
-                    neededItems = new ArrayList<>(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level));
-                    plugin.getNexusPlugin().getDatabaseAdapter().set("collectors", schematicId, Collector.toString(neededItems));
+                    neededItems = new ArrayList<>(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(condition).get(level));
+                    plugin.getNexusPlugin().getDatabaseAdapter().set("collectors", schematicId, Collector.toString(neededItems), b);
                 }
 
-                Collector collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)), Material.EMERALD_BLOCK)
-                        .setFilledAction(player1 -> {
-                            Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
-                            destroy(profile, schematicId, plugin, schematicType);
-                            Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
-                            nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId, 0);
-                            plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
-                                    profile.getProfileId(),
-                                    "schematicId", schematicId,
-                                    new DatabaseUpdate("level", level+1),
-                                    new DatabaseUpdate("placed", System.currentTimeMillis()));
-                        });
+                Collector oldCollector = plugin.getCollectorManager().getCollectors().get(pastedSign.getLocation().clone().subtract(0, 1, 0).getBlock());
+                if(oldCollector != null) {
+                    oldCollector.destroy();
+                }
+                Collector collector;
+                if(condition == Condition.INTACT) {
+                    collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)), Material.EMERALD_BLOCK)
+                            .setFilledAction(player1 -> {
+                                destroy(profile, schematicId, plugin, schematicType);
+                                Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
+                                nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId, 0);
+                                plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
+                                        profile.getProfileId(),
+                                        "schematicId", schematicId,
+                                        new DatabaseUpdate("level", level+1),
+                                        new DatabaseUpdate("placed", System.currentTimeMillis()));
+                            });
+                } else {
+                    collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK)
+                            .setFilledAction(player1 -> {
+                                destroy(profile, schematicId, plugin, false);
+                                Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
+                                repaired.build(location, rotation, schematicId, 0, true);
+                                plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
+                                        profile.getProfileId(), "schematicId", schematicId,
+                                        new DatabaseUpdate("damage", 0));
+                            });
+                }
                 collector.spawn(pastedSign.getLocation());
 
                 blockLocation.getBlock().setType(Material.AIR);
@@ -504,7 +529,6 @@ public class Schematic {
                     storage = blockLocation.clone().subtract(0, 1, 0).getBlock();
                 }
                 String storageId = pastedSign.getLine(1);
-                Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
 
                 if(storage.getState() instanceof Container) {
                     Container container = (Container) storage.getState();
@@ -583,6 +607,7 @@ public class Schematic {
 
         for (Location location : plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId)) {
             BlockData blockData = location.getBlock().getBlockData();
+
             location.getBlock().setType(Material.AIR);
 
             if(animated) {
@@ -596,6 +621,10 @@ public class Schematic {
 
         if(!animated) {
             for(Location location : toRemove) {
+                Collector oldCollector = plugin.getCollectorManager().getCollectors().get(location.getBlock());
+                if(oldCollector != null) {
+                    oldCollector.destroy();
+                }
                 location.getBlock().setType(Material.GRASS_BLOCK);
             }
         }

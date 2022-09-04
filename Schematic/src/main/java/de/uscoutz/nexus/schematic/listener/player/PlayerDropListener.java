@@ -29,7 +29,7 @@ public class PlayerDropListener implements Listener {
                 if(event.getItemDrop().isOnGround()) {
                     Block dropBlock = event.getItemDrop().getLocation().clone().subtract(0, 1, 0).getBlock();
                     Collector collector = plugin.getCollectorManager().getCollectors().get(dropBlock);
-                    if(dropBlock.getType() == Material.EMERALD_BLOCK && collector != null) {
+                    if(collector != null) {
                         collector.collect(player, event.getItemDrop());
                     } else {
                         player.getInventory().addItem(event.getItemDrop().getItemStack());

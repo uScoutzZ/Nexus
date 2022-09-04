@@ -70,6 +70,39 @@ public class DatabaseAdapter {
         return false;
     }
 
+    public boolean keyExistsTwo(String table, String whereKey, Object setKey, String whereKey2, Object setKey2) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        boolean value = false;
+
+        ResultSet resultSet = this.mySQL.query("SELECT * FROM `" + table + "` WHERE `" + whereKey + "`='" + setKey + "' AND " + whereKey2 + " = '" + setKey2 + "'");
+
+        try {
+            if(resultSet.next()) {
+                value = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return value;
+    }
+
+    public boolean keyExistsTwoAsync(String table, String whereKey, Object setKey, String whereKey2, Object setKey2) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        Future<Boolean> future = this.executorService.submit(() -> keyExistsTwo(table, whereKey, setKey, whereKey2, setKey2));
+
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     /**
      * Insert data in your database
      * @param table -> Table where you want insert
@@ -250,7 +283,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS playerProfiles (player VARCHAR(36), profileId VARCHAR(36), slot int, joinedProfile bigint, playtime bigint, inventory text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36), currentProfile int, firstLogin bigint, playtime bigint, gameprofile text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS schematics (profileId VARCHAR(36), schematicId VARCHAR(36), schematicType text, level int, rotation int, location text, placed bigint, damage double)");
-        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS collectors (schematicId VARCHAR(36), neededItems text)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS collectors (schematicId VARCHAR(36), neededItems text, intact boolean)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS storages (profileId VARCHAR(36), storageId text, inventory text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS raids (profileId VARCHAR(36), raidId VARCHAR(36), ended bigint)");
     }

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.commands;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,7 +29,7 @@ public class GetUpgradeItemsCommand implements CommandExecutor {
                 try {
                     SchematicType schematicType = SchematicType.valueOf(args[0]);
                     int level = Integer.parseInt(args[1]);
-                    List<ItemStack> neededItems = new ArrayList<>(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(level));
+                    List<ItemStack> neededItems = new ArrayList<>(plugin.getCollectorManager().getCollectorNeededMap().get(schematicType).get(Condition.INTACT).get(level));
 
                     for(ItemStack itemStack : neededItems) {
                         player.getInventory().addItem(itemStack);

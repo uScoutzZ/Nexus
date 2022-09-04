@@ -26,7 +26,7 @@ public class CollectorManager {
     @Getter
     private Map<Block, Collector> collectors;
     @Getter
-    private Map<SchematicType, Map<Integer, List<ItemStack>>> collectorNeededMap;
+    private Map<SchematicType, Map<Condition, Map<Integer, List<ItemStack>>>> collectorNeededMap;
     @Getter
     private File schematicCollectorsFile;
 
@@ -51,9 +51,10 @@ public class CollectorManager {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(schematicCollectorsFile);
         for(Condition condition : Condition.values()) {
             for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
+                collectorNeededMap.get(schematicType).put(condition, new HashMap<>());
                 for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).values()) {
-                    String needed = fileConfiguration.getString(schematicType.toString().toLowerCase() + "." + schematic.getLevel());
-                    collectorNeededMap.get(schematicType).put(schematic.getLevel(), getNeededItemsFromString(needed));
+                    String needed = fileConfiguration.getString(condition.toString() + "." + schematicType.toString().toLowerCase() + "." + schematic.getLevel());
+                    collectorNeededMap.get(schematicType).get(condition).put(schematic.getLevel(), getNeededItemsFromString(needed));
                 }
             }
         }

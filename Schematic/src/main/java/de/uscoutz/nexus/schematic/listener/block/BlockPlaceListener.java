@@ -56,7 +56,7 @@ public class BlockPlaceListener implements Listener {
                             long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
                             schematic.build(location, rotation, finished, schematicId, 0);
                         } else {
-                            schematic.build(location, rotation, schematicId, 0);
+                            schematic.build(location, rotation, schematicId, 0, false);
                         }
                         String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
                         plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",

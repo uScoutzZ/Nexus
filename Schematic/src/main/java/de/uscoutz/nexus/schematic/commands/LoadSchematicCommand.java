@@ -54,7 +54,7 @@ public class LoadSchematicCommand implements CommandExecutor {
                         }
                         Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
                         player.sendMessage("§ePasting " + schematic.getBlocks().size() +" blocks");
-                        schematic.build(player.getLocation(), rotation, UUID.randomUUID(), 0);
+                        schematic.build(player.getLocation(), rotation, UUID.randomUUID(), 0, false);
                     } catch (IllegalArgumentException exception) {
                         sendHelp(player);
                         exception.printStackTrace();
