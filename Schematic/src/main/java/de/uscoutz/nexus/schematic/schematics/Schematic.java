@@ -323,6 +323,7 @@ public class Schematic {
                 Region region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX[0], maxX[0], minZ[0], maxZ[0], schematicType.toString());
                 profile.getRegions().add(region);
                 plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematics().get(schematicType).add(region);
+                Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Added region, now trying to add Schematic to region (time included method)");
                 plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
                         new BuiltSchematic(plugin, this, damage, schematicId));
             }
@@ -356,6 +357,7 @@ public class Schematic {
         Region region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString());
         profile.getRegions().add(region);
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematics().get(schematicType).add(region);
+        Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Added region, now trying to add Schematic to region (no time method)");
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
                 new BuiltSchematic(plugin, this, damage, schematicId));
     }

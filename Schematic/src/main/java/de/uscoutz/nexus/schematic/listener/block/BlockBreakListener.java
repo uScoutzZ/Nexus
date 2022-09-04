@@ -26,9 +26,13 @@ public class BlockBreakListener implements Listener {
         if(region == null) {
             player.sendMessage("no region " + plugin.getNexusPlugin().getRegionManager().getRegions().size());
         } else {
-            player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + "");
-            player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getDamage());
-            player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
+            if(profile.getSchematicsByRegion().containsKey(region)) {
+                player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + "");
+                player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getDamage());
+                player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
+            } else {
+                player.sendMessage("§cNo schematic for this region found");
+            }
         }
 
 

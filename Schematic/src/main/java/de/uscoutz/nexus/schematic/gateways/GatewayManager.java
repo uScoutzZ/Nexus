@@ -47,7 +47,7 @@ public class GatewayManager {
             Location location1, location2;
             location1 = plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location1", Bukkit.getWorlds().get(0));
             location2 = plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location2", Bukkit.getWorlds().get(0));
-            Region region = new Region(plugin.getNexusPlugin(), Math.min(location1.getBlockX(), location2.getBlockX()),
+            Region region = new Region(plugin.getNexusPlugin(), Bukkit.getWorlds().get(0), Math.min(location1.getBlockX(), location2.getBlockX()),
                     Math.max(location1.getBlockX(), location2.getBlockX()),
                     Math.min(location1.getBlockY(), location2.getBlockY()),
                     Math.max(location1.getBlockY(), location2.getBlockY()),

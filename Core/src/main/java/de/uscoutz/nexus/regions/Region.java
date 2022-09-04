@@ -15,9 +15,13 @@ public class Region {
     private int minX, maxX, minY, maxY, minZ, maxZ;
 
     @Getter
+    private World world;
+
+    @Getter
     private BoundingBox boundingBox;
 
-    public Region(NexusPlugin plugin, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+    public Region(NexusPlugin plugin, World world, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        this.world = world;
         this.plugin = plugin;
         this.minX = minX;
         this.minZ = minZ;
@@ -31,6 +35,7 @@ public class Region {
 
     public Region(NexusPlugin plugin, World world, int minX, int maxX, int minZ, int maxZ, String s) {
         this.plugin = plugin;
+        this.world = world;
         minX -= 1;
         minZ -= 1;
         maxX += 1;

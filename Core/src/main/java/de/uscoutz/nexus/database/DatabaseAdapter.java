@@ -89,9 +89,9 @@ public class DatabaseAdapter {
             i++;
         }
 
-        System.out.println(Arrays.toString(value));
+        //System.out.println(Arrays.toString(value));
 
-        System.out.println(stringBuilder);
+        //System.out.println(stringBuilder);
 
         this.mySQL.queryUpdate(stringBuilder.toString());
     }
@@ -130,7 +130,7 @@ public class DatabaseAdapter {
 
         stringBuilder.append("WHERE `").append(whereKey).append("`='").append(setKey).append("'");
 
-        System.out.println(stringBuilder);
+        //System.out.println(stringBuilder);
 
         this.mySQL.queryUpdate(stringBuilder.toString());
     }
@@ -164,7 +164,7 @@ public class DatabaseAdapter {
 
         stringBuilder.append("WHERE `").append(whereKey).append("`='").append(setKey).append("' AND `").append(secWhereKey).append("`='").append(secSetKey).append("'");
 
-        System.out.println(stringBuilder);
+        //System.out.println(stringBuilder);
 
         this.mySQL.queryUpdate(stringBuilder.toString());
     }
@@ -176,7 +176,7 @@ public class DatabaseAdapter {
     public void delete(String table, String whereKey, Object setKey) {
         if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
 
-        System.out.println(table + " " + whereKey + " " + setKey);
+        //System.out.println(table + " " + whereKey + " " + setKey);
 
         this.mySQL.queryUpdate("DELETE FROM `" + table + "` WHERE `" + whereKey + "`='" + setKey + "'");
     }
@@ -184,7 +184,7 @@ public class DatabaseAdapter {
     public void deleteTwo(String table, String whereKey, Object setKey, String whereKey2, Object setKey2) {
         if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
 
-        System.out.println(table + " " + whereKey + " " + setKey + " " + whereKey2 + " " + setKey2);
+        //System.out.println(table + " " + whereKey + " " + setKey + " " + whereKey2 + " " + setKey2);
 
         this.mySQL.queryUpdate("DELETE FROM " + table + " WHERE " + whereKey + " = '" + setKey + "' AND " + whereKey2 + " = '" + setKey2 + "'");
     }

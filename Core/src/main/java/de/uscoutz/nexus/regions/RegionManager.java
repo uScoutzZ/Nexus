@@ -22,10 +22,12 @@ public class RegionManager {
 
     public Region getRegion(Location location) {
         for(Region region : regions) {
-            if(region.getBoundingBox().getMinX() <= location.getX() && region.getBoundingBox().getMaxX() >= location.getX()
-                    && region.getBoundingBox().getMinY() <= location.getY() && region.getBoundingBox().getMaxY() >= location.getY()
-                    && region.getBoundingBox().getMinZ() <= location.getZ() && region.getBoundingBox().getMaxZ() >= location.getZ()) {
-                return region;
+            if(location.getWorld() == region.getWorld()) {
+                if(region.getBoundingBox().getMinX() <= location.getX() && region.getBoundingBox().getMaxX() >= location.getX()
+                        && region.getBoundingBox().getMinY() <= location.getY() && region.getBoundingBox().getMaxY() >= location.getY()
+                        && region.getBoundingBox().getMinZ() <= location.getZ() && region.getBoundingBox().getMaxZ() >= location.getZ()) {
+                    return region;
+                }
             }
         }
 
