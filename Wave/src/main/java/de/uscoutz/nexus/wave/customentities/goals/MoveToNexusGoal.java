@@ -48,13 +48,15 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
             tries = 0;
         } else {
             if(region[0] != null) {
+                Profile profile = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(mob.getBukkitEntity().getWorld());
+                SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
                 if(region[0].getBoundingBox().clone().expand(2, 2, 2, 2, 2, 2).contains(
                         mob.getX(), mob.getY(), mob.getZ())) {
-                    valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() != location.getBlockY();
+                    BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
+                    valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() != location.getBlockY()
+                            && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;;
                 } else {
                     if(schematics.containsKey(region[0])) {
-                        Profile profile = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(mob.getBukkitEntity().getWorld());
-                        SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
                         BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
                         valid = BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;
                     } else {
