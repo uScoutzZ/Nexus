@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +27,8 @@ public class RaidProfile {
     private long lastRaid;
     @Getter @Setter
     private Raid raid;
+    @Getter
+    private BukkitTask task;
 
     public RaidProfile(Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
@@ -56,7 +59,7 @@ public class RaidProfile {
 
         Bukkit.broadcastMessage("Raid starts in " + TimeUnit.MILLISECONDS.toSeconds(startIn));
 
-        new BukkitRunnable() {
+        task = new BukkitRunnable() {
             @Override
             public void run() {
                 if(profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0) {

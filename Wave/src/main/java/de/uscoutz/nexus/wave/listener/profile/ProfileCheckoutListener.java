@@ -26,6 +26,9 @@ public class ProfileCheckoutListener implements Listener {
     public void onProfileCheckout(ProfileCheckoutEvent event) {
         Profile profile = event.getProfile();
         RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
+        if(raidProfile.getTask() != null) {
+            raidProfile.getTask().cancel();
+        }
 
         if(raidProfile.getRaid() != null) {
             raidProfile.getRaid().end();
