@@ -39,8 +39,6 @@ public class LoadSchematicCommand implements CommandExecutor {
                             }
                         }
                         int level = Integer.parseInt(args[1]);
-                        Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
-                        player.sendMessage("§ePasting " + schematic.getBlocks().size() +" blocks");
                         int rotation = 0;
                         if(args.length == 3) {
                             try {
@@ -54,6 +52,8 @@ public class LoadSchematicCommand implements CommandExecutor {
                                 }
                             }
                         }
+                        Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
+                        player.sendMessage("§ePasting " + schematic.getBlocks().size() +" blocks");
                         schematic.build(player.getLocation(), rotation, UUID.randomUUID(), 0);
                     } catch (IllegalArgumentException exception) {
                         sendHelp(player);
