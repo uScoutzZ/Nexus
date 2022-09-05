@@ -5,11 +5,14 @@ import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,10 +66,15 @@ public class ProfileLoadListener implements Listener {
                 World world = profile.getWorld().getWorld();
                 for(int i = 0; i < plugin.getSchematicManager().getSchematicsMap().get(SchematicType.TOWER).get(Condition.INTACT).size()-1; i++) {
                     Material material = Material.RED_STAINED_GLASS;
-                    Bukkit.getConsoleSender().sendMessage("[Nexus] Highest tower: " + profile.getHighestTower());
                     if(i <= profile.getHighestTower()) {
                         material = Material.AIR;
                     }
+                    Location location = plugin.getGatewayManager().getHolograms().get(i);
+                    location.setWorld(profile.getWorld().getWorld());
+                    ArmorStand armorStand = (ArmorStand) profile.getWorld().getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+                    armorStand.setVisible(false);
+                    armorStand.setCustomNameVisible(true);
+                    armorStand.customName(Component.text("§7Required tower level: §3§l" + (i+1)));
                     for(Block block : plugin.getGatewayManager().getGateways().get(i).getBlocksInRegion(world)) {
                         block.setType(material);
                     }

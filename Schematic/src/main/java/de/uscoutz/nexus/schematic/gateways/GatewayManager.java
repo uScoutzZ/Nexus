@@ -23,6 +23,8 @@ public class GatewayManager {
     @Getter
     private Map<Integer, Region> gateways;
     @Getter
+    private Map<Integer, Location> holograms;
+    @Getter
     private FileConfiguration fileConfiguration;
     @Getter
     private File gatewayFile;
@@ -31,6 +33,7 @@ public class GatewayManager {
         this.plugin = plugin;
         this.gatewayFile = gatewayFile;
         gateways = new HashMap<>();
+        holograms = new HashMap<>();
         if(!gatewayFile.exists()) {
             try {
                 gatewayFile.createNewFile();
@@ -54,6 +57,7 @@ public class GatewayManager {
                     Math.min(location1.getBlockZ(), location2.getBlockZ()),
                     Math.max(location1.getBlockZ(), location2.getBlockZ()));
             gateways.put(i, region);
+            holograms.put(i, plugin.getNexusPlugin().getLocationManager().getLocation(fileConfiguration, i + ".location3", Bukkit.getWorlds().get(0)));
         }
     }
 }
