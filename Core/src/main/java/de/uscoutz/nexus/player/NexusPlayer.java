@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class NexusPlayer {
 
@@ -267,9 +268,19 @@ public class NexusPlayer {
     }
 
     public void openProfiles(String coopInvitation) {
-        SimpleInventory inventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles-title"));
 
-        int[] slots = new int[]{11, 12, 14, 15};
+        int[] slots;
+        int size;
+        if(player.hasPermission("nexus.profile.unlimited")) {
+            size = 5*9;
+            slots = IntStream.range(0, size-1).toArray();
+        } else {
+            slots = new int[]{11, 12, 14, 15};
+            size = 3*9;
+        }
+
+        SimpleInventory inventory = InventoryBuilder.create(size, plugin.getLocaleManager().translate("de_DE", "profiles-title"));
+
         int currentSlot = 0;
         for(int i : slots) {
             Material material;
