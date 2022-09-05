@@ -36,10 +36,10 @@ public class Region {
     public Region(NexusPlugin plugin, World world, int minX, int maxX, int minZ, int maxZ, String s) {
         this.plugin = plugin;
         this.world = world;
-        minX -= 1;
+        /*minX -= 1;
         minZ -= 1;
         maxX += 1;
-        maxZ += 1;
+        maxZ += 1;*/
         boundingBox = new BoundingBox(minX, -64, minZ, maxX, 200, maxZ);
         plugin.getRegionManager().getRegions().add(this);
 
@@ -67,6 +67,6 @@ public class Region {
     }
 
     public boolean overlap(int minX, int maxX, int minZ, int maxZ) {
-        return new BoundingBox(minX, 0, minZ, maxX, 200, maxZ).overlaps(boundingBox);
+        return new BoundingBox(minX, 0, minZ, maxX, 200, maxZ).overlaps(boundingBox.clone().expand(1, 1, 1, 1, 1, 1));
     }
 }

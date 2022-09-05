@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
@@ -29,6 +30,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class NexusZombie extends Zombie implements NexusMob {
@@ -59,8 +61,19 @@ public class NexusZombie extends Zombie implements NexusMob {
                 }
                 setAggressive(!isAggressive());
                 if(isAggressive()) {
-                    if(moveToNexusGoal.isReachedTarget()) {
+                    /*if(moveToNexusGoal.isReachedTarget()) {
                         attackSchematic();
+                    }*/
+
+                    BuiltSchematic builtSchematic = moveToNexusGoal.getBuiltSchematic();
+                    if(builtSchematic != null) {
+                        Region schematicRegion = plugin.getSchematicPlugin().getNexusPlugin().getRegionManager().getRegion(builtSchematic.getLocation());
+                        if(schematicRegion.getBoundingBox().clone().expand(1, 1, 1, 1, 1, 1)
+                                .contains(getBukkitEntity().getLocation().getX(), getBukkitEntity().getLocation().getY(), getBukkitEntity().getLocation().getZ())) {
+                            if(BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED) {
+                                attackSchematic(builtSchematic);
+                            }
+                        }
                     }
                 }
             }
@@ -77,12 +90,13 @@ public class NexusZombie extends Zombie implements NexusMob {
     }
 
     @Override
-    public void attackSchematic() {
-        World world = this.getBukkitEntity().getWorld();
+    public void attackSchematic(BuiltSchematic builtSchematic) {
+        World world = this.getBukkitEntity().getWorld();/*
         UUID profileId = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(world).getProfileId();
         SchematicProfile profile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profileId);
         Region region = plugin.getSchematicPlugin().getNexusPlugin().getRegionManager().getRegion(this.getBukkitEntity().getLocation());
         BuiltSchematic builtSchematic = profile.getSchematicsByRegion().get(region);
+        */
         builtSchematic.damage(damage);
         Block block = ((LivingEntity)this.getBukkitEntity()).getTargetBlock(3);
         if(block != null) {

@@ -1,6 +1,8 @@
 package de.uscoutz.nexus.wave.customentities;
 
+import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
+
 public interface NexusMob {
 
-    void attackSchematic();
+    void attackSchematic(BuiltSchematic builtSchematic);
 }

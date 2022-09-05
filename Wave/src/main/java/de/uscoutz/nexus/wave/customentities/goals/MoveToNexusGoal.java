@@ -4,6 +4,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.schematics.*;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
@@ -23,6 +24,9 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
     private int tries;
 
     private Location nexusLocation;
+
+    @Getter
+    private BuiltSchematic builtSchematic;
 
     public MoveToNexusGoal(PathfinderMob mob) {
         super(mob, 1.0, 100, 20);
@@ -52,12 +56,12 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
                 SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
                 if(region[0].getBoundingBox().clone().expand(2, 2, 2, 2, 2, 2).contains(
                         mob.getX(), mob.getY(), mob.getZ())) {
-                    BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
+                    builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
                     valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() > location.getBlockY()
                             && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;;
                 } else {
                     if(schematics.containsKey(region[0])) {
-                        BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
+                        builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
                         valid = BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;
                     } else {
                         valid = false;

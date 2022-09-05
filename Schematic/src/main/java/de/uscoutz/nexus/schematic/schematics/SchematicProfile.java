@@ -14,7 +14,7 @@ public class SchematicProfile {
     private Profile profile;
 
     @Getter
-    private Map<UUID, List<Location>> builtSchematics;
+    private Map<UUID, BuiltSchematic> builtSchematics;
     @Getter
     private Map<SchematicType, List<Region>> schematics;
     @Getter

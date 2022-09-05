@@ -1,5 +1,6 @@
 package de.uscoutz.nexus.wave.customentities;
 
+import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.goals.MoveToNexusGoal;
 import net.minecraft.network.chat.Component;
@@ -52,7 +53,7 @@ public class NexusGolem extends IronGolem implements NexusMob{
     }
 
     @Override
-    public void attackSchematic() {
+    public void attackSchematic(BuiltSchematic builtSchematic) {
 
     }
 }
