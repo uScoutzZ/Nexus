@@ -37,8 +37,9 @@ public class Collector {
     private int requiredNexusLevel;
     private Material blockType;
     private Block block;
+    private String title;
 
-    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel, Material blockType) {
+    public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel, Material blockType, String title) {
         this.plugin = plugin;
         hologram = new HashMap<>();
         this.neededItems = new LinkedHashMap<>();
@@ -46,6 +47,7 @@ public class Collector {
         this.schematicId = schematicId;
         this.requiredNexusLevel = requiredNexusLevel;
         this.blockType = blockType;
+        this.title = title;
 
         for(ItemStack neededItem : neededItems) {
             this.neededItems.put(neededItem.getType(), neededItem.getAmount());
@@ -81,6 +83,17 @@ public class Collector {
             armorStand.setVisible(false);
             armorStand.setGravity(false);
             hologram.put(needed, armorStand);
+        }
+
+        if(title != null) {
+            ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location.getBlock().getLocation().clone()
+                    .add(0.5, hologram.size()-0.4, 0.5), EntityType.ARMOR_STAND);
+            armorStand.setSmall(true);
+            armorStand.customName(Component.text(title));
+            armorStand.setCustomNameVisible(true);
+            armorStand.setVisible(false);
+            armorStand.setGravity(false);
+            hologram.put(Material.AIR, armorStand);
         }
     }
 

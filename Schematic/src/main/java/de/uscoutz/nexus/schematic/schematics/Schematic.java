@@ -483,7 +483,7 @@ public class Schematic {
                 }
                 Collector collector;
                 if(condition == Condition.INTACT) {
-                    collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)), Material.EMERALD_BLOCK)
+                    collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)), Material.EMERALD_BLOCK, "§a§lUPGRADE")
                             .setFilledAction(player1 -> {
                                 destroy(profile, schematicId, plugin, schematicType);
                                 Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
@@ -495,7 +495,7 @@ public class Schematic {
                                         new DatabaseUpdate("placed", System.currentTimeMillis()));
                             });
                 } else {
-                    collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK)
+                    collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK, "§c§lREPAIR")
                             .setFilledAction(player1 -> {
                                 destroy(profile, schematicId, plugin, false);
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
