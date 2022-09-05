@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.util.UUID;
@@ -61,7 +62,7 @@ public class BuiltSchematic {
     }
 
     public static Condition getCondition(double percentageDamage) {
-        if(percentageDamage == 0) {
+        if(percentageDamage < 1) {
             return Condition.INTACT;
         } else if(percentageDamage >= 50) {
             return Condition.DESTROYED;
