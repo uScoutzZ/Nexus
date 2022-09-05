@@ -84,7 +84,7 @@ public class NexusZombie extends Zombie implements NexusMob {
         Region region = plugin.getSchematicPlugin().getNexusPlugin().getRegionManager().getRegion(this.getBukkitEntity().getLocation());
         BuiltSchematic builtSchematic = profile.getSchematicsByRegion().get(region);
         builtSchematic.damage(damage);
-        Block block = ((LivingEntity)this.getBukkitEntity()).getTargetBlock(2);
+        Block block = ((LivingEntity)this.getBukkitEntity()).getTargetBlock(3);
         if(block != null) {
             world.spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 35, 1, 1, 1, block.getBlockData());
         }
