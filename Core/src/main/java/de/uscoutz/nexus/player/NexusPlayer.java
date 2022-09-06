@@ -319,49 +319,54 @@ public class NexusPlayer {
 
             if(coopInvitation == null) {
                 inventory.setItem(i, itemBuilder, leftClick -> {
-                    SimpleInventory simpleInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_members-title"));
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    if(profile != null) {
+                        SimpleInventory simpleInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_members-title"));
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-                    simpleInventory.fill(0, 9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
-                    simpleInventory.setItem(4, ItemBuilder.skull()
-                            .skinURL("https://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f")
-                            .name(plugin.getLocaleManager().translate("de_DE", "profiles_coop"))
-                            .lore(plugin.getLocaleManager().translate("de_DE", "profiles_coop_lore")));
-                    simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
-                            .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"))
-                            .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile_lore")), deleteLeftClick -> {
-                        if(finalCurrentSlot != 0) {
-                            SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
-                            deleteInventory.setItem(13, ItemBuilder.skull()
-                                    .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
-                                    .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm"))
-                                    .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
-                                if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
-                                    new PacketDeleteProfile("123", profile.getProfileId())
-                                            .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
-                                                    plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId())));
+                        simpleInventory.fill(0, 9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
+                        simpleInventory.setItem(4, ItemBuilder.skull()
+                                .skinURL("https://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f")
+                                .name(plugin.getLocaleManager().translate("de_DE", "profiles_coop"))
+                                .lore(plugin.getLocaleManager().translate("de_DE", "profiles_coop_lore")));
+
+                        if(profile.getOwner().equals(player.getUniqueId())) {
+                            simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
+                                    .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"))
+                                    .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile_lore")), deleteLeftClick -> {
+                                if(finalCurrentSlot != 0) {
+                                    SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
+                                    deleteInventory.setItem(13, ItemBuilder.skull()
+                                            .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
+                                            .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm"))
+                                            .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
+                                        if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
+                                            new PacketDeleteProfile("123", profile.getProfileId())
+                                                    .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
+                                                            plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId())));
+                                        } else {
+                                            profile.delete();
+                                        }
+                                        player.closeInventory();
+                                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
+                                    });
+                                    deleteInventory.open(player);
                                 } else {
-                                    profile.delete();
+                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_profile_delete_not-deletable"));
                                 }
-                                player.closeInventory();
-                                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
                             });
-                            deleteInventory.open(player);
-                        } else {
-                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_profile_delete_not-deletable"));
                         }
-                    });
 
-                    if(profile.getMembers() != null) {
-                        for(ProfilePlayer profilePlayer : profile.getMembers().values()) {
-                            if(profilePlayer != null && profilePlayer.getGameProfile() != null) {
-                                simpleInventory.addItem(ItemBuilder.skull().owner(profilePlayer.getGameProfile()).name("§7" + profilePlayer.getGameProfile().getName()).lore(
-                                        plugin.getLocaleManager().translate("de_DE", "profiles_members_joined", sdf.format(new Date(profilePlayer.getJoinedProfile()))),
-                                        plugin.getLocaleManager().translate("de_DE", "profiles_members_playtime", profilePlayer.getOnlineTime())));
+                        if(profile.getMembers() != null) {
+                            for(ProfilePlayer profilePlayer : profile.getMembers().values()) {
+                                if(profilePlayer != null && profilePlayer.getGameProfile() != null) {
+                                    simpleInventory.addItem(ItemBuilder.skull().owner(profilePlayer.getGameProfile()).name("§7" + profilePlayer.getGameProfile().getName()).lore(
+                                            plugin.getLocaleManager().translate("de_DE", "profiles_members_joined", sdf.format(new Date(profilePlayer.getJoinedProfile()))),
+                                            plugin.getLocaleManager().translate("de_DE", "profiles_members_playtime", profilePlayer.getOnlineTime())));
+                                }
                             }
                         }
+                        simpleInventory.open(player);
                     }
-                    simpleInventory.open(player);
                 }, rightClick -> {
                     if(material == Material.GOLDEN_PICKAXE) {
                         if(currentProfileSlot == finalCurrentSlot) {
