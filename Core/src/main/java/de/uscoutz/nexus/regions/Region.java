@@ -12,6 +12,7 @@ import java.util.List;
 public class Region {
 
     private NexusPlugin plugin;
+    @Getter
     private int minX, maxX, minY, maxY, minZ, maxZ;
 
     @Getter

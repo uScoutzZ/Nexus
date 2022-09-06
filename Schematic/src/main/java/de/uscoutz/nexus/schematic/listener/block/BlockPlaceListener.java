@@ -6,6 +6,7 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
+import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -31,6 +32,8 @@ public class BlockPlaceListener implements Listener {
     public void onBlockBreak(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         SchematicPlayer schematicPlayer = plugin.getPlayerManager().getPlayerMap().get(player.getUniqueId());
+        SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(
+                plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld()).getProfileId());
 
         event.getPlayer().getInventory().getItemInMainHand();
         ItemStack itemStack = player.getInventory().getItem(player.getInventory().getHeldItemSlot());
@@ -47,28 +50,32 @@ public class BlockPlaceListener implements Listener {
                         "schematicid"), PersistentDataType.STRING);
                 if(id != null) {
                     UUID schematicId = UUID.fromString(id);
-                    player.sendMessage(id);
-                    Location location = event.getBlock().getLocation().subtract(0, 1, 0);
-                    int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                    int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
-                    Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
-                    if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
+                    if(schematicProfile.getBuiltSchematics().containsKey(schematicId)) {
                         event.setCancelled(true);
-                        player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                        player.sendMessage("§cThis schematic is already placed");
                     } else {
-                        if(!schematicItem.getSchematic().preview(location, rotation, true)) {
-                            if(schematic.getTimeToFinish() != 0) {
-                                long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
-                                schematic.build(location, rotation, finished, schematicId, 0);
-                            } else {
-                                schematic.build(location, rotation, schematicId, 0, false);
-                            }
-                            String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-                            plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
-                                    plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
-                                    schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
+                        Location location = event.getBlock().getLocation().subtract(0, 1, 0);
+                        int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
+                        int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+                        Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                        if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
+                            event.setCancelled(true);
+                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                         } else {
-                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                            if(!schematicItem.getSchematic().preview(location, rotation, true)) {
+                                if(schematic.getTimeToFinish() != 0) {
+                                    long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
+                                    schematic.build(location, rotation, finished, schematicId, 0);
+                                } else {
+                                    schematic.build(location, rotation, schematicId, 0, false);
+                                }
+                                String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+                                plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
+                                        plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
+                                        schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
+                            } else {
+                                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                            }
                         }
                     }
                 } else {

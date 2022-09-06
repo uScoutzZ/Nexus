@@ -221,6 +221,7 @@ public class Schematic {
             countdown.setGravity(false);
             countdown.setCustomNameVisible(true);
             countdown.customName(Component.text(counter[0]));
+            List<Location> blocks1 = new ArrayList<>();
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -232,6 +233,11 @@ public class Schematic {
                             }
                             profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()-1);
                             FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
+                            Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
+                            if(region == null) {
+                                preview(location, rotation, true);
+                                region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
+                            }
                             if(schematicType == SchematicType.NEXUS) {
                                 profile.setNexusLevel(level);
                             } else if(schematicType == SchematicType.TOWER) {
@@ -243,6 +249,7 @@ public class Schematic {
                                 }
                             }
 
+                            finish(profile, location, region.getMinX(), region.getMaxX(), region.getMinZ(), region.getMaxZ(), rotation, damage, schematicId, blocks1);
                             countdown.remove();
                             cancel();
                         } else {
@@ -278,7 +285,6 @@ public class Schematic {
             final int[] maxX = { Integer.MIN_VALUE };
             final int[] maxZ = { Integer.MIN_VALUE };
 
-            List<Location> blocks1 = new ArrayList<>();
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -347,10 +353,8 @@ public class Schematic {
             }
 
             assert minX != Integer.MAX_VALUE;
-            Bukkit.getConsoleSender().sendMessage(blocks1.size() + "");
             finish(profile, location, minX, maxX, minZ, maxZ, rotation, damage, schematicId, blocks1);
         } else {
-            Bukkit.broadcastMessage("update: " + damage);
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
             BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(
                     profile.getProfileId()).getBuiltSchematics().get(schematicId);
@@ -361,8 +365,13 @@ public class Schematic {
     }
 
     private void finish(Profile profile, Location location, int minX, int maxX, int minZ, int maxZ, int rotation, double damage, UUID schematicId, List<Location> blocks1) {
-        Region region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString());
-        profile.getRegions().add(region);
+        Region region;
+        if(plugin.getNexusPlugin().getRegionManager().getRegion(location) == null) {
+            region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString());
+            profile.getRegions().add(region);
+        } else {
+            region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
+        }
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematics().get(schematicType).add(region);
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
                 new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1));
