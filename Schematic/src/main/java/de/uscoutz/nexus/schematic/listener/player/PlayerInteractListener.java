@@ -2,9 +2,13 @@ package de.uscoutz.nexus.schematic.listener.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
+import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
+import de.uscoutz.nexus.schematic.schematics.*;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
@@ -13,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerInteractListener implements Listener {
 
@@ -58,6 +63,38 @@ public class PlayerInteractListener implements Listener {
                 Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
                 if(!profile.getStorageBlocks().containsValue(container)) {
                     event.setCancelled(true);
+                }
+            }
+        } else if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            Location clicked = event.getClickedBlock().getLocation();
+            Region region = plugin.getNexusPlugin().getRegionManager().getRegion(clicked);
+            Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(clicked.getWorld());
+            SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+            BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region);
+            if(builtSchematic.getSchematic().getSchematicType() == SchematicType.NEXUS) {
+                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_nexus-not-breakable"));
+            } else {
+                if(BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.INTACT) {
+                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_damaged-not-breakable"));
+                } else {
+                    if(plugin.getSchematicItemManager().getSchematicItemBySchematic().containsKey(builtSchematic.getSchematic())) {
+                        if(schematicPlayer.getBreaking() == null || !schematicPlayer.getBreaking().equals(builtSchematic)) {
+                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break"));
+                            schematicPlayer.setBreaking(builtSchematic);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    schematicPlayer.setBreaking(null);
+                                }
+                            }.runTaskLater(plugin, 40);
+                        } else {
+                            SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemBySchematic().get(builtSchematic.getSchematic());
+                            Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER);
+                            player.getInventory().addItem(schematicItem.getItemStack(builtSchematic.getSchematicId()));
+                        }
+                    } else {
+                        player.sendMessage("§cThe schematic item is not set up");
+                    }
                 }
             }
         }

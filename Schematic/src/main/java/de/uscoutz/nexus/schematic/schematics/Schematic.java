@@ -1,6 +1,5 @@
 package de.uscoutz.nexus.schematic.schematics;
 
-import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
@@ -499,7 +498,7 @@ public class Schematic {
                 } else {
                     collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK, "§c§lREPAIR")
                             .setFilledAction(player1 -> {
-                                destroy(profile, schematicId, plugin, false);
+                                destroy(profile, schematicId, plugin, DestroyAnimation.SILENT);
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
                                 repaired.build(location, rotation, schematicId, 0, true);
                                 plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
@@ -596,7 +595,7 @@ public class Schematic {
         }
     }
 
-    public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, boolean animated) {
+    public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, DestroyAnimation animation) {
         int minHeight = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).getBlocks().get(0).getBlockY();
         List<Location> toRemove = new ArrayList<>();
         for (Location blockLocation : plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).getBlocks()) {
@@ -612,7 +611,7 @@ public class Schematic {
 
             location.getBlock().setType(Material.AIR);
 
-            if(animated) {
+            if(animation == DestroyAnimation.UPGRADE) {
                 FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location, blockData);
                 double x = 0;
                 double z = 0;
@@ -621,7 +620,7 @@ public class Schematic {
             }
         }
 
-        if(!animated) {
+        if(animation == DestroyAnimation.SILENT || animation == DestroyAnimation.PLAYER) {
             for(Location location : toRemove) {
                 Collector oldCollector = plugin.getCollectorManager().getCollectors().get(location.getBlock());
                 if(oldCollector != null) {
@@ -629,6 +628,13 @@ public class Schematic {
                 }
                 location.getBlock().setType(Material.GRASS_BLOCK);
             }
+        }
+        if(animation == DestroyAnimation.PLAYER) {
+            plugin.getNexusPlugin().getDatabaseAdapter().delete("schematics", "schematicId", schematicId);
+            Region region = plugin.getNexusPlugin().getRegionManager().getRegion(plugin.getSchematicManager().getSchematicProfileMap().get(
+                    profile.getProfileId()).getBuiltSchematics().get(schematicId).getBlocks().get(0));
+            plugin.getNexusPlugin().getRegionManager().getRegions().remove(region);
+            profile.getRegions().remove(region);
         }
     }
 
@@ -638,6 +644,6 @@ public class Schematic {
             profile.saveStorages();
         }
 
-        destroy(profile, schematicId, plugin, true);
+        destroy(profile, schematicId, plugin, DestroyAnimation.UPGRADE);
     }
 }

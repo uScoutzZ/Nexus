@@ -273,7 +273,7 @@ public class NexusPlayer {
         int size;
         if(player.hasPermission("nexus.profile.unlimited")) {
             size = 5*9;
-            slots = IntStream.range(0, size-1).toArray();
+            slots = IntStream.range(0, size).toArray();
         } else {
             slots = new int[]{11, 12, 14, 15};
             size = 3*9;

@@ -4,6 +4,7 @@ import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
+import de.uscoutz.nexus.schematic.schematics.DestroyAnimation;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import org.bukkit.entity.Entity;
@@ -31,7 +32,7 @@ public class ProfileCheckoutListener implements Listener {
         }
 
         for(UUID schematicId : profile.getSchematicIds()) {
-            Schematic.destroy(profile, schematicId, plugin, false);
+            Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT);
         }
 
         for(Entity entity : profile.getWorld().getWorld().getEntities()) {

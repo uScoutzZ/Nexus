@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.player;
 
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
+import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -28,6 +29,8 @@ public class SchematicPlayer {
     private Map<Integer, Location> locations;
     @Getter
     private Player player;
+    @Getter @Setter
+    private BuiltSchematic breaking;
 
     private BukkitTask task;
 

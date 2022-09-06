@@ -29,9 +29,13 @@ public class SchematicItemManager {
     private File itemsFile;
     private FileConfiguration itemsConfig;
 
+    @Getter
+    private Map<Schematic, SchematicItem> schematicItemBySchematic;
+
     public SchematicItemManager(NexusSchematicPlugin plugin, File itemsFile) {
         this.plugin = plugin;
         schematicItemMap = new HashMap<>();
+        schematicItemBySchematic = new HashMap<>();
         this.itemsFile = itemsFile;
         if(!itemsFile.exists()) {
             try {
@@ -60,6 +64,7 @@ public class SchematicItemManager {
 
                 schematicItem.build();
                 schematicItemMap.put(key, schematicItem);
+                schematicItemBySchematic.put(schematic, schematicItem);
             }
         }
     }

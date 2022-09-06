@@ -43,28 +43,37 @@ public class BlockPlaceListener implements Listener {
                 SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemMap().get(key);
                 Schematic schematic = schematicItem.getSchematic();
 
-                UUID schematicId = UUID.randomUUID();
-                Location location = event.getBlock().getLocation().subtract(0, 1, 0);
-                int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
-                Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
-                if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
-                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
-                } else {
-                    if(!schematicItem.getSchematic().preview(location, rotation, true)) {
-                        if(schematic.getTimeToFinish() != 0) {
-                            long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
-                            schematic.build(location, rotation, finished, schematicId, 0);
-                        } else {
-                            schematic.build(location, rotation, schematicId, 0, false);
-                        }
-                        String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
-                        plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
-                                plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
-                                schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
+                String id = dataContainer.get(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(),
+                        "schematicid"), PersistentDataType.STRING);
+                if(id != null) {
+                    UUID schematicId = UUID.fromString(id);
+                    player.sendMessage(id);
+                    Location location = event.getBlock().getLocation().subtract(0, 1, 0);
+                    int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
+                    int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+                    Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                    if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
+                        event.setCancelled(true);
+                        player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                     } else {
-                        player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                        if(!schematicItem.getSchematic().preview(location, rotation, true)) {
+                            if(schematic.getTimeToFinish() != 0) {
+                                long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
+                                schematic.build(location, rotation, finished, schematicId, 0);
+                            } else {
+                                schematic.build(location, rotation, schematicId, 0, false);
+                            }
+                            String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+                            plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
+                                    plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
+                                    schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
+                        } else {
+                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
+                        }
                     }
+                } else {
+                    event.setCancelled(true);
+                    player.sendMessage("§cThe schematic item is not set up");
                 }
             }
         }
