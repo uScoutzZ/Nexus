@@ -31,10 +31,12 @@ public class Raid {
     private Profile profile;
     @Getter
     private List<Entity> mobs;
+    @Getter
+    private BossBar bossBar;
+    @Getter
+    private List<Player> players;
 
     private long started;
-    private BossBar bossBar;
-    private List<Player> players;
     private RaidType raidType;
     private int wave;
 
@@ -70,10 +72,7 @@ public class Raid {
                     profile.cancelCheckout();
                     if(countdown[0] == 0) {
                         startWave(1);
-                        for(Player all : profile.getWorld().getWorld().getPlayers()) {
-                            all.hideBossBar(bossBar);
-                            cancel();
-                        }
+                        cancel();
                     } else {
                         String counter = String.format("%02d:%02d:%02d", TimeUnit.SECONDS.toHours(countdown[0]),
                                 TimeUnit.SECONDS.toMinutes(countdown[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(countdown[0])),
@@ -82,12 +81,6 @@ public class Raid {
                                 "de_DE", "raid_starts-in", counter)));
                         double progress = (double) countdown[0]/raidCounterSeconds;
                         bossBar.progress((float) progress);
-                        for(Player all : profile.getWorld().getWorld().getPlayers()) {
-                            if(!players.contains(all)) {
-                                players.add(all);
-                                all.showBossBar(bossBar);
-                            }
-                        }
                         countdown[0]--;
                     }
                 } else {
@@ -103,6 +96,9 @@ public class Raid {
         for(Player player : players) {
             player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raids_wave-start", wave));
         }
+        double progress = (double) mobs.size()/raidType.getMobsByWave().get(wave).size();
+        bossBar.progress((float) progress);
+        bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_remaining-mobs")));
 
         final int[] mobs = {raidType.getMobsPerWave().get(wave)};
 
@@ -117,7 +113,7 @@ public class Raid {
                     cancel();
                 }
             }
-        }.runTaskTimer(plugin, 40, 20);
+        }.runTaskTimer(plugin, 40, 30);
     }
 
     private void spawnRandomMonster() {
