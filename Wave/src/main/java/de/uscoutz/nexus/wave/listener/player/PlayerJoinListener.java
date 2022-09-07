@@ -20,7 +20,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getUniqueId());
+        RaidPlayer raidPlayer = new RaidPlayer(player, plugin);
         Profile newProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
         RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
 
