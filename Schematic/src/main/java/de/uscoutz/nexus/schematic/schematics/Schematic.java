@@ -644,6 +644,9 @@ public class Schematic {
                     profile.getProfileId()).getBuiltSchematics().get(schematicId).getBlocks().get(0));
             plugin.getNexusPlugin().getRegionManager().getRegions().remove(region);
             profile.getRegions().remove(region);
+            profile.getSchematicIds().remove(schematicId);
+            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().remove(schematicId);
+            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().remove(region);
         }
     }
 
