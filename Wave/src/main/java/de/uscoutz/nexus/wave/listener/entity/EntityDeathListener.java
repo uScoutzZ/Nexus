@@ -5,6 +5,7 @@ import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
 import de.uscoutz.nexus.wave.profile.Raid;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +32,9 @@ public class EntityDeathListener implements Listener {
                 event.getEntity().getKiller().sendMessage("§aya");
                 raid.getMobs().remove(event.getEntity().getUniqueId());
                 raid.addKill();
+                if(raid.getKilledInCurrentWave() == raid.getRaidType().getMobsPerWave().get(raid.getWave())) {
+                    Bukkit.broadcastMessage("All mobs of this wave killed");
+                }
             }
         }
     }

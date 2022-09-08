@@ -42,8 +42,10 @@ public class Raid {
     private List<Player> players;
 
     private long started;
+    @Getter
     private RaidType raidType;
-    private int wave, killedInCurrentWave;
+    @Getter
+    private int killedInCurrentWave, wave;
 
     public Raid(RaidType raidType, Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
