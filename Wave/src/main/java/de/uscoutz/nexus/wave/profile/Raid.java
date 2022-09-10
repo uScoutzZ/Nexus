@@ -35,6 +35,8 @@ public class Raid {
     @Getter
     private Profile profile;
     @Getter
+    private RaidProfile raidProfile;
+    @Getter
     private List<UUID> mobs;
     @Getter
     private BossBar bossBar;
@@ -60,10 +62,17 @@ public class Raid {
         for(UUID entityId : mobs) {
             Objects.requireNonNull(Bukkit.getEntity(entityId)).remove();
         }
+        profile.getWorld().changeTime(6000);
+        profile.getActivePlayers().forEach(player -> {
+            RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getPlayer().getUniqueId());
+            raidPlayer.leaveRaid(this);
+        });
         plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);
-        if(profile.getActivePlayers().size() == 0) {
-            profile.scheduleCheckout();
-        }
+
+        profile.getActivePlayers().forEach(nexusPlayer -> {
+            nexusPlayer.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_ended"));
+        });
+        raidProfile.scheduleRaid();
     }
 
     public void schedule() {
@@ -107,6 +116,7 @@ public class Raid {
         killedInCurrentWave = 0;
         updateWaveProgress();
         profile.getWorld().changeTime(13000);
+        bossBar.color(BossBar.Color.BLUE);
         for(Player player : players) {
             player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raids_wave-start", wave));
         }
@@ -125,6 +135,41 @@ public class Raid {
                 }
             }
         }.runTaskTimer(plugin, 40, 30);
+    }
+
+    public void stopWave() {
+        long waveCounter = plugin.getConfig().getLong("wave-counter");
+        int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(waveCounter);
+        final int[] countdown = {(int) TimeUnit.MILLISECONDS.toSeconds(waveCounter)};
+        bossBar.color(BossBar.Color.YELLOW);
+
+        if(wave == raidType.getMobsPerWave().size()) {
+            end();
+        } else {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if(profile.loaded()) {
+                        profile.cancelCheckout();
+                        if(countdown[0] == 0) {
+                            startWave(wave+1);
+                            cancel();
+                        } else {
+                            String counter = String.format("%02d:%02d:%02d", TimeUnit.SECONDS.toHours(countdown[0]),
+                                    TimeUnit.SECONDS.toMinutes(countdown[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(countdown[0])),
+                                    TimeUnit.SECONDS.toSeconds(countdown[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(countdown[0])));
+                            bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
+                                    "de_DE", "raid_wave-starts-in", counter)));
+                            double progress = (double) countdown[0]/raidCounterSeconds;
+                            bossBar.progress((float) progress);
+                            countdown[0]--;
+                        }
+                    } else {
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 0, 20);
+        }
     }
 
     private void spawnRandomMonster() {

@@ -33,7 +33,7 @@ public class EntityDeathListener implements Listener {
                 raid.getMobs().remove(event.getEntity().getUniqueId());
                 raid.addKill();
                 if(raid.getKilledInCurrentWave() == raid.getRaidType().getMobsPerWave().get(raid.getWave())) {
-                    Bukkit.broadcastMessage("All mobs of this wave killed");
+                    raid.stopWave();
                 }
             }
         }

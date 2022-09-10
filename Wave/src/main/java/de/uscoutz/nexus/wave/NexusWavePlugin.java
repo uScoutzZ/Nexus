@@ -39,7 +39,7 @@ public class NexusWavePlugin extends JavaPlugin {
         nexusPlugin = NexusPlugin.getInstance();
         schematicPlugin = NexusSchematicPlugin.getInstance();
         raidManager = new RaidManager(new File("/home/networksync/nexus/raids/"), this);
-        raidManager.loadSpawnLocations(128);
+        raidManager.loadSpawnLocations(nexusPlugin.getConfig().getInt("base-radius"));
         raidManager.loadRaidTypes();
         playerManager = new PlayerManager(this);
 

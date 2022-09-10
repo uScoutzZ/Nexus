@@ -130,6 +130,7 @@ public class Schematic {
     }
 
     public boolean preview(Location location, int rotation, boolean set) {
+        Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
         int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
 
         int minY = location.getBlockY();
@@ -162,12 +163,15 @@ public class Schematic {
 
         Color color1, color2;
         boolean overlap = false;
-        Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
         for(Region profileRegion : profile.getRegions()) {
             if(profileRegion.overlap(minX, maxX, minZ, maxZ)) {
                 overlap = true;
                 break;
             }
+        }
+
+        if(!profile.getWorld().isLocationInBase(location)) {
+            overlap = true;
         }
 
         if(overlap) {

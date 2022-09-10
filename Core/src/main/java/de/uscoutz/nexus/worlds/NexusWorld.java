@@ -4,10 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Difficulty;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
@@ -22,7 +19,9 @@ public class NexusWorld {
     @Getter
     private World world;
     @Getter
-    private Location spawn;
+    private Location spawn, middle;
+    @Getter
+    private int radius;
 
     public NexusWorld(Profile profile, NexusPlugin plugin) {
         this.plugin = plugin;
@@ -30,14 +29,20 @@ public class NexusWorld {
         world = plugin.getWorldManager().getEmptyWorlds().remove(0);
         plugin.getWorldManager().getWorldProfileMap().put(world, profile);
         spawn = world.getSpawnLocation();
+        middle = plugin.getLocationManager().getLocation("nexus-crystal", world);
         world.setDifficulty(Difficulty.HARD);
+        radius = plugin.getConfig().getInt("base-radius");
         assign();
         new BukkitRunnable() {
             @Override
             public void run() {
-                world.spawnEntity(plugin.getLocationManager().getLocation("nexus-crystal", world), EntityType.ENDER_CRYSTAL);
+                world.spawnEntity(middle, EntityType.ENDER_CRYSTAL);
             }
         }.runTask(plugin);
+    }
+
+    public boolean isLocationInBase(Location location) {
+        return middle.distance(location) < radius;
     }
 
     public void assign() {

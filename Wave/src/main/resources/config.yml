@@ -2,3 +2,4 @@ cooldown: 900000
 raid-counter: 75000
 raid-range-min: 75000
 raid-range-max: 80000
+wave-counter: 30000

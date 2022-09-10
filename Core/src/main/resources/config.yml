@@ -8,3 +8,4 @@ cloudtype: "NEXUS"
 profile-slots: 4
 profile-checkout-after: 30
 concurrently-building: 1
+base-radius: 90
