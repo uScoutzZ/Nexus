@@ -29,7 +29,6 @@ public class EntityDeathListener implements Listener {
             Raid raid = raidProfile.getRaid();
             Entity entity = event.getEntity();
             if(raid.getMobs().contains(entity.getUniqueId())) {
-                event.getEntity().getKiller().sendMessage("§aya");
                 raid.getMobs().remove(event.getEntity().getUniqueId());
                 raid.addKill();
                 if(raid.getKilledInCurrentWave() == raid.getRaidType().getMobsPerWave().get(raid.getWave())) {

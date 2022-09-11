@@ -235,9 +235,13 @@ public class Profile {
         plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
 
-        Location location = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
-        String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
+        Location realNexusLocation = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
+        String nexusLocation = realNexusLocation.getBlockX() + ", " + realNexusLocation.getBlockY() + ", " + realNexusLocation.getBlockZ();
         plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "NEXUS", 0, 0, nexusLocation, System.currentTimeMillis(), 0);
+
+        Location realWorkshopLocation = plugin.getLocationManager().getLocation("workshop", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
+        String workshopLocation = realWorkshopLocation.getBlockX() + ", " + realWorkshopLocation.getBlockY() + ", " + realWorkshopLocation.getBlockZ();
+        plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "WORKSHOP", 0, 180, workshopLocation, System.currentTimeMillis(), 50);
         this.owner = owner;
     }
 
