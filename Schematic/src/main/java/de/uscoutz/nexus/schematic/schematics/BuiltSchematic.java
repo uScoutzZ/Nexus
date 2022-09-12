@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,10 @@ public class BuiltSchematic {
     private Location location;
     @Getter @Setter
     private List<Location> blocks;
+    @Getter
+    private List<Entity> entities;
 
-    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks) {
+    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks, List<Entity> entities) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
@@ -38,6 +41,7 @@ public class BuiltSchematic {
         this.rotation = rotation;
         damage = percentDamage*schematic.getDurability();
         this.blocks = blocks;
+        this.entities = entities;
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, this);
     }
 
