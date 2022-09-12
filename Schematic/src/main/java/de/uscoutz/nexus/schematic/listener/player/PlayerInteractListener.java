@@ -89,7 +89,7 @@ public class PlayerInteractListener implements Listener {
                             }.runTaskLater(plugin, 40);
                         } else {
                             SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemBySchematic().get(builtSchematic.getSchematic());
-                            Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER);
+                            Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER, builtSchematic.getSchematic().getSchematicType());
                             player.getInventory().addItem(schematicItem.getItemStack(builtSchematic.getSchematicId()));
                         }
                     } else {

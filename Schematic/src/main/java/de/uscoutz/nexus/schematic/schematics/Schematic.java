@@ -521,7 +521,7 @@ public class Schematic {
                 } else {
                     collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK, "§c§lREPAIR")
                             .setFilledAction(player1 -> {
-                                destroy(profile, schematicId, plugin, DestroyAnimation.SILENT);
+                                destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematicType);
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
                                 repaired.build(location, rotation, schematicId, 0, true);
                                 plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
@@ -654,7 +654,10 @@ public class Schematic {
         }
     }
 
-    public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, DestroyAnimation animation) {
+    public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, DestroyAnimation animation, SchematicType schematicType) {
+        if(schematicType == SchematicType.WORKSHOP) {
+            profile.saveStorages();
+        }
         BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
         int minHeight = builtSchematic.getBlocks().get(0).getBlockY();
         List<Location> toRemove = new ArrayList<>();
@@ -704,10 +707,7 @@ public class Schematic {
 
     public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, SchematicType schematicType) {
         World world = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId).getBlocks().get(0).getWorld();
-        if(schematicType == SchematicType.WORKSHOP) {
-            profile.saveStorages();
-        }
 
-        destroy(profile, schematicId, plugin, DestroyAnimation.UPGRADE);
+        destroy(profile, schematicId, plugin, DestroyAnimation.UPGRADE, schematicType);
     }
 }

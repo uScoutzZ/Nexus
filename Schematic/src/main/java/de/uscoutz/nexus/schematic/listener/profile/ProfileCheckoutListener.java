@@ -32,7 +32,9 @@ public class ProfileCheckoutListener implements Listener {
         }
 
         for(UUID schematicId : profile.getSchematicIds()) {
-            Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT);
+            Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT,
+                    plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(
+                            schematicId).getSchematic().getSchematicType());
         }
 
         for(Entity entity : profile.getWorld().getWorld().getEntities()) {
