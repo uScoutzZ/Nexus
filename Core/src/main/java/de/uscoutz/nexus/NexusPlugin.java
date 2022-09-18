@@ -1,5 +1,6 @@
 package de.uscoutz.nexus;
 
+import de.uscoutz.nexus.biomes.BiomeManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
 import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
@@ -45,6 +46,8 @@ public class NexusPlugin extends JavaPlugin {
     private ToolManager toolManager;
     @Getter
     private RegionManager regionManager;
+    @Getter
+    private BiomeManager biomeManager;
 
     private NetworkServer networkServer;
 
@@ -66,6 +69,8 @@ public class NexusPlugin extends JavaPlugin {
         toolManager.loadTools();
         toolManager.loadBlockResistances();
         regionManager = new RegionManager(this);
+        biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
+        biomeManager.loadBiomes();
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
@@ -79,6 +84,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(this), this);
         Bukkit.getPluginManager().registerEvents(new AsyncPlayerChatListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));

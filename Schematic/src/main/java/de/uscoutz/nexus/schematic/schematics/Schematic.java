@@ -181,7 +181,7 @@ public class Schematic {
             color1 = Color.GREEN;
             color2 = Color.LIME;
             if(set) {
-                profile.getRegions().add(new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString()));
+                profile.getRegions().add(new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ));
             }
         }
 
@@ -375,7 +375,7 @@ public class Schematic {
     private void finish(Profile profile, Location location, int minX, int maxX, int minZ, int maxZ, int rotation, double damage, UUID schematicId, List<Location> blocks1, List<Entity> entities) {
         Region region;
         if(plugin.getNexusPlugin().getRegionManager().getRegion(location) == null) {
-            region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ, schematicType.toString());
+            region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ);
             profile.getRegions().add(region);
         } else {
             region = plugin.getNexusPlugin().getRegionManager().getRegion(location);

@@ -20,9 +20,9 @@ public class RegionManager {
         regions = new ArrayList<>();
     }
 
-    public Region getRegion(Location location) {
+    public Region getRegion(Location location, boolean worldMatters) {
         for(Region region : regions) {
-            if(location.getWorld() == region.getWorld()) {
+            if(location.getWorld() == region.getWorld() || !worldMatters) {
                 if(region.getBoundingBox().getMinX() <= location.getX() && region.getBoundingBox().getMaxX() >= location.getX()
                         && region.getBoundingBox().getMinY() <= location.getY() && region.getBoundingBox().getMaxY() >= location.getY()
                         && region.getBoundingBox().getMinZ() <= location.getZ() && region.getBoundingBox().getMaxZ() >= location.getZ()) {
@@ -32,5 +32,9 @@ public class RegionManager {
         }
 
         return null;
+    }
+
+    public Region getRegion(Location location) {
+        return getRegion(location, true);
     }
 }

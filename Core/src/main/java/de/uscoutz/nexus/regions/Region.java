@@ -34,7 +34,7 @@ public class Region {
         //plugin.getRegionManager().getRegions().add(this);
     }
 
-    public Region(NexusPlugin plugin, World world, int minX, int maxX, int minZ, int maxZ, String s) {
+    public Region(NexusPlugin plugin, World world, int minX, int maxX, int minZ, int maxZ) {
         this.plugin = plugin;
         this.world = world;
         /*minX -= 1;

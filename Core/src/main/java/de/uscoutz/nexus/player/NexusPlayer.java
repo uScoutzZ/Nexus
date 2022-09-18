@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.player;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
@@ -11,6 +12,8 @@ import de.uscoutz.nexus.networking.packet.packets.player.PacketPlayerChangeServe
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketDeleteProfile;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
+import de.uscoutz.nexus.scoreboards.ScoreboardUpdateType;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventorySerializer;
 import eu.thesimplecloud.api.CloudAPI;
@@ -51,6 +54,10 @@ public class NexusPlayer {
     private long firstLogin, generalPlaytime, joined, joinedProfile;
     @Getter @Setter
     private int currentProfileSlot;
+    @Getter @Setter
+    private Biome biome;
+    @Getter
+    private NexusScoreboard nexusScoreboard;
 
     public NexusPlayer(UUID uuid, NexusPlugin plugin) {
         this.plugin = plugin;
@@ -168,6 +175,13 @@ public class NexusPlayer {
             player.teleport(plugin.getLocationManager().getLocation("base-spawn", profile.getWorld().getWorld()));
         }
         player.getInventory().clear();
+        if(nexusScoreboard != null) {
+            player.setScoreboard(null);
+        }
+        biome = plugin.getBiomeManager().getBiome(player.getLocation());
+        nexusScoreboard = new NexusScoreboard(plugin);
+        nexusScoreboard.setup(player);
+        nexusScoreboard.update(ScoreboardUpdateType.BIOME);
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
             player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
