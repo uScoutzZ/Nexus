@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerChangeWorldListener implements Listener {
 
@@ -29,8 +30,14 @@ public class PlayerChangeWorldListener implements Listener {
         if(oldRaidProfile.getRaid() != null) {
             raidPlayer.leaveRaid(oldRaidProfile.getRaid());
         }
-        if(newRaidProfile.getRaid() != null) {
-            raidPlayer.joinRaid(newRaidProfile.getRaid());
-        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(newRaidProfile.getRaid() != null) {
+                    raidPlayer.joinRaid(newRaidProfile.getRaid());
+                }
+            }
+        }.runTaskLater(plugin, 20);
     }
 }
