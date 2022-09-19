@@ -4,17 +4,27 @@ import de.uscoutz.nexus.NexusPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 public enum Task {
 
     TALK_TO_GEORGE(true, 0, (player, quest) -> {
-        for(String message : NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
-                .translate("de_DE", "george_collect-wood-assigned", player.getName(), quest.getTask().next().getGoal()))) {
-            player.sendMessage(message);
-        }
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_collect-wood-assigned", player.getName(), quest.getTask().next().getGoal()));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(messages.size() != 0) {
+                    player.sendMessage(messages.remove(0));
+                } else {
+                    cancel();
+                }
+            }
+        }.runTaskTimer(NexusPlugin.getInstance(), 0, 50);
     }),
     COLLECT_LOG(false, 4, (player, quest) -> {
         player.getInventory().addItem(NexusPlugin.getInstance().getToolManager().getToolMap().get("wooden_axe").getItemStack());
