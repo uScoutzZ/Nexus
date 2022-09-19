@@ -25,10 +25,10 @@ public class PlayerInteractAtEntityListener implements Listener {
 
         if(event.getRightClicked() instanceof Villager) {
             if(profile.getUnfinishedQuests().containsKey(Task.TALK_TO_GEORGE)) {
-                profile.getQuests().get(Task.TALK_TO_GEORGE).finish();
+                profile.getQuests().get(Task.TALK_TO_GEORGE).finish(player);
             } else {
                 if(profile.getUnfinishedQuests().containsKey(Task.COLLECT_LOG)) {
-                    profile.getQuests().get(Task.COLLECT_LOG).addProgress(1);
+                    profile.getQuests().get(Task.COLLECT_LOG).addProgress(player, 1);
                 }
             }
         }

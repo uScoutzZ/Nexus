@@ -72,22 +72,20 @@ public class LocaleManager {
         }
     }
 
-    public void assignLocal(String local) {
-        this.files.forEach(propFile -> {
-            if(propFile.getName().endsWith(".properties")) {
-                Properties properties = new Properties();
-                try (FileInputStream inputStream = new FileInputStream(propFile)){
-                    properties.load(new InputStreamReader(inputStream, UTF_8));
+    public List<String> split(String message) {
+        List<String> messages = new ArrayList<>();
 
-                    properties.setProperty(local, "§c" + local + " (translation not found)");
-
-                    try(FileOutputStream outputStream = new FileOutputStream(propFile)) {
-                        properties.store(new OutputStreamWriter(outputStream, UTF_8), "Edited by Felix");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        String prefix;
+        if(message.startsWith("§6§lGeorge§7: ")) {
+            prefix = "§6§lGeorge§7: §f";
+            messages.addAll(List.of(message.replace(prefix, "").split("\\. ")));
+            for(String string : messages) {
+                messages.set(messages.indexOf(string), prefix + string);
             }
-        });
+        } else {
+            prefix = "\n";
+        }
+
+        return messages;
     }
 }

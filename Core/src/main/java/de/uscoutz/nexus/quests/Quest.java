@@ -60,11 +60,12 @@ public class Quest {
         return this;
     }
 
-    public void finish() {
+    public void finish(Player player) {
         finished = System.currentTimeMillis();
         plugin.getDatabaseAdapter().updateTwoAsync("quests", "profileId", profileId,
                 "task", task.toString(),
                 new DatabaseUpdate("finished", finished));
+        task.getActionWhenFinished().accept(player, this);
         if(task.isChronological()) {
             profile.getQuests().put(task.next(), new Quest(profileId, task.next(), plugin).assign());
         }
@@ -78,7 +79,7 @@ public class Quest {
         }
     }
 
-    public long addProgress(long value) {
+    public long addProgress(Player player, long value) {
         progress += value;
         plugin.getDatabaseAdapter().updateTwoAsync("quests", "profileId", profileId,
                 "task", task.toString(),
@@ -93,7 +94,7 @@ public class Quest {
             bossBar.progress(barProgress);
         }
         if(this.progress >= task.getGoal()) {
-            finish();
+            finish(player);
         }
         return this.progress;
     }
