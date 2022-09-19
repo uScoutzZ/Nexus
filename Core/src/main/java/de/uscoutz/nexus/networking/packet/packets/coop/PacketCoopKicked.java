@@ -32,7 +32,11 @@ public class PacketCoopKicked extends Packet {
                 }
             }.runTaskLater(NexusPlugin.getInstance(), 2);
         } else {
-            for (int i = 0; i < NexusPlugin.getInstance().getConfig().getInt("profile-slots"); i++) {
+            int maxProfiles = NexusPlugin.getInstance().getConfig().getInt("profile-slots");
+            if(nexusPlayer.getPlayer().hasPermission("nexus.profile.unlimited")) {
+                maxProfiles = 45;
+            }
+            for (int i = 0; i < maxProfiles; i++) {
                 if (nexusPlayer.getProfilesMap().containsKey(i)) {
                     Profile profile = nexusPlayer.getProfilesMap().get(i);
                     if(profile.getProfileId().equals(profileId)) {
