@@ -65,7 +65,9 @@ public class Quest {
         plugin.getDatabaseAdapter().updateTwoAsync("quests", "profileId", profileId,
                 "task", task.toString(),
                 new DatabaseUpdate("finished", finished));
-        task.getActionWhenFinished().accept(player, this);
+        if(task.getActionWhenFinished() != null) {
+            task.getActionWhenFinished().accept(player, this);
+        }
         if(task.isChronological()) {
             profile.getQuests().put(task.next(), new Quest(profileId, task.next(), plugin).assign());
         }

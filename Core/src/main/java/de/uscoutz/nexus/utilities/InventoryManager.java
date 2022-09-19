@@ -1,7 +1,11 @@
 package de.uscoutz.nexus.utilities;
 
+import de.uscoutz.nexus.quests.Quest;
+import de.uscoutz.nexus.quests.Task;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -12,8 +16,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.List;
 
-public class InventorySerializer {
+public class InventoryManager {
 
     public static String toBase64(Inventory inventory) {
         try {
@@ -59,5 +64,36 @@ public class InventorySerializer {
         }
 
         return inventory;
+    }
+
+    public static int removeNeededItems(Player player, Material material, Quest quest) {
+        return removeNeededItems(player, material, (int) (quest.getTask().getGoal()-quest.getProgress()));
+    }
+
+    public static int removeNeededItems(Player player, Material material, int neededItems) {
+        ItemStack needed = new ItemStack(material, neededItems);
+        int amount = needed.getAmount();
+        int added = 0;
+        for(ItemStack itemStack : player.getInventory().getContents()) {
+            if(itemStack != null) {
+                if(itemStack.isSimilar(needed)) {
+                    if (itemStack.getAmount() >= amount) {
+                        itemStack.setAmount(itemStack.getAmount() - amount);
+                        added = added+amount;
+                        amount = 0;
+                    } else {
+                        amount = amount-itemStack.getAmount();
+                        added = added+itemStack.getAmount();
+                        itemStack.setAmount(0);
+                    }
+                }
+            }
+
+            if(amount == 0) {
+                break;
+            }
+        }
+
+        return added;
     }
 }

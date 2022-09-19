@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
-import de.uscoutz.nexus.utilities.InventorySerializer;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -51,7 +51,7 @@ public class ProfilePlayer {
 
     public void checkout(long joined) {
         Player player = Bukkit.getPlayer(playerUUID);
-        inventoryBase64 = InventorySerializer.toBase64(player.getInventory());
+        inventoryBase64 = InventoryManager.toBase64(player.getInventory());
         playtime = playtime + (System.currentTimeMillis()-joined);
         plugin.getDatabaseAdapter().updateTwoAsync("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),

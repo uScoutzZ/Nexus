@@ -9,7 +9,7 @@ import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
-import de.uscoutz.nexus.utilities.InventorySerializer;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
@@ -18,8 +18,6 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -152,7 +150,7 @@ public class Profile {
 
     public void saveStorages() {
         for(String storageId : storageBlocks.keySet()) {
-            String contents = InventorySerializer.toBase64(storageBlocks.get(storageId).getInventory());
+            String contents = InventoryManager.toBase64(storageBlocks.get(storageId).getInventory());
             plugin.getDatabaseAdapter().updateTwo("storages", "profileId", profileId,
                     "storageId", storageId,
                     new DatabaseUpdate("inventory", contents));

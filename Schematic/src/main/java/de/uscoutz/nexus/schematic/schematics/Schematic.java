@@ -7,7 +7,7 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
 import de.uscoutz.nexus.utilities.FireworkUtilities;
-import de.uscoutz.nexus.utilities.InventorySerializer;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -565,9 +565,9 @@ public class Schematic {
                     profile.getStorageBlocks().put(storageId, container);
                     if(!contents.equals("")) {
                         try {
-                            container.getInventory().setContents(InventorySerializer.fromBase64(contents).getContents());
+                            container.getInventory().setContents(InventoryManager.fromBase64(contents).getContents());
                         } catch (IllegalArgumentException exception) {
-                            for(ItemStack itemStack : InventorySerializer.fromBase64(contents).getContents()) {
+                            for(ItemStack itemStack : InventoryManager.fromBase64(contents).getContents()) {
                                 if(itemStack != null) {
                                     container.getInventory().addItem(itemStack);
                                 }

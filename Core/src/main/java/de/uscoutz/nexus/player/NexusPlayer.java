@@ -16,7 +16,7 @@ import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.scoreboards.ScoreboardUpdateType;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
-import de.uscoutz.nexus.utilities.InventorySerializer;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.service.ICloudService;
 import lombok.Getter;
@@ -194,7 +194,7 @@ public class NexusPlayer {
         }
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
-            player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
+            player.getInventory().setContents(InventoryManager.fromBase64(profile.getMembers().get(
                     player.getUniqueId()).getInventoryBase64()).getContents());
             for(ItemStack itemStack : player.getInventory().getContents()) {
                 if(itemStack != null && itemStack.getItemMeta() != null) {
