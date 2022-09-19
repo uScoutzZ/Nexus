@@ -6,6 +6,8 @@ import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.player.NexusPlayer;
+import de.uscoutz.nexus.quests.Quest;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.utilities.InventorySerializer;
 import de.uscoutz.nexus.worlds.NexusWorld;
@@ -51,6 +53,8 @@ public class Profile {
     private List<UUID> schematicIds;
     @Getter
     private List<Region> regions;
+    @Getter
+    private Map<Task, Quest> quests;
 
     @Getter
     private int[] timeToCheckout;
@@ -63,6 +67,7 @@ public class Profile {
         members = new HashMap<>();
         storages = new HashMap<>();
         storageBlocks = new HashMap<>();
+        quests = new HashMap<>();
         schematicIds = new ArrayList<>();
         regions = new ArrayList<>();
         if(exists()) {
@@ -206,6 +211,20 @@ public class Profile {
                         Bukkit.getPluginManager().callEvent(new ProfileLoadEvent(Profile.this));
                     }
                 }.runTask(plugin);
+
+                ResultSet questsResultSet = plugin.getDatabaseAdapter().getAsync("quests", "profileId", String.valueOf(profileId));
+
+                try {
+                    while(questsResultSet.next()) {
+                        Task task = Task.valueOf(questsResultSet.getString("task"));
+                        long progress = questsResultSet.getLong("progress"),
+                        begun = questsResultSet.getLong("begun"),
+                        finished = questsResultSet.getLong("finished");
+                        quests.put(task, new Quest(profileId, task, progress, begun, finished, plugin));
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
             } else {
                 loading = false;
             }
@@ -242,6 +261,7 @@ public class Profile {
         Location realWorkshopLocation = plugin.getLocationManager().getLocation("workshop", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
         String workshopLocation = realWorkshopLocation.getBlockX() + ", " + realWorkshopLocation.getBlockY() + ", " + realWorkshopLocation.getBlockZ();
         plugin.getDatabaseAdapter().set("schematics", profileId, UUID.randomUUID(), "WORKSHOP", 0, 180, workshopLocation, System.currentTimeMillis(), 50);
+        quests.put(Task.TALK_TO_GEORGE, new Quest(profileId, Task.TALK_TO_GEORGE, plugin).assign());
         this.owner = owner;
     }
 
@@ -265,6 +285,44 @@ public class Profile {
                 loadMembers();
             }
         }.runTaskLater(plugin, 3);
+    }
+
+    public Map<Task, Quest> getUnfinishedQuests() {
+        Map<Task, Quest> unfinishedQuests = new HashMap<>();
+
+        for(Quest quest : quests.values()) {
+            if(!quest.isFinished()) {
+                unfinishedQuests.put(quest.getTask(), quest);
+            }
+        }
+
+        return unfinishedQuests;
+    }
+
+    public Quest getMainQuest() {
+        List<Quest> importantQuests = new ArrayList<>();
+        for(Quest quest : getUnfinishedQuests().values()) {
+            if(quest.getTask().isChronological()) {
+                importantQuests.add(quest);
+            }
+        }
+
+        if(importantQuests.size() == 0) {
+            importantQuests.addAll(getUnfinishedQuests().values());
+            if(importantQuests.size() == 0) {
+                return null;
+            }
+        }
+
+
+        Quest oldestQuest = null;
+        for(Quest quest : importantQuests) {
+            if(oldestQuest == null || quest.getBegun() <= oldestQuest.getBegun()) {
+                oldestQuest = quest;
+            }
+        }
+
+        return oldestQuest;
     }
 
     public boolean loaded() {

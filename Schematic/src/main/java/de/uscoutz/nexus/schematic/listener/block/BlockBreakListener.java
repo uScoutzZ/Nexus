@@ -23,9 +23,7 @@ public class BlockBreakListener implements Listener {
                 plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld()).getProfileId());
 
         Region region = plugin.getNexusPlugin().getRegionManager().getRegion(event.getBlock().getLocation());
-        if(region == null) {
-            player.sendMessage("no region " + plugin.getNexusPlugin().getRegionManager().getRegions().size());
-        } else {
+        if(region != null) {
             if(profile.getSchematicsByRegion().containsKey(region)) {
                 player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + "");
                 player.sendMessage("id: " + profile.getSchematicsByRegion().get(region).getSchematicId());
@@ -33,8 +31,7 @@ public class BlockBreakListener implements Listener {
                 player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
             } else {
                 player.sendMessage("§cNo schematic for this region found");
-            }
-        }
+            }        }
 
 
 

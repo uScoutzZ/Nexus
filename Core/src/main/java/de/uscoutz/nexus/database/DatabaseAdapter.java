@@ -286,6 +286,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS collectors (schematicId VARCHAR(36), neededItems text, intact boolean)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS storages (profileId VARCHAR(36), storageId text, inventory text)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS raids (profileId VARCHAR(36), raidId VARCHAR(36), ended bigint)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS quests (profileId VARCHAR(36), task text, progress bigint, begun bigint, finished bigint)");
     }
 }
 

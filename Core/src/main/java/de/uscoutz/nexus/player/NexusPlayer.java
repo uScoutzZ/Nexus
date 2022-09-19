@@ -12,6 +12,7 @@ import de.uscoutz.nexus.networking.packet.packets.player.PacketPlayerChangeServe
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketDeleteProfile;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
+import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.scoreboards.ScoreboardUpdateType;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
@@ -92,6 +93,10 @@ public class NexusPlayer {
     public void switchProfile(int profileSlot) {
         if(getCurrentProfile() != null && getCurrentProfile().getMembers().containsKey(uuid)) {
             getCurrentProfile().getMembers().get(uuid).checkout(joined);
+            Quest mainQuest = getCurrentProfile().getMainQuest();
+            if(mainQuest != null) {
+                player.hideBossBar(mainQuest.getBossBars().get("de_DE"));
+            }
         }
         //player.getInventory().clear();
         currentProfileSlot = profileSlot;
@@ -176,12 +181,17 @@ public class NexusPlayer {
         }
         player.getInventory().clear();
         if(nexusScoreboard != null) {
-            player.setScoreboard(null);
+            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
         biome = plugin.getBiomeManager().getBiome(player.getLocation());
         nexusScoreboard = new NexusScoreboard(plugin);
         nexusScoreboard.setup(player);
         nexusScoreboard.update(ScoreboardUpdateType.BIOME);
+
+        Quest mainQuest = profile.getMainQuest();
+        if(mainQuest != null) {
+            mainQuest.display(player);
+        }
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
             player.getInventory().setContents(InventorySerializer.fromBase64(profile.getMembers().get(
