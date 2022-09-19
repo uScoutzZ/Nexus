@@ -29,13 +29,10 @@ public class BlockBreakListener implements Listener {
                 player.sendMessage("id: " + profile.getSchematicsByRegion().get(region).getSchematicId());
                 player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getDamage());
                 player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
+                event.setCancelled(true);
             } else {
                 player.sendMessage("§cNo schematic for this region found");
-            }        }
-
-
-
-        event.setCancelled(true);
-
+            }
+        }
     }
 }
