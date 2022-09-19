@@ -40,7 +40,7 @@ public class RaidManager {
     }
 
     public void loadSpawnLocations(double radius) {
-        double PI = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208995;
+        double PI = Math.PI;
         Location spawn = plugin.getNexusPlugin().getLocationManager().getLocation("nexus-crystal", Bukkit.getWorlds().get(0));
         double x = spawn.getX(), y = spawn.getZ();
         for (int factor = 0; factor <= 150; factor++) {

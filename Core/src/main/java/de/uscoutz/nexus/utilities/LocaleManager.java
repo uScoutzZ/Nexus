@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.utilities;
 
 import de.uscoutz.nexus.NexusPlugin;
+import lombok.Getter;
 
 import java.io.*;
 import java.util.*;
@@ -12,11 +13,14 @@ public class LocaleManager {
     private NexusPlugin plugin;
     private Map<String, File> localFiles;
     private List<File> files;
+    @Getter
+    private List<String> languageKeys;
 
     public LocaleManager(NexusPlugin plugin) {
         this.plugin = plugin;
         this.localFiles = new HashMap<>();
         this.files = new ArrayList<>();
+        languageKeys = new ArrayList<>();
     }
 
     public void assignFiles(File path) {
@@ -26,6 +30,7 @@ public class LocaleManager {
 
         for (File file : files) {
             this.localFiles.put(file.getName(), file);
+            languageKeys.add(file.getName().split("\\.")[0]);
             this.files.add(file);
         }
     }

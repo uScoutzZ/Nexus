@@ -22,10 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Raid {
@@ -39,7 +36,7 @@ public class Raid {
     @Getter
     private List<UUID> mobs;
     @Getter
-    private BossBar bossBar;
+    private Map<String, BossBar> bossBars;
     @Getter
     private List<Player> players;
 
@@ -56,6 +53,7 @@ public class Raid {
         started = System.currentTimeMillis();
         players = new ArrayList<>();
         mobs = new ArrayList<>();
+        bossBars = new HashMap<>();
     }
 
     public void end() {
@@ -79,7 +77,9 @@ public class Raid {
         long raidCounter = plugin.getConfig().getLong("raid-counter");
         int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(raidCounter);
         final int[] countdown = {(int) TimeUnit.MILLISECONDS.toSeconds(raidCounter)};
-        bossBar = BossBar.bossBar(Component.text(""), 1, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6);
+        for(String key : plugin.getNexusPlugin().getLocaleManager().getLanguageKeys()) {
+            bossBars.put(key, BossBar.bossBar(Component.text(""), 1, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6));
+        }
 
         for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
             RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(nexusPlayer.getPlayer().getUniqueId());
@@ -98,10 +98,13 @@ public class Raid {
                         String counter = String.format("%02d:%02d:%02d", TimeUnit.SECONDS.toHours(countdown[0]),
                                 TimeUnit.SECONDS.toMinutes(countdown[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(countdown[0])),
                                 TimeUnit.SECONDS.toSeconds(countdown[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(countdown[0])));
-                        bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
-                                "de_DE", "raid_starts-in", counter)));
                         double progress = (double) countdown[0]/raidCounterSeconds;
-                        bossBar.progress((float) progress);
+                        for(String key : bossBars.keySet()) {
+                            BossBar bossBar = bossBars.get(key);
+                            bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
+                                    key, "raid_starts-in", counter)));
+                            bossBar.progress((float) progress);
+                        }
                         countdown[0]--;
                     }
                 } else {
@@ -116,7 +119,9 @@ public class Raid {
         killedInCurrentWave = 0;
         updateWaveProgress();
         profile.getWorld().changeTime(13000);
-        bossBar.color(BossBar.Color.BLUE);
+        for(BossBar bossBar : bossBars.values()) {
+            bossBar.color(BossBar.Color.BLUE);
+        }
         for(Player player : players) {
             player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raids_wave-start", wave));
         }
@@ -141,7 +146,9 @@ public class Raid {
         long waveCounter = plugin.getConfig().getLong("wave-counter");
         int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(waveCounter);
         final int[] countdown = {(int) TimeUnit.MILLISECONDS.toSeconds(waveCounter)};
-        bossBar.color(BossBar.Color.YELLOW);
+        for(BossBar bossBar : bossBars.values()) {
+            bossBar.color(BossBar.Color.YELLOW);
+        }
 
         if(wave == raidType.getMobsPerWave().size()) {
             end();
@@ -158,10 +165,15 @@ public class Raid {
                             String counter = String.format("%02d:%02d:%02d", TimeUnit.SECONDS.toHours(countdown[0]),
                                     TimeUnit.SECONDS.toMinutes(countdown[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(countdown[0])),
                                     TimeUnit.SECONDS.toSeconds(countdown[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(countdown[0])));
-                            bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
-                                    "de_DE", "raid_wave-starts-in", counter)));
                             double progress = (double) countdown[0]/raidCounterSeconds;
-                            bossBar.progress((float) progress);
+
+                            for(String key : bossBars.keySet()) {
+                                BossBar bossBar = bossBars.get(key);
+                                bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
+                                        key, "raid_wave-starts-in", counter)));
+                                bossBar.progress((float) progress);
+                            }
+
                             countdown[0]--;
                         }
                     } else {
@@ -197,7 +209,11 @@ public class Raid {
 
     private void updateWaveProgress() {
         double progress = (double) killedInCurrentWave/raidType.getMobsPerWave().get(wave);
-        bossBar.progress(1-(float) progress);
-        bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_remaining-mobs")));
+
+        for(String key : bossBars.keySet()) {
+            BossBar bossBar = bossBars.get(key);
+            bossBar.progress(1-(float) progress);
+            bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(key, "raid_remaining-mobs")));
+        }
     }
 }
