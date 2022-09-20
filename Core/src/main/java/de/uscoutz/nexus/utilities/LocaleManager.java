@@ -2,9 +2,14 @@ package de.uscoutz.nexus.utilities;
 
 import de.uscoutz.nexus.NexusPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.util.RGBLike;
+import net.md_5.bungee.api.ChatColor;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -60,6 +65,17 @@ public class LocaleManager {
             if(message.contains("%prefix%")) {
                 message = message.replace("%prefix%", translate("de_DE", "prefix"));
             }
+
+            Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+            Matcher matcher = pattern.matcher(message);
+
+            while (matcher.find()) {
+                String color = message.substring(matcher.start(), matcher.end());
+                message = message.replace(color, TextColor.fromHexString(color) +"");
+                matcher = pattern.matcher(message);
+            }
+
+            message = ChatColor.translateAlternateColorCodes('&', message);
 
             int i = 0;
             for(Object argument : variables) {
