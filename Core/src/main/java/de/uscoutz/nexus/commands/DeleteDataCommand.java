@@ -37,6 +37,9 @@ public class DeleteDataCommand implements CommandExecutor {
                 for(String profileId : playerProfiles) {
                     plugin.getDatabaseAdapter().delete("playerProfiles", "profileId", profileId);
                     plugin.getDatabaseAdapter().delete("schematics", "profileId", profileId);
+                    plugin.getDatabaseAdapter().delete("quests", "profileId", profileId);
+                    plugin.getDatabaseAdapter().delete("raids", "profileId", profileId);
+                    plugin.getDatabaseAdapter().delete("storages", "profileId", profileId);
                 }
 
                 plugin.getDatabaseAdapter().delete("players", "player", args[0]);

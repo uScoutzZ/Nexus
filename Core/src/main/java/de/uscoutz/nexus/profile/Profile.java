@@ -121,6 +121,9 @@ public class Profile {
 
         plugin.getDatabaseAdapter().delete("playerProfiles", "profileId", profileId);
         plugin.getDatabaseAdapter().delete("schematics", "profileId", profileId);
+        plugin.getDatabaseAdapter().delete("quests", "profileId", profileId);
+        plugin.getDatabaseAdapter().delete("raids", "profileId", profileId);
+        plugin.getDatabaseAdapter().delete("storages", "profileId", profileId);
         plugin.getDatabaseAdapter().deleteTwo("profiles", "owner", owner, "profileId", profileId);
         new BukkitRunnable() {
             @Override
