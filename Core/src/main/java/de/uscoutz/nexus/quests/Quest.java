@@ -69,7 +69,11 @@ public class Quest {
             task.getActionWhenFinished().accept(player, this);
         }
         if(task.isChronological()) {
-            profile.getQuests().put(task.next(), new Quest(profileId, task.next(), plugin).assign());
+            if(task.next() != null) {
+                profile.getQuests().put(task.next(), new Quest(profileId, task.next(), plugin).assign());
+            } else {
+                player.sendMessage("§cEven though chronological=true, there isn't another quest to do");
+            }
         }
 
         Quest mainQuest = profile.getMainQuest();

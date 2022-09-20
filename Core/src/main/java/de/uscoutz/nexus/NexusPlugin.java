@@ -7,6 +7,7 @@ import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
 import de.uscoutz.nexus.inventory.InventoryListener;
 import de.uscoutz.nexus.listeners.block.BlockBreakListener;
 import de.uscoutz.nexus.listeners.entity.EntityDamageByEntityListener;
+import de.uscoutz.nexus.listeners.inventory.InvenvtoryOpenListener;
 import de.uscoutz.nexus.listeners.player.*;
 import de.uscoutz.nexus.locations.LocationManager;
 import de.uscoutz.nexus.networking.NetworkServer;
@@ -86,6 +87,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractAtEntityListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new InvenvtoryOpenListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));

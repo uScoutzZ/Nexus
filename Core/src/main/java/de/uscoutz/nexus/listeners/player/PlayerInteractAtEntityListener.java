@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.utilities.InventoryManager;
+import net.minecraft.network.chat.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -30,9 +31,10 @@ public class PlayerInteractAtEntityListener implements Listener {
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
         Profile profile = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld());
-        player.sendMessage(profile.getQuests().size() + "");
 
         if(event.getRightClicked() instanceof Villager) {
+            event.setCancelled(true);
+            String name = event.getRightClicked().getCustomName();
             if(profile.getUnfinishedQuests().containsKey(Task.TALK_TO_GEORGE)) {
                 profile.getQuests().get(Task.TALK_TO_GEORGE).finish(player);
             } else {
@@ -41,7 +43,12 @@ public class PlayerInteractAtEntityListener implements Listener {
 
                     int progress = InventoryManager.removeNeededItems(player, Material.DARK_OAK_LOG, quest);
                     if(progress != 0) {
-                        profile.getQuests().get(Task.COLLECT_LOG).addProgress(player, progress);
+                        long finalProgress = profile.getQuests().get(Task.COLLECT_LOG).addProgress(player, progress);
+                        if(finalProgress < quest.getTask().getGoal()) {
+                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_collected-wood", name, progress));
+                        }
+                    } else {
+                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_no-wood", name));
                     }
                 }
             }

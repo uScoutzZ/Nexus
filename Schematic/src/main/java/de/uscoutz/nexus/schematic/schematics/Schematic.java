@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
@@ -517,6 +518,11 @@ public class Schematic {
                                         "schematicId", schematicId,
                                         new DatabaseUpdate("level", level+1),
                                         new DatabaseUpdate("placed", System.currentTimeMillis()));
+                                if(schematicType == SchematicType.NEXUS) {
+                                    if(profile.getUnfinishedQuests().containsKey(Task.UPGRADE_NEXUS)) {
+                                        profile.getQuests().get(Task.UPGRADE_NEXUS).finish(player1);
+                                    }
+                                }
                             });
                 } else {
                     collector = new Collector(neededItems, schematicId, plugin, 0, Material.REDSTONE_BLOCK, "§c§lREPAIR")

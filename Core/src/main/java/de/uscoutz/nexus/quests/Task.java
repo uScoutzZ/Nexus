@@ -17,11 +17,23 @@ public enum Task {
 
     TALK_TO_GEORGE(true, 0, (player, quest) -> {
         List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
-                .translate("de_DE", "george_collect-wood-assigned", player.getName(), quest.getTask().next().getGoal()));
+                .translate("de_DE", "george_collect-wood-assigned", NexusPlugin.getInstance().getConfig().get("villager-name"),
+                        player.getName(), quest.getTask().next().getGoal()));
         sendMessages(player, messages);
     }),
-    COLLECT_LOG(false, 64, (player, quest) -> {
+    COLLECT_LOG(true, 5, (player, quest) -> {
         player.getInventory().addItem(NexusPlugin.getInstance().getToolManager().getToolMap().get("wooden_axe").getItemStack());
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_upgrade-nexus-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }),
+    UPGRADE_NEXUS(true, 0, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-walls-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }),
+    BUILD_WALLS(true, 5, (player, quest) -> {
+
     });
 
     Task(boolean chronological) {
