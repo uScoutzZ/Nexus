@@ -92,8 +92,8 @@ public class LocaleManager {
         List<String> messages = new ArrayList<>();
 
         String prefix;
-        if(message.startsWith("§6§lGeorge§7: ")) {
-            prefix = "§6§lGeorge§7: §f";
+        if(message.startsWith(plugin.getConfig().getString("villager-name") + "§7: ")) {
+            prefix = plugin.getConfig().getString("villager-name") + "§7: §f";
             messages.addAll(List.of(message.replace(prefix, "").split("\\. ")));
             for(String string : messages) {
                 messages.set(messages.indexOf(string), prefix + string);
