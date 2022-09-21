@@ -1,11 +1,13 @@
 package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
 import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
 import de.uscoutz.nexus.schematic.gateways.GatewayManager;
 import de.uscoutz.nexus.schematic.listener.block.*;
 import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
 import de.uscoutz.nexus.schematic.listener.inventory.InventoryOpenListener;
+import de.uscoutz.nexus.schematic.listener.inventory.SchematicInventoryOpenedListener;
 import de.uscoutz.nexus.schematic.listener.player.*;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
@@ -81,6 +83,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockGrowListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryOpenListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new SchematicInventoryOpenedListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }

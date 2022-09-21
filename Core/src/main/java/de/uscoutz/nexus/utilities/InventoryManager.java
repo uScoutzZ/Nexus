@@ -1,12 +1,20 @@
 package de.uscoutz.nexus.utilities;
 
+import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
+import de.uscoutz.nexus.gamemechanics.tools.Tool;
+import de.uscoutz.nexus.inventory.InventoryBuilder;
+import de.uscoutz.nexus.inventory.SimpleInventory;
+import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -19,6 +27,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class InventoryManager {
+
+    private NexusPlugin plugin;
+
+    public InventoryManager(NexusPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     public static String toBase64(Inventory inventory) {
         try {
@@ -95,5 +109,63 @@ public class InventoryManager {
         }
 
         return added;
+    }
+
+    public void openWorkshopSchematics(Player player) {
+        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "workshop_schematics"));
+
+        Bukkit.getPluginManager().callEvent(new SchematicInventoryOpenedEvent(inventory, player));
+
+        setNavigationItems(inventory, player, FilterType.SCHEMATICS);
+        inventory.open(player);
+    }
+
+    public void openWorkshopTools(Player player) {
+        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
+
+        for(Tool tool : plugin.getToolManager().getToolMap().values()) {
+            inventory.addItem(tool.getItemStack());
+        }
+
+        setNavigationItems(inventory, player, FilterType.TOOLS);
+        inventory.open(player);
+    }
+
+    public void openRescuedItems(Player player) {
+        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "villager_rescue"));
+
+        setNavigationItems(inventory, player, FilterType.RESCUED);
+        inventory.open(player);
+    }
+
+    private void setNavigationItems(SimpleInventory inventory, Player player, FilterType filterType) {
+        ItemBuilder schematics = ItemBuilder.create(Material.OAK_LOG)
+                .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_schematics"));
+        ItemBuilder tools = ItemBuilder.create(Material.GOLDEN_PICKAXE)
+                .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_tools"));
+        ItemBuilder rescued = ItemBuilder.create(Material.ENDER_CHEST)
+                .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_rescue"));
+
+        if(filterType == FilterType.SCHEMATICS) {
+            schematics.enchant(Enchantment.FROST_WALKER, 1)
+                    .flag(ItemFlag.HIDE_ENCHANTS);
+        } else if(filterType == FilterType.TOOLS) {
+            tools.enchant(Enchantment.FROST_WALKER, 1)
+                    .flag(ItemFlag.HIDE_ENCHANTS);
+        } else {
+            rescued.enchant(Enchantment.FROST_WALKER, 1)
+                    .flag(ItemFlag.HIDE_ENCHANTS);
+        }
+
+        inventory.setItem(36, schematics, event -> openWorkshopSchematics(player));
+        inventory.setItem(37, tools, event -> openWorkshopTools(player));
+        inventory.setItem(38, rescued, event -> openRescuedItems(player));
+        inventory.fill(27, 36, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
+    }
+
+    private enum FilterType {
+        SCHEMATICS,
+        TOOLS,
+        RESCUED;
     }
 }

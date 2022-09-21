@@ -15,6 +15,7 @@ import de.uscoutz.nexus.networking.NexusServer;
 import de.uscoutz.nexus.player.PlayerManager;
 import de.uscoutz.nexus.profile.ProfileManager;
 import de.uscoutz.nexus.regions.RegionManager;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.utilities.LocaleManager;
 import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
@@ -49,6 +50,8 @@ public class NexusPlugin extends JavaPlugin {
     private RegionManager regionManager;
     @Getter
     private BiomeManager biomeManager;
+    @Getter
+    private InventoryManager inventoryManager;
 
     private NetworkServer networkServer;
 
@@ -72,6 +75,7 @@ public class NexusPlugin extends JavaPlugin {
         regionManager = new RegionManager(this);
         biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
         biomeManager.loadBiomes();
+        inventoryManager = new InventoryManager(this);
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
