@@ -7,26 +7,32 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class SchematicItem extends NexusItem {
 
     @Getter
     private Schematic schematic;
-    private SchematicType schematicType;
-    private int level;
+    @Getter
+    private boolean obtainable;
+    @Getter @Setter
+    private List<ItemStack> ingredients;
     private NexusSchematicPlugin plugin;
 
-    public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic) {
+    public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic, boolean obtainable) {
         super(key, itemBuilder, plugin.getNexusPlugin());
         this.schematic = schematic;
         this.plugin = plugin;
+        this.obtainable = obtainable;
         addPersistentData(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "schematictype"),
                 PersistentDataType.STRING, schematic.getSchematicType().toString().toLowerCase());
         addPersistentData(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "schematiclevel"),

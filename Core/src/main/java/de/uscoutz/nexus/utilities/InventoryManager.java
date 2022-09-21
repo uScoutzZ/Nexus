@@ -9,8 +9,11 @@ import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.translation.Translatable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,6 +27,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InventoryManager {
@@ -81,34 +86,53 @@ public class InventoryManager {
     }
 
     public static int removeNeededItems(Player player, Material material, Quest quest) {
-        return removeNeededItems(player, material, (int) (quest.getTask().getGoal()-quest.getProgress()));
+        return removeNeededItems(player, Arrays.asList(new ItemStack(material, (int) (quest.getTask().getGoal()-quest.getProgress()))));
     }
 
-    public static int removeNeededItems(Player player, Material material, int neededItems) {
-        ItemStack needed = new ItemStack(material, neededItems);
-        int amount = needed.getAmount();
+    public static int removeNeededItems(Player player, List<ItemStack> toRemove) {
         int added = 0;
-        for(ItemStack itemStack : player.getInventory().getContents()) {
-            if(itemStack != null) {
-                if(itemStack.isSimilar(needed)) {
-                    if (itemStack.getAmount() >= amount) {
-                        itemStack.setAmount(itemStack.getAmount() - amount);
-                        added = added+amount;
-                        amount = 0;
-                    } else {
-                        amount = amount-itemStack.getAmount();
-                        added = added+itemStack.getAmount();
-                        itemStack.setAmount(0);
+        for(ItemStack needed : toRemove) {
+            int amount = needed.getAmount();
+            for(ItemStack itemStack : player.getInventory().getContents()) {
+                if(itemStack != null) {
+                    if(itemStack.isSimilar(needed)) {
+                        if (itemStack.getAmount() >= amount) {
+                            itemStack.setAmount(itemStack.getAmount() - amount);
+                            added = added+amount;
+                            amount = 0;
+                        } else {
+                            amount = amount-itemStack.getAmount();
+                            added = added+itemStack.getAmount();
+                            itemStack.setAmount(0);
+                        }
                     }
                 }
-            }
 
-            if(amount == 0) {
-                break;
+                if(amount == 0) {
+                    break;
+                }
             }
         }
 
         return added;
+    }
+
+    public static List<ItemStack> getNeededItemsFromString(String needed) {
+        List<ItemStack> neededItems = new ArrayList<>();
+
+        if(needed != null && !needed.equals("")) {
+            for(String stringMaterial : needed.split(", ")) {
+                int amount = Integer.parseInt(stringMaterial.split(":")[1]);
+                Material material = Material.getMaterial(stringMaterial.split(":")[0]);
+                try {
+                    neededItems.add(new ItemStack(material, amount));
+                } catch (IllegalArgumentException exception) {
+                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Material " + stringMaterial +" not found");
+                }
+            }
+        }
+
+        return neededItems;
     }
 
     public void openWorkshopSchematics(Player player) {
@@ -124,7 +148,7 @@ public class InventoryManager {
         SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
 
         for(Tool tool : plugin.getToolManager().getToolMap().values()) {
-            inventory.addItem(tool.getItemStack());
+            getShopItem(player, inventory, tool.getItemStack(), tool.getIngredients());
         }
 
         setNavigationItems(inventory, player, FilterType.TOOLS);
@@ -136,6 +160,39 @@ public class InventoryManager {
 
         setNavigationItems(inventory, player, FilterType.RESCUED);
         inventory.open(player);
+    }
+
+    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, List<ItemStack> ingredients) {
+        List<Component> lore = new ArrayList<>();
+        ItemStack shopItem = itemStack.clone();
+        lore.add(Component.text(plugin.getLocaleManager().translate("de_DE", "workshop_needed-items")));
+        boolean playerHasItems = true;
+        if(ingredients != null) {
+            if(ingredients.size() == 0) {
+                lore.add(Component.text("§cNot configured"));
+            }
+            for(ItemStack neededStack : ingredients) {
+                Translatable translatable = neededStack;
+                lore.add(Component.text("§e" + neededStack.getAmount() + "x " + LegacyComponentSerializer.legacyAmpersand().serialize(Component.translatable(translatable.translationKey()))));
+                if(!player.getInventory().containsAtLeast(neededStack, neededStack.getAmount())) {
+                    playerHasItems = false;
+                }
+            }
+        }
+        shopItem.lore(lore);
+        boolean finalPlayerHasItems = playerHasItems;
+        simpleInventory.addItem(shopItem, event -> {
+            if(!finalPlayerHasItems) {
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0F, 1.0F);
+                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
+            } else {
+                player.closeInventory();
+                removeNeededItems(player, ingredients);
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+                player.getInventory().addItem(itemStack);
+            }
+        });
+        return shopItem;
     }
 
     private void setNavigationItems(SimpleInventory inventory, Player player, FilterType filterType) {

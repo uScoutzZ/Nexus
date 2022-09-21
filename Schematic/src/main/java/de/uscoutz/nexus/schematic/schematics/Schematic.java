@@ -492,7 +492,7 @@ public class Schematic {
                     ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().getTwo("collectors", "schematicId", String.valueOf(schematicId), "intact", String.valueOf(b));
                     try {
                         if(resultSet.next()) {
-                            neededItems = plugin.getCollectorManager().getNeededItemsFromString(resultSet.getString("neededItems"));
+                            neededItems = plugin.getNexusPlugin().getInventoryManager().getNeededItemsFromString(resultSet.getString("neededItems"));
                         }
                     } catch (SQLException exception) {
                         exception.printStackTrace();

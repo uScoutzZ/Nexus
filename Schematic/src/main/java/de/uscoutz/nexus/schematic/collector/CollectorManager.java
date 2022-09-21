@@ -4,6 +4,7 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -54,27 +55,9 @@ public class CollectorManager {
                 collectorNeededMap.get(schematicType).put(condition, new HashMap<>());
                 for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).values()) {
                     String needed = fileConfiguration.getString(condition.toString() + "." + schematicType.toString().toLowerCase() + "." + schematic.getLevel());
-                    collectorNeededMap.get(schematicType).get(condition).put(schematic.getLevel(), getNeededItemsFromString(needed));
+                    collectorNeededMap.get(schematicType).get(condition).put(schematic.getLevel(), InventoryManager.getNeededItemsFromString(needed));
                 }
             }
         }
-    }
-
-    public List<ItemStack> getNeededItemsFromString(String needed) {
-        List<ItemStack> neededItems = new ArrayList<>();
-
-        if(needed != null && !needed.equals("")) {
-            for(String stringMaterial : needed.split(", ")) {
-                int amount = Integer.parseInt(stringMaterial.split(":")[1]);
-                Material material = Material.getMaterial(stringMaterial.split(":")[0]);
-                try {
-                    neededItems.add(new ItemStack(material, amount));
-                } catch (IllegalArgumentException exception) {
-                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Material " + stringMaterial +" not found");
-                }
-            }
-        }
-
-        return neededItems;
     }
 }

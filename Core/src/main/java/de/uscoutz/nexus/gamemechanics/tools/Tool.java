@@ -4,14 +4,20 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.gamemechanics.NexusItem;
 import de.uscoutz.nexus.item.ItemBuilder;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.List;
 
 public class Tool extends NexusItem {
 
     @Getter
     private int breakingPower;
+    @Getter @Setter
+    private List<ItemStack> ingredients;
 
     private NexusPlugin nexusPlugin;
 

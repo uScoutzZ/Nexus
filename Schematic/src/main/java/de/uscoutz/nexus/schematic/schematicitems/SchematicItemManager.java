@@ -3,9 +3,11 @@ package de.uscoutz.nexus.schematic.schematicitems;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.CollectorManager;
 import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -52,14 +54,19 @@ public class SchematicItemManager {
             Material material = Material.getMaterial(itemsConfig.getString(key + ".material"));
             SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
             int level = itemsConfig.getInt(key + ".level");
+            boolean obtainable = itemsConfig.getBoolean(key + ".obtainable");
             Schematic schematic = plugin.getSchematicManager()
                     .getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
             if(schematic == null) {
                 Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
             } else {
-                SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic);
+                SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic, obtainable);
                 if(itemsConfig.getString(key + ".locale") != null) {
                     schematicItem.name(itemsConfig.getString(key + ".locale"));
+                }
+                if(obtainable) {
+                    String ingredients = itemsConfig.getString(key+ ".ingredients");
+                    schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
                 }
 
                 schematicItem.build();

@@ -2,6 +2,7 @@ package de.uscoutz.nexus.gamemechanics.tools;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
+import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -62,6 +63,8 @@ public class ToolManager {
             if(toolsConfig.getString(key + ".locale") != null) {
                 tool.name(toolsConfig.getString(key + ".locale"));
             }
+            String ingredients = toolsConfig.getString(key+ ".ingredients");
+            tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
 
             tool.build();
             toolMap.put(key, tool);

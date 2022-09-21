@@ -20,10 +20,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerInteractAtEntityListener implements Listener {
 
@@ -47,7 +44,8 @@ public class PlayerInteractAtEntityListener implements Listener {
                 if(profile.getUnfinishedQuests().containsKey(Task.COLLECT_LOG)) {
                     Quest quest = profile.getUnfinishedQuests().get(Task.COLLECT_LOG);
 
-                    int progress = InventoryManager.removeNeededItems(player, Material.DARK_OAK_LOG, quest);
+                    int progress = InventoryManager.removeNeededItems(player, Arrays.asList(new ItemStack(Material.DARK_OAK_LOG,
+                            (int) (quest.getTask().getGoal()-quest.getProgress()))));
                     if(progress != 0) {
                         long finalProgress = profile.getQuests().get(Task.COLLECT_LOG).addProgress(player, progress);
                         if(finalProgress < quest.getTask().getGoal()) {
