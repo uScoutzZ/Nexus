@@ -92,6 +92,7 @@ public class BlockPlaceListener implements Listener {
                                 }
                                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
                             } else {
+                                event.setCancelled(true);
                                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                             }
                         }

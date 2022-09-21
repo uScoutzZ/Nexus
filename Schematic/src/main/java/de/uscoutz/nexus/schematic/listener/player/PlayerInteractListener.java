@@ -71,6 +71,9 @@ public class PlayerInteractListener implements Listener {
             Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(clicked.getWorld());
             SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
             BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region);
+            if(builtSchematic == null) {
+                return;
+            }
             if(builtSchematic.getSchematic().getSchematicType() == SchematicType.NEXUS) {
                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_nexus-not-breakable"));
             } else {
