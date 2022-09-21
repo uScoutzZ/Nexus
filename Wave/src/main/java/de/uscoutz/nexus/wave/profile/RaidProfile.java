@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,7 +63,8 @@ public class RaidProfile {
         task = new BukkitRunnable() {
             @Override
             public void run() {
-                if(profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0) {
+                if(profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0
+                        && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished()) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
                     RaidType raidType;
                     try {
