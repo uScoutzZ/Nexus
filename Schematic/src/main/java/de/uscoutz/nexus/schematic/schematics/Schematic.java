@@ -592,7 +592,15 @@ public class Schematic {
             } else if(pastedSign.getLine(0).equals("[ENTITY]")) {
                 BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
                 EntityType entityType = EntityType.valueOf(pastedSign.getLine(1));
-                Entity entity = location.getWorld().spawnEntity(blockLocation.clone().add(0.5, 0, 0.5), entityType);
+                Location entityLocation = blockLocation.clone();
+                if(rotation == 0) {
+                    entityLocation.setYaw(180);
+                } else if(rotation == 90){
+                    entityLocation.setYaw(90);
+                } else if(rotation == 270){
+                    entityLocation.setYaw(-90);
+                }
+                Entity entity = location.getWorld().spawnEntity(entityLocation.add(0.5, 0, 0.5), entityType);
                 if(entityType == EntityType.DROPPED_ITEM) {
                     Item item = (Item) entity;
                     Material material = Material.getMaterial(pastedSign.getLine(2));
