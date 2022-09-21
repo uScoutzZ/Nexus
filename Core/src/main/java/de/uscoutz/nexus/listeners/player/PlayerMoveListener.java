@@ -4,7 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.regions.Region;
-import de.uscoutz.nexus.scoreboards.ScoreboardUpdateType;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +27,7 @@ public class PlayerMoveListener implements Listener {
 
         if(nexusPlayer.getBiome() == null || !nexusPlayer.getBiome().equals(biome)) {
             nexusPlayer.setBiome(biome);
-            nexusPlayer.getNexusScoreboard().update(ScoreboardUpdateType.BIOME);
+            nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.BIOME);
         }
     }
 }

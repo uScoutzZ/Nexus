@@ -2,12 +2,14 @@ package de.uscoutz.nexus.schematic.schematics;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.laser.Laser;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.utilities.FireworkUtilities;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
@@ -248,6 +250,9 @@ public class Schematic {
                             }
                             if(schematicType == SchematicType.NEXUS) {
                                 profile.setNexusLevel(level);
+                                for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
+                                    nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
+                                }
                             } else if(schematicType == SchematicType.TOWER) {
                                 if(profile.getHighestTower() < level) {
                                     profile.setHighestTower(level);

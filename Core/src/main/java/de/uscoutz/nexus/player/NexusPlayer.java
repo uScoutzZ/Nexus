@@ -14,7 +14,6 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
-import de.uscoutz.nexus.scoreboards.ScoreboardUpdateType;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import eu.thesimplecloud.api.CloudAPI;
@@ -186,7 +185,8 @@ public class NexusPlayer {
         biome = plugin.getBiomeManager().getBiome(player.getLocation());
         nexusScoreboard = new NexusScoreboard(plugin);
         nexusScoreboard.setup(player);
-        nexusScoreboard.update(ScoreboardUpdateType.BIOME);
+        nexusScoreboard.update(NexusScoreboard.ScoreboardUpdateType.BIOME);
+        nexusScoreboard.update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
 
         Quest mainQuest = profile.getMainQuest();
         if(mainQuest != null) {
