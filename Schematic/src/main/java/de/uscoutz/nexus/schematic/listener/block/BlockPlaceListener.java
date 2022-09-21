@@ -9,7 +9,9 @@ import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +44,6 @@ public class BlockPlaceListener implements Listener {
         if(itemStack != null && itemStack.getItemMeta() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if(plugin.getSchematicItemManager().isSchematicItem(itemMeta)) {
-                event.setCancelled(true);
                 PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
                 String key = dataContainer.get(new NamespacedKey(plugin.getNexusPlugin().getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemMap().get(key);
@@ -65,6 +66,7 @@ public class BlockPlaceListener implements Listener {
                             player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
                         } else {
                             if(!schematicItem.getSchematic().preview(location, rotation, true)) {
+                                event.setCancelled(true);
                                 if(schematic.getTimeToFinish() != 0) {
                                     long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
                                     schematic.build(location, rotation, finished, schematicId, 0);
@@ -75,7 +77,6 @@ public class BlockPlaceListener implements Listener {
                                 plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
                                         plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
                                         schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
-
                                 if(schematic.getSchematicType() == SchematicType.WALL) {
                                     if(profile.getUnfinishedQuests().containsKey(Task.BUILD_WALLS)) {
                                         profile.getUnfinishedQuests().get(Task.BUILD_WALLS).addProgress(player, 1);
@@ -89,6 +90,7 @@ public class BlockPlaceListener implements Listener {
                                         profile.getUnfinishedQuests().get(Task.BUILD_TOWER).finish(player);
                                     }
                                 }
+                                player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
                             } else {
                                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                             }
@@ -98,7 +100,15 @@ public class BlockPlaceListener implements Listener {
                     event.setCancelled(true);
                     player.sendMessage("§cThe schematic item is not set up");
                 }
+            } else {
+                if(player.getGameMode() != GameMode.CREATIVE) {
+                    event.setCancelled(true);
+                } else {
+                    event.setCancelled(false);
+                }
             }
+        } else {
+            event.setCancelled(true);
         }
     }
 }
