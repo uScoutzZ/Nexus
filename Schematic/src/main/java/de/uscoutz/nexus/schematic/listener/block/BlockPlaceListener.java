@@ -2,11 +2,13 @@ package de.uscoutz.nexus.schematic.listener.block;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
+import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -73,6 +75,20 @@ public class BlockPlaceListener implements Listener {
                                 plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
                                         plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
                                         schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
+
+                                if(schematic.getSchematicType() == SchematicType.WALL) {
+                                    if(profile.getUnfinishedQuests().containsKey(Task.BUILD_WALLS)) {
+                                        profile.getUnfinishedQuests().get(Task.BUILD_WALLS).addProgress(player, 1);
+                                    }
+                                } else if(schematic.getSchematicType() == SchematicType.HOME) {
+                                    if(profile.getUnfinishedQuests().containsKey(Task.BUILD_HOME)) {
+                                        profile.getUnfinishedQuests().get(Task.BUILD_HOME).finish(player);
+                                    }
+                                } else if(schematic.getSchematicType() == SchematicType.TOWER) {
+                                    if(profile.getUnfinishedQuests().containsKey(Task.BUILD_TOWER)) {
+                                        profile.getUnfinishedQuests().get(Task.BUILD_TOWER).finish(player);
+                                    }
+                                }
                             } else {
                                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_not-enough-space"));
                             }

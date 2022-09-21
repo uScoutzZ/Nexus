@@ -29,11 +29,28 @@ public enum Task {
     }),
     UPGRADE_NEXUS(true, 0, (player, quest) -> {
         List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
-                .translate("de_DE", "george_build-walls-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+                .translate("de_DE", "george_build-walls-assigned", NexusPlugin.getInstance().getConfig().get("villager-name"), quest.getTask().next().getGoal()));
         sendMessages(player, messages);
     }),
     BUILD_WALLS(true, 5, (player, quest) -> {
-
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-home-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }),
+    BUILD_HOME(true, 0, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_repair-workshop-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }),
+    REPAIR_WORKSHOP(true, 0, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-tower-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }),
+    BUILD_TOWER(false, 0, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-tower-finished", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
     });
 
     Task(boolean chronological) {

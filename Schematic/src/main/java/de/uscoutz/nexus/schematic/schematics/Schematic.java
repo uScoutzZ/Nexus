@@ -542,6 +542,9 @@ public class Schematic {
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
                                 repaired.build(location, rotation, schematicId, 0, true);
                                 Bukkit.broadcastMessage("Repaired " + schematicId);
+                                if(schematicType == SchematicType.WORKSHOP && profile.getUnfinishedQuests().containsKey(Task.REPAIR_WORKSHOP)) {
+                                    profile.getQuests().get(Task.REPAIR_WORKSHOP).finish(player1);
+                                }
                                 plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
                                         profile.getProfileId(), "schematicId", schematicId,
                                         new DatabaseUpdate("damage", 0));
