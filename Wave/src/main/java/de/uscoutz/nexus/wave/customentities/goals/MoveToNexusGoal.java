@@ -58,7 +58,7 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
                         mob.getX(), mob.getY(), mob.getZ())) {
                     builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
                     valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() > location.getBlockY()
-                            && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;;
+                            && builtSchematic != null && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;;
                 } else {
                     if(schematics.containsKey(region[0])) {
                         builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
