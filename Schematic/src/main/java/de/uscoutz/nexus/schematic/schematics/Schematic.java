@@ -1,5 +1,6 @@
 package de.uscoutz.nexus.schematic.schematics;
 
+import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Task;
@@ -342,7 +343,13 @@ public class Schematic {
         List<Location> blocks1 = new ArrayList<>();
         List<Entity> entities = new ArrayList<>();
         int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
-        BuiltSchematic builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities);
+
+        BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(
+                profile.getProfileId()).getBuiltSchematics().get(schematicId);
+        if(builtSchematic == null && !update) {
+            builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities);
+        }
+
         for(int j = 0; j < blocks.size(); j++) {
             Location block = setBlock(blocks.get(j), rotation, location, null, schematicId, damage);
             minX = Math.min(minX, block.getBlockX());
@@ -365,9 +372,8 @@ public class Schematic {
             finish(profile, location, minX, maxX, minZ, maxZ, rotation, damage, schematicId, blocks1, entities);
         } else {
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
-            builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(
-                    profile.getProfileId()).getBuiltSchematics().get(schematicId);
             builtSchematic.setDamage(damage);
+            Bukkit.broadcastMessage(schematicId + " damage is " + damage + "(" + builtSchematic.getDamage() + ")");
             builtSchematic.setBlocks(blocks1);
             builtSchematic.setSchematic(this);
         }
@@ -530,6 +536,7 @@ public class Schematic {
                                 destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematicType);
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
                                 repaired.build(location, rotation, schematicId, 0, true);
+                                Bukkit.broadcastMessage("Repaired " + schematicId);
                                 plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
                                         profile.getProfileId(), "schematicId", schematicId,
                                         new DatabaseUpdate("damage", 0));
@@ -608,7 +615,7 @@ public class Schematic {
                         livingEntity.setAI(false);
                         if(entityType == EntityType.VILLAGER && schematicType == SchematicType.WORKSHOP) {
                             entity.setCustomNameVisible(true);
-                            entity.customName(Component.text("§6§lGeorge"));
+                            entity.customName(Component.text(plugin.getNexusPlugin().getConfig().getString("villager-name")));
                             Villager villager = (Villager) entity;
                             villager.setProfession(Villager.Profession.ARMORER);
                         }

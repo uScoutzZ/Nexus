@@ -25,7 +25,8 @@ public class BlockBreakListener implements Listener {
         Region region = plugin.getNexusPlugin().getRegionManager().getRegion(event.getBlock().getLocation());
         if(region != null) {
             if(profile.getSchematicsByRegion().containsKey(region)) {
-                player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + "");
+                player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + " "
+                        + profile.getSchematicsByRegion().get(region).getSchematic().getLevel());
                 player.sendMessage("id: " + profile.getSchematicsByRegion().get(region).getSchematicId());
                 player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getDamage());
                 player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
