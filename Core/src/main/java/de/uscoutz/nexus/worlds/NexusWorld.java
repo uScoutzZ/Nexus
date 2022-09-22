@@ -7,8 +7,12 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class NexusWorld {
 
@@ -22,6 +26,8 @@ public class NexusWorld {
     private Location spawn, middle;
     @Getter
     private int radius;
+    @Getter
+    private Map<Location, Map<Location, BlockData>> brokenBlocks;
 
     public NexusWorld(Profile profile, NexusPlugin plugin) {
         this.plugin = plugin;
@@ -32,6 +38,7 @@ public class NexusWorld {
         middle = plugin.getLocationManager().getLocation("nexus-crystal", world);
         world.setDifficulty(Difficulty.HARD);
         radius = plugin.getConfig().getInt("base-radius");
+        brokenBlocks = new HashMap<>();
         assign();
         new BukkitRunnable() {
             @Override
