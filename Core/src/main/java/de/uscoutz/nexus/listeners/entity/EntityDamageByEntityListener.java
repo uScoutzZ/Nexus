@@ -3,6 +3,7 @@ package de.uscoutz.nexus.listeners.entity;
 import de.uscoutz.nexus.NexusPlugin;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +26,7 @@ public class EntityDamageByEntityListener implements Listener {
             event.setCancelled(true);
         }
 
-        if(hit instanceof EnderCrystal) {
+        if(hit instanceof EnderCrystal || hit instanceof ItemFrame) {
             event.setCancelled(true);
         }
     }
