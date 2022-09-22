@@ -12,6 +12,7 @@ import de.uscoutz.nexus.schematic.laser.Laser;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.utilities.FireworkUtilities;
 import de.uscoutz.nexus.utilities.InventoryManager;
+import de.uscoutz.nexus.worlds.NexusWorld;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -23,6 +24,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.*;
@@ -644,6 +646,10 @@ public class Schematic {
             }
         }
 
+        if(schematicType == SchematicType.HOME && block.getBlockData() instanceof Bed) {
+            NexusWorld nexusWorld = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld()).getWorld();
+            nexusWorld.setSpawn(blockLocation.clone().add(0, 0.75, 0));
+        }
 
         return blockLocation;
     }

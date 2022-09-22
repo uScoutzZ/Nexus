@@ -7,7 +7,9 @@ import de.uscoutz.nexus.wave.commands.SpawnEntityCommand;
 import de.uscoutz.nexus.wave.listener.creature.CreatureSpawnListener;
 import de.uscoutz.nexus.wave.listener.entity.EntityDeathListener;
 import de.uscoutz.nexus.wave.listener.player.PlayerChangeWorldListener;
+import de.uscoutz.nexus.wave.listener.player.PlayerDeathListener;
 import de.uscoutz.nexus.wave.listener.player.PlayerJoinListener;
+import de.uscoutz.nexus.wave.listener.player.PlayerRespawnListener;
 import de.uscoutz.nexus.wave.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.wave.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.wave.player.PlayerManager;
@@ -49,6 +51,8 @@ public class NexusWavePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerChangeWorldListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDeathListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         getCommand("spawnentity").setExecutor(new SpawnEntityCommand(this));
         Bukkit.getConsoleSender().sendMessage("[NexusWave] Enabled");
     }

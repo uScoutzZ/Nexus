@@ -84,4 +84,8 @@ public class NexusWorld {
             }
         }.runTaskTimer(plugin, 0, 1);
     }
+
+    public void setSpawn(Location location) {
+        spawn = location;
+    }
 }
