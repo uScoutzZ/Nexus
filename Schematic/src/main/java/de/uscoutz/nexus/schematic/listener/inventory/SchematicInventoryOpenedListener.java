@@ -27,7 +27,7 @@ public class SchematicInventoryOpenedListener implements Listener {
         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(event.getPlayer().getWorld());
 
         for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
-            if(schematicItem.isObtainable()) {
+            if(schematicItem.isObtainable() && (schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))) {
                 ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
                         event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
                 //event.getSimpleInventory().addItem(itemStack);

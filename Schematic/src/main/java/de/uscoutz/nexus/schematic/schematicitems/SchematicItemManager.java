@@ -2,6 +2,7 @@ package de.uscoutz.nexus.schematic.schematicitems;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.item.ItemBuilder;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
 import de.uscoutz.nexus.schematic.schematics.Condition;
@@ -67,6 +68,13 @@ public class SchematicItemManager {
                 if(obtainable) {
                     String ingredients = itemsConfig.getString(key+ ".ingredients");
                     schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+                    String taskName = itemsConfig.getString(key+ ".quest");
+                    if(taskName != null) {
+                        try {
+                            schematicItem.setTask(Task.valueOf(taskName));
+                        } catch (Exception ignored) {
+                        }
+                    }
                 }
 
                 schematicItem.build();

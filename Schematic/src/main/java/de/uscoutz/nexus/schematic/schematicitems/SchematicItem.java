@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.schematicitems;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.gamemechanics.NexusItem;
 import de.uscoutz.nexus.item.ItemBuilder;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
@@ -26,6 +27,8 @@ public class SchematicItem extends NexusItem {
     private boolean obtainable;
     @Getter @Setter
     private List<ItemStack> ingredients;
+    @Getter @Setter
+    private Task task;
     private NexusSchematicPlugin plugin;
 
     public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic, boolean obtainable) {
