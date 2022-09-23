@@ -22,13 +22,13 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         SchematicPlayer schematicPlayer = new SchematicPlayer(player.getUniqueId(), plugin);
 
-        new BukkitRunnable() {
+        /*new BukkitRunnable() {
             @Override
             public void run() {
                 for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
                     player.getInventory().addItem(schematicItem.getItemStack());
                 }
             }
-        }.runTaskLater(plugin, 20);
+        }.runTaskLater(plugin, 20);*/
     }
 }

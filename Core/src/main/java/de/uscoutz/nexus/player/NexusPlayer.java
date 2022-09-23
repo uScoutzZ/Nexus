@@ -227,9 +227,9 @@ public class NexusPlayer {
             }
         }
 
-        for(Tool tool : plugin.getToolManager().getToolMap().values()) {
+        /*for(Tool tool : plugin.getToolManager().getToolMap().values()) {
             player.getInventory().addItem(tool.getItemStack());
-        }
+        }*/
     }
 
     public void checkout() {
