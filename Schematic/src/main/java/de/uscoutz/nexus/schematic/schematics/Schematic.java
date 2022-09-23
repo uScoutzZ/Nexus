@@ -213,7 +213,6 @@ public class Schematic {
     }
 
     public void build(Location location, int rotation, long finished, UUID schematicId, double damage) {
-        Bukkit.broadcastMessage("§ePasting " + blocks.size() + " blocks");
         if(finished <= System.currentTimeMillis()) {
             build(location, rotation, schematicId, damage, false);
         } else {
@@ -380,7 +379,6 @@ public class Schematic {
         } else {
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
             builtSchematic.setDamage(damage);
-            Bukkit.broadcastMessage(schematicId + " damage is " + damage + "(" + builtSchematic.getDamage() + ")");
             builtSchematic.setBlocks(blocks1);
             builtSchematic.setSchematic(this);
         }
@@ -543,7 +541,6 @@ public class Schematic {
                                 destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematicType);
                                 Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
                                 repaired.build(location, rotation, schematicId, 0, true);
-                                Bukkit.broadcastMessage("Repaired " + schematicId);
                                 if(schematicType == SchematicType.WORKSHOP && profile.getUnfinishedQuests().containsKey(Task.REPAIR_WORKSHOP)) {
                                     profile.getQuests().get(Task.REPAIR_WORKSHOP).finish(player1);
                                 }

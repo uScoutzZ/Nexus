@@ -28,7 +28,9 @@ public class Tool extends NexusItem {
 
     public Tool breakingPower(int breakingPower) {
         this.breakingPower = breakingPower;
-        getItemBuilder().lore(nexusPlugin.getLocaleManager().translate("de_DE", "tool_breaking-power", breakingPower));
+        if(breakingPower != 0) {
+            getItemBuilder().lore(nexusPlugin.getLocaleManager().translate("de_DE", "tool_breaking-power", breakingPower));
+        }
         NamespacedKey key = new NamespacedKey(nexusPlugin.getName().toLowerCase(), "breakingpower");
         addPersistentData(key, PersistentDataType.INTEGER, breakingPower);
         return this;

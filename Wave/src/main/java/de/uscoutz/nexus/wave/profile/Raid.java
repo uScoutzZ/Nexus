@@ -135,7 +135,6 @@ public class Raid {
                     spawnRandomMonster();
                     mobs[0]--;
                 } else {
-                    players.forEach(player -> player.sendMessage("§aWave ended"));
                     cancel();
                 }
             }

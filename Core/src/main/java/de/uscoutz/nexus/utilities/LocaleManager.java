@@ -66,12 +66,14 @@ public class LocaleManager {
                 message = message.replace("%prefix%", translate("de_DE", "prefix"));
             }
 
+            message = message.replace(" Nexus", plugin.getConfig().getString("nexus-color") + " Nexus");
             Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
             Matcher matcher = pattern.matcher(message);
 
             while (matcher.find()) {
                 String color = message.substring(matcher.start(), matcher.end());
-                message = message.replace(color, TextColor.fromHexString(color) +"");
+                //message = message.replace(color, TextColor.fromHexString(color) +"");
+                message = message.replace(color, ChatColor.of(color) + "");
                 matcher = pattern.matcher(message);
             }
 

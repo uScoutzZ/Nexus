@@ -136,7 +136,8 @@ public class Profile {
     public void checkout() {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
-                all.kick(Component.text(plugin.getLocaleManager().translate("de_DE", "profile-unloaded")));
+                all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-unloaded"));
+                all.kick(Component.text(""));
             }
             Bukkit.getPluginManager().callEvent(new ProfileCheckoutEvent(Profile.this));
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());

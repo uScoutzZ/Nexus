@@ -394,7 +394,7 @@ public class NexusPlayer {
                 }, rightClick -> {
                     if(material == Material.GOLDEN_PICKAXE) {
                         if(currentProfileSlot == finalCurrentSlot) {
-                            player.sendMessage("§cAlready on this profile");
+                            //player.sendMessage("§cAlready on this profile");
                         } else {
                             switchProfile(finalCurrentSlot);
                         }

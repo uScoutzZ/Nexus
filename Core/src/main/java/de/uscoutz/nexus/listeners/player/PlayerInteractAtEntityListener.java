@@ -55,13 +55,17 @@ public class PlayerInteractAtEntityListener implements Listener {
                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_no-wood", name));
                     }
                 } else {
-                    if(profile.getQuests().containsKey(Task.BUILD_WALLS)) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                plugin.getInventoryManager().openWorkshopSchematics(player);
-                            }
-                        }.runTaskLater(plugin, 1);
+                    if(profile.getUnfinishedQuests().containsKey(Task.UPGRADE_NEXUS)) {
+                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_upgrade-nexus", name));
+                    } else {
+                        if(profile.getQuests().containsKey(Task.BUILD_WALLS)) {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    plugin.getInventoryManager().openWorkshopSchematics(player);
+                                }
+                            }.runTaskLater(plugin, 1);
+                        }
                     }
                 }
             }

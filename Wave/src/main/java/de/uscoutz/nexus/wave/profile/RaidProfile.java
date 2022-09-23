@@ -58,8 +58,6 @@ public class RaidProfile {
         long rangeMax = plugin.getConfig().getLong("raid-range-max");
         long startIn = new Random().nextLong(rangeMax-rangeMin)+rangeMin;
 
-        Bukkit.broadcastMessage("Raid starts in " + TimeUnit.MILLISECONDS.toSeconds(startIn));
-
         task = new BukkitRunnable() {
             @Override
             public void run() {

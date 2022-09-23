@@ -31,11 +31,11 @@ public class PlayerDropListener implements Listener {
                     Collector collector = plugin.getCollectorManager().getCollectors().get(dropBlock);
                     if(collector != null) {
                         collector.collect(player, event.getItemDrop());
-                    } else {
+                    } /*else {
                         player.getInventory().addItem(event.getItemDrop().getItemStack());
                         event.getItemDrop().remove();
                         player.sendMessage("§cCouldn't find a collector here");
-                    }
+                    }*/
                     cancel();
                 }
             }
