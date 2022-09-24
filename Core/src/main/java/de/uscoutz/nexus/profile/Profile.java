@@ -191,6 +191,7 @@ public class Profile {
         if(!loading) {
             loading = true;
             loadMembers();
+            lastActivity = System.currentTimeMillis();
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
                 ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("storages", "profileId", String.valueOf(profileId));
 

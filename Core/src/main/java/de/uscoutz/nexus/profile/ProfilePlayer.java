@@ -3,6 +3,7 @@ package de.uscoutz.nexus.profile;
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.utilities.DateUtilities;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
@@ -67,35 +68,6 @@ public class ProfilePlayer {
     }
 
     public String getOnlineTime() {
-        long different = playtime;
-
-        int seconds = 0;
-        int minutes = 0;
-        int hours = 0;
-
-        while (different > 1000) {
-            different-=1000;
-            seconds++;
-        }
-        while (seconds > 60) {
-            seconds-=60;
-            minutes++;
-        }
-        while (minutes > 60) {
-            minutes-=60;
-            hours++;
-        }
-
-        if(hours == 0) {
-            if(minutes == 0) {
-                return plugin.getLocaleManager().translate("de_DE", "seconds", String.valueOf(seconds));
-            } else {
-                return plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minutes));
-            }
-        } else if(hours == 1) {
-            return plugin.getLocaleManager().translate("de_DE", "hour");
-        } else {
-            return plugin.getLocaleManager().translate("de_DE", "hours", String.valueOf(hours));
-        }
+        return DateUtilities.getTime(0, playtime, plugin);
     }
 }

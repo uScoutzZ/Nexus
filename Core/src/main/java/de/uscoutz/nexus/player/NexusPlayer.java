@@ -14,6 +14,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
+import de.uscoutz.nexus.utilities.DateUtilities;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import eu.thesimplecloud.api.CloudAPI;
@@ -326,7 +327,8 @@ public class NexusPlayer {
                     }
                     lore = Arrays.asList(" ", plugin.getLocaleManager().translate("de_DE", "profiles_owner", profile.getMembers().get(profile.getOwner()).getGameProfile().getName()),
                             plugin.getLocaleManager().translate("de_DE", "profiles_members", members), " ",
-                            plugin.getLocaleManager().translate("de_DE", "profiles_nexus-level", profile.getNexusLevel()));
+                            plugin.getLocaleManager().translate("de_DE", "profiles_nexus-level", profile.getNexusLevel()),
+                            plugin.getLocaleManager().translate("de_DE", "last-activity", DateUtilities.getTime(profile.getLastActivity(), System.currentTimeMillis(), plugin)));
                 } else {
                     material = Material.BARRIER;
                 }
