@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.util.RGBLike;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 import java.io.*;
 import java.util.*;
@@ -71,7 +72,7 @@ public class LocaleManager {
             Matcher matcher = pattern.matcher(message);
 
             while (matcher.find()) {
-                String color = message.substring(matcher.start(), matcher.end());
+                String color = matcher.group();
                 //message = message.replace(color, TextColor.fromHexString(color) +"");
                 message = message.replace(color, ChatColor.of(color) + "");
                 matcher = pattern.matcher(message);

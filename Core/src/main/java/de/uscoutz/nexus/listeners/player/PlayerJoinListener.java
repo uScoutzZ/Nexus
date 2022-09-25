@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.listeners.player;
 
 import de.uscoutz.nexus.NexusPlugin;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,6 +19,9 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-
+        if(player.getGameMode() == GameMode.CREATIVE) {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.setAllowFlight(true);
+        }
     }
 }

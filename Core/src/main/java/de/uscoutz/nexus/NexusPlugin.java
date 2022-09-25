@@ -7,6 +7,7 @@ import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
 import de.uscoutz.nexus.inventory.InventoryListener;
 import de.uscoutz.nexus.listeners.block.BlockBreakListener;
 import de.uscoutz.nexus.listeners.entity.EntityDamageByEntityListener;
+import de.uscoutz.nexus.listeners.entity.EntityPickupItemListener;
 import de.uscoutz.nexus.listeners.food.FoodLevelChangeListener;
 import de.uscoutz.nexus.listeners.inventory.InvenvtoryOpenListener;
 import de.uscoutz.nexus.listeners.player.*;
@@ -70,9 +71,10 @@ public class NexusPlugin extends JavaPlugin {
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
         toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"),
-                new File("/home/networksync/nexus/blockresistance.yml"));
+                new File("/home/networksync/nexus/blockresistance.yml"), new File("/home/networksync/nexus/blockdrops.yml"));
         toolManager.loadTools();
         toolManager.loadBlockResistances();
+        toolManager.loadBlockDrops();
         regionManager = new RegionManager(this);
         biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
         biomeManager.loadBiomes();
@@ -94,6 +96,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerInteractAtEntityListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InvenvtoryOpenListener(this), this);
         Bukkit.getPluginManager().registerEvents(new FoodLevelChangeListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new EntityPickupItemListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));

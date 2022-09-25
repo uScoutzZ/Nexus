@@ -21,7 +21,7 @@ public class PlayerDropListener implements Listener {
     @EventHandler
     public void onPlayerDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        event.getItemDrop().setCanPlayerPickup(false);
+        final boolean[] pickupCancelled = {false};
 
         new BukkitRunnable() {
             @Override
@@ -31,6 +31,7 @@ public class PlayerDropListener implements Listener {
                     Collector collector = plugin.getCollectorManager().getCollectors().get(dropBlock);
                     if(collector != null) {
                         collector.collect(player, event.getItemDrop());
+                        pickupCancelled[0] = true;
                     } /*else {
                         player.getInventory().addItem(event.getItemDrop().getItemStack());
                         event.getItemDrop().remove();
@@ -40,5 +41,7 @@ public class PlayerDropListener implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 1);
+
+        event.getItemDrop().setCanPlayerPickup(pickupCancelled[0]);
     }
 }

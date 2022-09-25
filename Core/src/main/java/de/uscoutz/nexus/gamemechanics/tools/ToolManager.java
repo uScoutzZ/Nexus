@@ -26,14 +26,17 @@ public class ToolManager {
     @Getter
     private Map<Material, Integer> blockResistance;
     @Getter
-    private File toolsFile, resistanceFile;
+    private Map<Material, Material> blockDrop;
     @Getter
-    private FileConfiguration toolsConfig, resistanceConfig;
+    private File toolsFile, resistanceFile, blockdropsFile;
+    @Getter
+    private FileConfiguration toolsConfig, resistanceConfig, blockdropsConfig;
 
-    public ToolManager(NexusPlugin plugin, File toolsFile, File resistanceFile) {
+    public ToolManager(NexusPlugin plugin, File toolsFile, File resistanceFile, File blockdropsFile) {
         this.plugin = plugin;
         toolMap = new HashMap<>();
         blockResistance = new HashMap<>();
+        blockDrop = new HashMap<>();
         this.toolsFile = toolsFile;
         this.resistanceFile = resistanceFile;
         if(!toolsFile.exists()) {
@@ -50,8 +53,16 @@ public class ToolManager {
                 throw new RuntimeException(e);
             }
         }
+        if(!blockdropsFile.exists()) {
+            try {
+                blockdropsFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         toolsConfig = YamlConfiguration.loadConfiguration(toolsFile);
         resistanceConfig = YamlConfiguration.loadConfiguration(resistanceFile);
+        blockdropsConfig = YamlConfiguration.loadConfiguration(blockdropsFile);
     }
 
     public void loadTools() {
@@ -76,6 +87,14 @@ public class ToolManager {
             Material material = Material.getMaterial(key);
             int resistance = resistanceConfig.getInt(key);
             blockResistance.put(material, resistance);
+        }
+    }
+
+    public void loadBlockDrops() {
+        for(String key : blockdropsConfig.getKeys(false)) {
+            Material material = Material.getMaterial(key);
+            Material drop = Material.getMaterial(blockdropsConfig.getString(key));
+            blockDrop.put(material, drop);
         }
     }
 
