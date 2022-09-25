@@ -50,7 +50,7 @@ public class ProfileLoadListener implements Listener {
                         z = Integer.parseInt(stringLocation.split(", ")[2]);
 
                 Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
-                Condition condition = BuiltSchematic.getCondition(damage/schematic.getDurability());
+                Condition condition = BuiltSchematic.getCondition(damage*schematic.getDurability());
                 schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
 
                 schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, placed+schematic.getTimeToFinish(), schematicId, damage);

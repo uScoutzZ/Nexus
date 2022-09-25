@@ -77,26 +77,30 @@ public class PlayerInteractListener implements Listener {
             if(builtSchematic.getSchematic().getSchematicType() == SchematicType.NEXUS) {
                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_nexus-not-breakable"));
             } else {
-                if(BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.INTACT) {
-                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_damaged-not-breakable"));
+                if(profile.getWorld().getWorld().getTime() == 13000) {
+                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_cant-destroy-when-raid"));
                 } else {
-                    if(plugin.getSchematicItemManager().getSchematicItemBySchematic().containsKey(builtSchematic.getSchematic())) {
-                        if(schematicPlayer.getBreaking() == null || !schematicPlayer.getBreaking().equals(builtSchematic)) {
-                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break"));
-                            schematicPlayer.setBreaking(builtSchematic);
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    schematicPlayer.setBreaking(null);
-                                }
-                            }.runTaskLater(plugin, 40);
-                        } else {
-                            SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemBySchematic().get(builtSchematic.getSchematic());
-                            Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER, builtSchematic.getSchematic().getSchematicType());
-                            player.getInventory().addItem(schematicItem.getItemStack(builtSchematic.getSchematicId()));
-                        }
+                    if(BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.INTACT) {
+                        player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_damaged-not-breakable"));
                     } else {
-                        player.sendMessage("§cThe schematic item is not set up");
+                        if(plugin.getSchematicItemManager().getSchematicItemBySchematic().containsKey(builtSchematic.getSchematic())) {
+                            if(schematicPlayer.getBreaking() == null || !schematicPlayer.getBreaking().equals(builtSchematic)) {
+                                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break"));
+                                schematicPlayer.setBreaking(builtSchematic);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        schematicPlayer.setBreaking(null);
+                                    }
+                                }.runTaskLater(plugin, 40);
+                            } else {
+                                SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemBySchematic().get(builtSchematic.getSchematic());
+                                Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER, builtSchematic.getSchematic().getSchematicType());
+                                player.getInventory().addItem(schematicItem.getItemStack(builtSchematic.getSchematicId()));
+                            }
+                        } else {
+                            player.sendMessage("§cThe schematic item is not set up");
+                        }
                     }
                 }
             }

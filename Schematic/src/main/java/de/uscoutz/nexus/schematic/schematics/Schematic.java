@@ -1,6 +1,5 @@
 package de.uscoutz.nexus.schematic.schematics;
 
-import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
@@ -378,7 +377,7 @@ public class Schematic {
             finish(profile, location, minX, maxX, minZ, maxZ, rotation, damage, schematicId, blocks1, entities);
         } else {
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
-            builtSchematic.setDamage(damage);
+            builtSchematic.setHits(damage);
             builtSchematic.setBlocks(blocks1);
             builtSchematic.setSchematic(this);
         }
@@ -495,8 +494,7 @@ public class Schematic {
             }
             pastedSign.update();
             if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
-                double percentDamage = damage/durability;
-                Condition condition = BuiltSchematic.getCondition(percentDamage);
+                Condition condition = BuiltSchematic.getCondition(damage*durability);
                 List<ItemStack> neededItems = new ArrayList<>();
                 int b = condition == Condition.INTACT ? 1:0;
                 if(plugin.getNexusPlugin().getDatabaseAdapter().keyExistsTwo("collectors", "schematicId", schematicId, "intact", b)) {

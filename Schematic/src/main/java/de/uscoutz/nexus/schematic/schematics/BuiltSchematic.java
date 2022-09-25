@@ -5,11 +5,9 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +20,7 @@ public class BuiltSchematic {
     @Getter
     private final UUID schematicId;
     @Setter
-    private double damage;
+    private double hits;
     private Profile profile;
     private int rotation;
     @Getter
@@ -39,7 +37,7 @@ public class BuiltSchematic {
         this.profile = profile;
         this.location = location;
         this.rotation = rotation;
-        damage = percentDamage*schematic.getDurability();
+        hits = percentDamage*schematic.getDurability();
         this.blocks = blocks;
         this.entities = entities;
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, this);
@@ -47,7 +45,7 @@ public class BuiltSchematic {
 
     public void damage(double damage) {
         Condition oldCondition = getCondition(getPercentDamage());
-        this.damage += damage;
+        this.hits += damage;
         Condition newCondition = getCondition(getPercentDamage());
 
         if(oldCondition != newCondition) {
@@ -56,20 +54,20 @@ public class BuiltSchematic {
             }
             Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematic.getSchematicType());
             Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematic.getSchematicType()).get(newCondition).get(schematic.getLevel());
-            repaired.build(location, rotation, schematicId, this.damage, true);
+            repaired.build(location, rotation, schematicId, this.hits, true);
         }
     }
 
     public void saveDamage() {
-        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", damage/schematic.getDurability()));
+        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", hits /schematic.getDurability()));
     }
 
-    public double getDamage() {
-        return damage;
+    public double getHits() {
+        return hits;
     }
 
     public double getPercentDamage() {
-        return damage/schematic.getDurability();
+        return (hits /schematic.getDurability())*100;
     }
 
     public static Condition getCondition(double percentageDamage) {

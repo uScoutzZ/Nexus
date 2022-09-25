@@ -4,10 +4,7 @@ import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
-import de.uscoutz.nexus.wave.customentities.NexusEntityType;
-import de.uscoutz.nexus.wave.customentities.NexusGolem;
-import de.uscoutz.nexus.wave.customentities.NexusMob;
-import de.uscoutz.nexus.wave.customentities.NexusZombie;
+import de.uscoutz.nexus.wave.customentities.*;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
@@ -193,6 +190,8 @@ public class Raid {
             entity = new NexusZombie(randomLocation, plugin, 1);
         } else if(nexusEntityType == NexusEntityType.GOLEM) {
             entity = new NexusGolem(randomLocation, plugin, 2);
+        } else if(nexusEntityType == NexusEntityType.SKELETON) {
+            entity = new NexusSkeleton(randomLocation, plugin, 2);
         }
 
         boolean loaded = randomLocation.getChunk().load();

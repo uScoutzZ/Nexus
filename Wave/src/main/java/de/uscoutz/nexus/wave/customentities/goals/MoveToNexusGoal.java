@@ -12,6 +12,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.CropBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -54,11 +55,11 @@ public class MoveToNexusGoal extends MoveToBlockGoal {
             if(region[0] != null) {
                 Profile profile = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(mob.getBukkitEntity().getWorld());
                 SchematicProfile schematicProfile = NexusWavePlugin.getInstance().getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
-                if(region[0].getBoundingBox().clone().expand(2, 2, 2, 2, 2, 2).contains(
+                if(mob.getBukkitEntity().getType() != EntityType.SKELETON && region[0].getBoundingBox().clone().expand(2, 2, 2, 2, 2, 2).contains(
                         mob.getX(), mob.getY(), mob.getZ())) {
                     builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
                     valid = location.getWorld().getHighestBlockAt(location).getLocation().getBlockY() > location.getBlockY()
-                            && builtSchematic != null && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;;
+                            && builtSchematic != null && BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.DESTROYED;
                 } else {
                     if(schematics.containsKey(region[0])) {
                         builtSchematic = schematicProfile.getSchematicsByRegion().get(region[0]);
