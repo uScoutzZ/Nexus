@@ -2,7 +2,6 @@ package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
-import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.*;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
@@ -14,7 +13,6 @@ import net.minecraft.world.entity.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -55,7 +53,10 @@ public class Raid {
 
     public void end() {
         for(UUID entityId : mobs) {
-            Objects.requireNonNull(Bukkit.getEntity(entityId)).remove();
+            org.bukkit.entity.Entity entity = Bukkit.getEntity(entityId);
+            if(entity != null) {
+                entity.remove();
+            }
         }
         profile.getWorld().changeTime(6000);
         profile.getActivePlayers().forEach(player -> {
