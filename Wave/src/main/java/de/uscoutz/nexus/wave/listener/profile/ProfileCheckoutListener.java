@@ -31,7 +31,7 @@ public class ProfileCheckoutListener implements Listener {
         }
 
         if(raidProfile.getRaid() != null) {
-            raidProfile.getRaid().end();
+            raidProfile.getRaid().end(false);
         }
 
         plugin.getRaidManager().getRaidProfileMap().remove(profile.getProfileId());

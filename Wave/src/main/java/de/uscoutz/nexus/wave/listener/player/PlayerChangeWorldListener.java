@@ -22,22 +22,24 @@ public class PlayerChangeWorldListener implements Listener {
     public void onWorldChanged(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getUniqueId());
-        Profile oldProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(event.getFrom());
-        Profile newProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
-        RaidProfile oldRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(oldProfile.getProfileId());
-        RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
-
-        if(oldRaidProfile.getRaid() != null) {
-            raidPlayer.leaveRaid(oldRaidProfile.getRaid());
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if(newRaidProfile.getRaid() != null) {
-                    raidPlayer.joinRaid(newRaidProfile.getRaid());
-                }
+        if(plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().containsKey(event.getFrom())) {
+            Profile oldProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(event.getFrom());
+            RaidProfile oldRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(oldProfile.getProfileId());
+            if(oldRaidProfile.getRaid() != null) {
+                raidPlayer.leaveRaid(oldRaidProfile.getRaid());
             }
-        }.runTaskLater(plugin, 20);
+            if(plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().containsKey(player.getWorld())) {
+                Profile newProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if(newRaidProfile.getRaid() != null) {
+                            raidPlayer.joinRaid(newRaidProfile.getRaid());
+                        }
+                    }
+                }.runTaskLater(plugin, 20);
+            }
+        }
     }
 }

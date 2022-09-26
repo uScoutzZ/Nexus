@@ -45,13 +45,15 @@ public class Raid {
         this.plugin = plugin;
         this.raidType = raidType;
         this.profile = profile;
+        raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
+
         started = System.currentTimeMillis();
         players = new ArrayList<>();
         mobs = new ArrayList<>();
         bossBars = new HashMap<>();
     }
 
-    public void end() {
+    public void end(boolean scheduleNew) {
         for(UUID entityId : mobs) {
             org.bukkit.entity.Entity entity = Bukkit.getEntity(entityId);
             if(entity != null) {
@@ -68,7 +70,9 @@ public class Raid {
         profile.getActivePlayers().forEach(nexusPlayer -> {
             nexusPlayer.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_ended"));
         });
-        raidProfile.scheduleRaid();
+        if(scheduleNew) {
+            raidProfile.scheduleRaid();
+        }
     }
 
     public void schedule() {
@@ -129,7 +133,7 @@ public class Raid {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(mobs[0] != 0) {
+                if(mobs[0] != 0 && profile.loaded()) {
                     spawnRandomMonster();
                     mobs[0]--;
                 } else {
@@ -148,7 +152,7 @@ public class Raid {
         }
 
         if(wave == raidType.getMobsPerWave().size()) {
-            end();
+            end(true);
         } else {
             new BukkitRunnable() {
                 @Override
