@@ -2,6 +2,7 @@ package de.uscoutz.nexus.quests;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
@@ -24,6 +25,7 @@ public class Quest {
     private Map<String, BossBar> bossBars;
     private UUID profileId;
     private NexusPlugin plugin;
+    @Getter
     private Profile profile;
 
     public Quest(UUID profileId, Task task, long progress, long begun, long finished, NexusPlugin plugin) {
@@ -57,6 +59,15 @@ public class Quest {
 
     public Quest assign() {
         plugin.getDatabaseAdapter().setAsync("quests", profileId, task.toString(), 0, System.currentTimeMillis(), 0);
+        if(task.getActionWhenAssiged() != null && profile.getActivePlayers().size() != 0) {
+            task.getActionWhenAssiged().accept(profile.getActivePlayers().get(0).getPlayer(), this);
+        }
+
+        if(profile != null && profile.getMainQuest() == this) {
+            for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
+                display(nexusPlayer.getPlayer());
+            }
+        }
         return this;
     }
 

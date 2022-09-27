@@ -30,6 +30,7 @@ public class SchematicInventoryOpenedListener implements Listener {
             if(schematicItem.isObtainable() && (schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))) {
                 ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
                         event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
+
                 //event.getSimpleInventory().addItem(itemStack);
             }
         }

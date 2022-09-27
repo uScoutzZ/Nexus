@@ -90,6 +90,9 @@ public class BlockPlaceListener implements Listener {
                                         profile.getUnfinishedQuests().get(Task.BUILD_TOWER).finish(player);
                                     }
                                 }
+                                if(profile.getUnfinishedQuests().containsKey(Task.BUILD_PORTAL)) {
+                                    profile.getQuests().get(Task.BUILD_PORTAL).finish(player);
+                                }
                                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
                             } else {
                                 event.setCancelled(true);

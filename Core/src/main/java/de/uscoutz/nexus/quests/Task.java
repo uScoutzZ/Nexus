@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.quests;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.player.NexusPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -51,6 +52,18 @@ public enum Task {
         List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
                 .translate("de_DE", "george_build-tower-finished", NexusPlugin.getInstance().getConfig().get("villager-name")));
         sendMessages(player, messages);
+    }),
+    BUILD_PORTAL(false, 0, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-portal-finished", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+    }, (player, quest) -> {
+        List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
+                .translate("de_DE", "george_build-portal-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
+        sendMessages(player, messages);
+        for(NexusPlayer nexusPlayer : quest.getProfile().getActivePlayers()) {
+            quest.display(nexusPlayer.getPlayer());
+        }
     });
 
     Task(boolean chronological) {
@@ -68,12 +81,19 @@ public enum Task {
         this.actionWhenFinished = actionWhenFinished;
     }
 
+    Task(boolean chronological, long goal, BiConsumer<Player, Quest> actionWhenFinished, BiConsumer<Player, Quest> actionWhenAssigned) {
+        this.chronological = chronological;
+        this.goal = goal;
+        this.actionWhenFinished = actionWhenFinished;
+        this.actionWhenAssiged = actionWhenAssigned;
+    }
+
     @Getter
     private boolean chronological;
     @Getter
     private long goal;
     @Getter
-    private BiConsumer<Player, Quest> actionWhenFinished;
+    private BiConsumer<Player, Quest> actionWhenFinished, actionWhenAssiged;
     private static Task[] vals = values();
 
     public Task next() {
@@ -90,6 +110,6 @@ public enum Task {
                     cancel();
                 }
             }
-        }.runTaskTimer(NexusPlugin.getInstance(), 0, 50);
+        }.runTaskTimer(NexusPlugin.getInstance(), 10, 80);
     }
 }

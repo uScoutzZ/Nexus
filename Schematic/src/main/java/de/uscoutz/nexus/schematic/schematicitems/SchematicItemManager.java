@@ -55,6 +55,8 @@ public class SchematicItemManager {
             Material material = Material.getMaterial(itemsConfig.getString(key + ".material"));
             SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
             int level = itemsConfig.getInt(key + ".level");
+            int requiredLevel;
+
             boolean obtainable = itemsConfig.getBoolean(key + ".obtainable");
             Schematic schematic = plugin.getSchematicManager()
                     .getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);

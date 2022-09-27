@@ -361,4 +361,15 @@ public class Profile {
     public boolean isPrepared() {
         return plugin.getProfileManager().getProfilesMap().containsKey(profileId);
     }
+
+    public void setNexusLevel(int nexusLevel) {
+        this.nexusLevel = nexusLevel;
+        if(nexusLevel == 5) {
+            if(!quests.containsKey(Task.BUILD_PORTAL)) {
+                Quest quest = new Quest(profileId, Task.BUILD_PORTAL, plugin);
+                quest.assign();
+                quests.put(Task.BUILD_PORTAL, quest);
+            }
+        }
+    }
 }
