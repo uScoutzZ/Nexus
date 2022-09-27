@@ -70,14 +70,14 @@ public class NexusPlugin extends JavaPlugin {
         localeManager = new LocaleManager(this);
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
+        biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
+        biomeManager.loadBiomes();
         toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"),
                 new File("/home/networksync/nexus/blockresistance.yml"), new File("/home/networksync/nexus/blockdrops.yml"));
         toolManager.loadTools();
         toolManager.loadBlockResistances();
         toolManager.loadBlockDrops();
         regionManager = new RegionManager(this);
-        biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
-        biomeManager.loadBiomes();
         inventoryManager = new InventoryManager(this);
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);

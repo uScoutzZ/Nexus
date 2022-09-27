@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.gamemechanics.tools;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
@@ -24,8 +25,6 @@ public class ToolManager {
     @Getter
     private Map<String, Tool> toolMap;
     @Getter
-    private Map<Material, Integer> blockResistance;
-    @Getter
     private Map<Material, Material> blockDrop;
     @Getter
     private File toolsFile, resistanceFile, blockdropsFile;
@@ -35,7 +34,6 @@ public class ToolManager {
     public ToolManager(NexusPlugin plugin, File toolsFile, File resistanceFile, File blockdropsFile) {
         this.plugin = plugin;
         toolMap = new HashMap<>();
-        blockResistance = new HashMap<>();
         blockDrop = new HashMap<>();
         this.toolsFile = toolsFile;
         this.resistanceFile = resistanceFile;
@@ -83,10 +81,17 @@ public class ToolManager {
     }
 
     public void loadBlockResistances() {
-        for(String key : resistanceConfig.getKeys(false)) {
-            Material material = Material.getMaterial(key);
-            int resistance = resistanceConfig.getInt(key);
-            blockResistance.put(material, resistance);
+        for(String key : resistanceConfig.getKeys(true)) {
+            if(countDots(key) == 1) {
+                Material material = Material.getMaterial(key.split("\\.")[1]);
+                int resistance = resistanceConfig.getInt(key);
+                for(Biome biome : plugin.getBiomeManager().getBiomeByRegion().values()) {
+                    if(biome.getLocaleKey().equals(key.split("\\.")[0])) {
+                        biome.getBlockResistance().put(material, resistance);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -111,5 +116,15 @@ public class ToolManager {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
         return dataContainer.has(namespacedKey);
+    }
+
+    private int countDots(String s) {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '.') {
+                count++;
+            }
+        }
+        return count;
     }
 }

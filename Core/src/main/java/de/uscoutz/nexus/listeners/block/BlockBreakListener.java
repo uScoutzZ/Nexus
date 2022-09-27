@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.listeners.block;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,11 +37,12 @@ public class BlockBreakListener implements Listener {
 
         ItemMeta itemMeta = event.getPlayer().getInventory().getItemInMainHand().getItemMeta();
         int blockResistance, breakingPower = 0;
-        if(!plugin.getToolManager().getBlockResistance().containsKey(event.getBlock().getType())) {
+        Biome biome = plugin.getBiomeManager().getBiome(event.getBlock().getLocation());
+        if(biome == null || !biome.getBlockResistance().containsKey(event.getBlock().getType())) {
             event.setCancelled(true);
             return;
         } else {
-            blockResistance = plugin.getToolManager().getBlockResistance().get(event.getBlock().getType());
+            blockResistance = biome.getBlockResistance().get(event.getBlock().getType());
             if(itemMeta != null && plugin.getToolManager().isTool(itemMeta)) {
                 breakingPower = plugin.getToolManager().getBreakingPower(itemMeta);
             }
