@@ -4,6 +4,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,10 +31,10 @@ public class PlayerChangeWorldListener implements Listener {
             }
             if(plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().containsKey(player.getWorld())) {
                 Profile newProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
-                RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
                 new BukkitRunnable() {
                     @Override
                     public void run() {
+                        RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
                         if(newRaidProfile.getRaid() != null) {
                             raidPlayer.joinRaid(newRaidProfile.getRaid());
                         }

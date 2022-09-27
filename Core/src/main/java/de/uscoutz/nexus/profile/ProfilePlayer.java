@@ -25,6 +25,8 @@ public class ProfilePlayer {
     @Getter @Setter
     private long playtime, joinedProfile;
     @Getter
+    private int kills, deaths;
+    @Getter
     private UUID playerUUID;
     @Getter @Setter
     private String inventoryBase64;
@@ -39,10 +41,24 @@ public class ProfilePlayer {
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
 
-        ResultSet resultSet = plugin.getDatabaseAdapter().get("players", "player", String.valueOf(playerUUID));
+        ResultSet resultSet = plugin.getDatabaseAdapter().getTwo("playerStats", "player", String.valueOf(playerUUID), "profileId", String.valueOf(profile.getProfileId()));
         try {
             if(resultSet.next()) {
-                gameProfile = GameProfileSerializer.fromString(resultSet.getString("gameprofile"));
+                deaths = resultSet.getInt("deaths");
+                kills = resultSet.getInt("kills");
+            } else {
+                deaths = 0;
+                kills = 0;
+                plugin.getDatabaseAdapter().setAsync("playerStats", playerUUID, profile.getProfileId(), 0, 0);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        ResultSet gameProfileResultSet = plugin.getDatabaseAdapter().get("players", "player", String.valueOf(playerUUID));
+        try {
+            if(gameProfileResultSet.next()) {
+                gameProfile = GameProfileSerializer.fromString(gameProfileResultSet.getString("gameprofile"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -54,9 +70,13 @@ public class ProfilePlayer {
         Player player = Bukkit.getPlayer(playerUUID);
         inventoryBase64 = InventoryManager.toBase64(player.getInventory());
         playtime = playtime + (System.currentTimeMillis()-joined);
-        plugin.getDatabaseAdapter().updateTwoAsync("playerProfiles", "profileId", profile.getProfileId(),
+        plugin.getDatabaseAdapter().updateTwo("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
                 new DatabaseUpdate("inventory", inventoryBase64));
+        plugin.getDatabaseAdapter().updateTwo("playerStats", "player", playerUUID,
+                "profileId", profile.getProfileId(),
+                new DatabaseUpdate("deaths", deaths),
+                new DatabaseUpdate("kills", kills));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -65,6 +85,14 @@ public class ProfilePlayer {
                 }
             }
         }.runTaskLater(plugin, 10);
+    }
+
+    public void addKill() {
+        kills++;
+    }
+
+    public void addDeath() {
+        deaths++;
     }
 
     public String getOnlineTime() {

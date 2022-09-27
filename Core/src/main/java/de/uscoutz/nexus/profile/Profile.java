@@ -40,7 +40,7 @@ public class Profile {
     @Getter
     private Map<String, Container> storageBlocks;
     @Getter @Setter
-    private int nexusLevel, concurrentlyBuilding, highestTower = -1;
+    private int nexusLevel, concurrentlyBuilding, wonRaids, lostRaids, highestTower = -1;
     @Getter
     private long start, lastActivity;
     @Getter
@@ -146,6 +146,9 @@ public class Profile {
             plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
                     new DatabaseUpdate("nexusLevel", nexusLevel),
                     new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
+            plugin.getDatabaseAdapter().update("profileStats", "profileId", profileId,
+                    new DatabaseUpdate("wonRaids", wonRaids),
+                    new DatabaseUpdate("lostRaids", lostRaids));
             saveStorages();
             world = null;
             loading = false;
@@ -236,26 +239,44 @@ public class Profile {
 
     public void prepare() {
         Bukkit.getConsoleSender().sendMessage("[Nexus] Preparing");
-        ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("profiles", "profileId", String.valueOf(profileId));
+        ResultSet profileResultSet = plugin.getDatabaseAdapter().getAsync("profiles", "profileId", String.valueOf(profileId));
 
         try {
-            while(resultSet.next()) {
-                owner = UUID.fromString(resultSet.getString("owner"));
-                nexusLevel = resultSet.getInt("nexusLevel");
-                start = resultSet.getLong("start");
-                lastActivity = resultSet.getLong("lastActivity");
+            while(profileResultSet.next()) {
+                owner = UUID.fromString(profileResultSet.getString("owner"));
+                nexusLevel = profileResultSet.getInt("nexusLevel");
+                start = profileResultSet.getLong("start");
+                lastActivity = profileResultSet.getLong("lastActivity");
             }
             plugin.getProfileManager().getProfilesMap().put(profileId, this);
             loadMembers();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        ResultSet statsResultSet = plugin.getDatabaseAdapter().getAsync("profileStats", "profileId", String.valueOf(profileId));
+
+        try {
+            if(statsResultSet.next()) {
+                lostRaids = statsResultSet.getInt("lostRaids");
+                wonRaids = statsResultSet.getInt("wonRaids");
+            } else {
+                lostRaids = 0;
+                wonRaids = 0;
+                plugin.getDatabaseAdapter().setAsync("profileStats", profileId, 0, 0);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void create(UUID owner, int profileSlot) {
         plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
+        plugin.getDatabaseAdapter().set("profileStats", profileId, 0, 0);
         plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
+        plugin.getDatabaseAdapter().set("playerStats", owner, profileId, 0, 0);
 
         Location realNexusLocation = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
         String nexusLocation = realNexusLocation.getBlockX() + ", " + realNexusLocation.getBlockY() + ", " + realNexusLocation.getBlockZ();
@@ -271,6 +292,7 @@ public class Profile {
     public void addPlayer(int profileSlot, UUID player) {
         plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
+        plugin.getDatabaseAdapter().set("playerStats", player, profileId, 0, 0);
         new BukkitRunnable() {
             @Override
             public void run() {

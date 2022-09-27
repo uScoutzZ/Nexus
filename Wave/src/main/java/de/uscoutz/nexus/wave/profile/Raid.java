@@ -53,7 +53,7 @@ public class Raid {
         bossBars = new HashMap<>();
     }
 
-    public void end(boolean scheduleNew) {
+    public void end(boolean scheduleNew, boolean won) {
         for(UUID entityId : mobs) {
             org.bukkit.entity.Entity entity = Bukkit.getEntity(entityId);
             if(entity != null) {
@@ -70,6 +70,11 @@ public class Raid {
         profile.getActivePlayers().forEach(nexusPlayer -> {
             nexusPlayer.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_ended"));
         });
+        if(won) {
+            profile.setWonRaids(profile.getWonRaids() + 1);
+        } else {
+            profile.setLostRaids(profile.getLostRaids() + 1);
+        }
         if(scheduleNew) {
             raidProfile.scheduleRaid();
         }
@@ -152,7 +157,7 @@ public class Raid {
         }
 
         if(wave == raidType.getMobsPerWave().size()) {
-            end(true);
+            end(true, true);
         } else {
             new BukkitRunnable() {
                 @Override
