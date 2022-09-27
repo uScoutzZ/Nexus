@@ -79,7 +79,14 @@ public class Raid {
         plugin.getNexusPlugin().getDatabaseAdapter().set("raids",
                 String.valueOf(profile.getProfileId()), raidType.getRaidTypeId(), won ? 1:0, kills, String.valueOf(System.currentTimeMillis()));
         if(scheduleNew) {
-            raidProfile.scheduleRaid();
+            long cooldown = plugin.getConfig().getLong("cooldown");
+            Bukkit.broadcastMessage("New raid in " + TimeUnit.MILLISECONDS.toSeconds(cooldown));
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    raidProfile.scheduleRaid();
+                }
+            }.runTaskLater(plugin, TimeUnit.MILLISECONDS.toSeconds(cooldown)*20);
         }
     }
 
