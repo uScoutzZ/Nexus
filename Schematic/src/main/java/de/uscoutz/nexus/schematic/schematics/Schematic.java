@@ -15,6 +15,7 @@ import de.uscoutz.nexus.worlds.NexusWorld;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.world.level.block.NetherPortalBlock;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -23,6 +24,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.WallSign;
@@ -639,6 +641,14 @@ public class Schematic {
                 builtSchematic.getEntities().add(entity);
                 pastedSign.getBlock().setType(Material.AIR);
             }
+        } else if(block.getBlockData() instanceof Orientable) {
+            Orientable orientable = (Orientable) blockLocation.getBlock().getBlockData().clone();
+            if(rotation == 90 || rotation == 270) {
+                orientable.setAxis(Axis.X);
+            } else {
+                orientable.setAxis(Axis.Z);
+            }
+            blockLocation.getBlock().setBlockData(orientable);
         }
 
         if(schematicType == SchematicType.HOME && block.getBlockData() instanceof Bed) {
