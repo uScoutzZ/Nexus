@@ -43,7 +43,6 @@ public class RaidProfile {
                 String.valueOf(profile.getProfileId()), "ended DESC");
         try {
             if(resultSet.next()) {
-                UUID raidId = UUID.fromString(resultSet.getString("raidId"));
                 lastRaid = resultSet.getLong("ended");
             } else {
                 lastRaid = 0;

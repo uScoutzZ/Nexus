@@ -19,7 +19,7 @@ public class RaidType implements Cloneable {
     private Map<Integer, List<NexusEntityType>> mobsByWave;
     @Getter
     private Map<Integer, Integer> mobsPerWave;
-
+    @Getter
     private String raidTypeId;
 
     @Override
@@ -29,7 +29,7 @@ public class RaidType implements Cloneable {
 
     public RaidType(String raidTypeId, FileConfiguration fileConfiguration, NexusWavePlugin plugin) {
         this.plugin = plugin;
-        this.raidTypeId = raidTypeId;
+        this.raidTypeId = raidTypeId.replace(".yml", "");
         mobsByWave = new HashMap<>();
         mobsPerWave = new HashMap<>();
 

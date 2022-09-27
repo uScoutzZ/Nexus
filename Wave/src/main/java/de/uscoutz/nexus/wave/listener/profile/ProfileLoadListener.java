@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ProfileLoadListener implements Listener {
 
@@ -45,7 +46,7 @@ public class ProfileLoadListener implements Listener {
                 public void run() {
                     raidProfile.scheduleRaid();
                 }
-            }.runTaskLater(plugin, (raidProfile.getLastRaid()+cooldown)-System.currentTimeMillis());
+            }.runTaskLater(plugin, TimeUnit.MILLISECONDS.toSeconds((raidProfile.getLastRaid()+cooldown)-System.currentTimeMillis())*20);
         }
     }
 }

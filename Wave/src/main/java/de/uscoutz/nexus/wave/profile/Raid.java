@@ -2,6 +2,7 @@ package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.*;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
@@ -39,7 +40,7 @@ public class Raid {
     @Getter
     private RaidType raidType;
     @Getter
-    private int killedInCurrentWave, wave;
+    private int killedInCurrentWave, wave, kills;
 
     public Raid(RaidType raidType, Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
@@ -75,6 +76,8 @@ public class Raid {
         } else {
             profile.setLostRaids(profile.getLostRaids() + 1);
         }
+        plugin.getNexusPlugin().getDatabaseAdapter().set("raids",
+                String.valueOf(profile.getProfileId()), raidType.getRaidTypeId(), won ? 1:0, kills, String.valueOf(System.currentTimeMillis()));
         if(scheduleNew) {
             raidProfile.scheduleRaid();
         }
@@ -212,6 +215,7 @@ public class Raid {
 
     public void addKill() {
         killedInCurrentWave++;
+        kills++;
         updateWaveProgress();
     }
 
