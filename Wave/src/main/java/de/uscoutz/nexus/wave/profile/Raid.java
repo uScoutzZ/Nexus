@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -35,12 +36,12 @@ public class Raid {
     private Map<String, BossBar> bossBars;
     @Getter
     private List<Player> players;
-
-    private long started;
     @Getter
     private RaidType raidType;
     @Getter
     private int killedInCurrentWave, wave, kills;
+
+    private BukkitTask counterTask;
 
     public Raid(RaidType raidType, Profile profile, NexusWavePlugin plugin) {
         this.plugin = plugin;
@@ -48,7 +49,6 @@ public class Raid {
         this.profile = profile;
         raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
 
-        started = System.currentTimeMillis();
         players = new ArrayList<>();
         mobs = new ArrayList<>();
         bossBars = new HashMap<>();
@@ -66,6 +66,7 @@ public class Raid {
             RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getPlayer().getUniqueId());
             raidPlayer.leaveRaid(this);
         });
+        counterTask.cancel();
         plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);
 
         profile.getActivePlayers().forEach(nexusPlayer -> {
@@ -80,7 +81,6 @@ public class Raid {
                 String.valueOf(profile.getProfileId()), raidType.getRaidTypeId(), won ? 1:0, kills, String.valueOf(System.currentTimeMillis()));
         if(scheduleNew) {
             long cooldown = plugin.getConfig().getLong("cooldown");
-            Bukkit.broadcastMessage("New raid in " + TimeUnit.MILLISECONDS.toSeconds(cooldown));
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -103,7 +103,7 @@ public class Raid {
             raidPlayer.joinRaid(this);
         }
 
-        new BukkitRunnable() {
+        counterTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if(profile.loaded()) {

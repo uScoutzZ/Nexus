@@ -2,8 +2,7 @@ package de.uscoutz.nexus.wave;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
-import de.uscoutz.nexus.schematic.collector.CollectorManager;
-import de.uscoutz.nexus.wave.commands.SpawnEntityCommand;
+import de.uscoutz.nexus.wave.commands.CancelRaidCommand;
 import de.uscoutz.nexus.wave.listener.creature.CreatureSpawnListener;
 import de.uscoutz.nexus.wave.listener.entity.EntityDamageByEntityListener;
 import de.uscoutz.nexus.wave.listener.entity.EntityDamageListener;
@@ -57,7 +56,7 @@ public class NexusWavePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
-        getCommand("spawnentity").setExecutor(new SpawnEntityCommand(this));
+        getCommand("cancelraid").setExecutor(new CancelRaidCommand(this));
         Bukkit.getConsoleSender().sendMessage("[NexusWave] Enabled");
     }
 }
