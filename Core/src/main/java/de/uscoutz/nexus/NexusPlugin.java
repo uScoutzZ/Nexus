@@ -23,6 +23,7 @@ import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -106,6 +107,13 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("profileunload").setExecutor(new ProfileUnloadCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                databaseAdapter.getAsync("players", "player", "1a6b3b81-8dea-40b4-9929-cea02016955a");
+            }
+        }.runTaskTimer(this, 20*60*90, 20*60*90);
     }
 
     @Override
