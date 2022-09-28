@@ -189,7 +189,7 @@ public class Schematic {
             color1 = Color.GREEN;
             color2 = Color.LIME;
             if(set) {
-                profile.getRegions().add(new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ));
+                new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ);
             }
         }
 
@@ -391,7 +391,6 @@ public class Schematic {
         Region region;
         if(plugin.getNexusPlugin().getRegionManager().getRegion(location) == null) {
             region = new Region(plugin.getNexusPlugin(), location.getWorld(), minX, maxX, minZ, maxZ);
-            profile.getRegions().add(region);
         } else {
             region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
         }
@@ -739,8 +738,9 @@ public class Schematic {
         if(animation == DestroyAnimation.PLAYER) {
             plugin.getNexusPlugin().getDatabaseAdapter().delete("schematics", "schematicId", schematicId);
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(builtSchematic.getBlocks().get(0));
-            plugin.getNexusPlugin().getRegionManager().getRegions().remove(region);
+            Bukkit.broadcastMessage("size before " + profile.getRegions().size());
             profile.getRegions().remove(region);
+            Bukkit.broadcastMessage("size after " + profile.getRegions().size());
             profile.getSchematicIds().remove(schematicId);
             plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().remove(schematicId);
             plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().remove(region);
