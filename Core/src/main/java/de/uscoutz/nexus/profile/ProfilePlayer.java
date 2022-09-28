@@ -9,11 +9,14 @@ import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ProfilePlayer {
@@ -32,6 +35,8 @@ public class ProfilePlayer {
     private String inventoryBase64;
     @Getter
     private GameProfile gameProfile;
+    @Getter
+    private Map<Material, Integer> brokenBlocks;
 
     public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, NexusPlugin plugin) {
         this.profile = profile;
@@ -40,6 +45,7 @@ public class ProfilePlayer {
         this.playtime = playtime;
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
+        brokenBlocks = new HashMap<>();
 
         ResultSet resultSet = plugin.getDatabaseAdapter().getTwo("playerStats", "player", String.valueOf(playerUUID), "profileId", String.valueOf(profile.getProfileId()));
         try {
@@ -77,9 +83,25 @@ public class ProfilePlayer {
                 "profileId", profile.getProfileId(),
                 new DatabaseUpdate("deaths", deaths),
                 new DatabaseUpdate("kills", kills));
+        for(Material material : brokenBlocks.keySet()) {
+            if(!plugin.getDatabaseAdapter().keyExistsThreeAsync("brokenBlocks", "player", playerUUID, "profileId", profile.getProfileId(), "material", material.toString())) {
+                plugin.getDatabaseAdapter().setAsync("brokenBlocks", playerUUID, profile.getProfileId(), material.name(), brokenBlocks.get(material));
+            } else {
+                try {
+                    ResultSet resultSet = plugin.getDatabaseAdapter().getThreeAsync("brokenBlocks", "player", playerUUID.toString(), "profileId", profile.getProfileId().toString(), "material", material.toString());
+                    if(resultSet.next()) {
+                        int currentAmount = resultSet.getInt("amount");
+                        plugin.getDatabaseAdapter().updateThreeAsync("brokenBlocks", "player", playerUUID, "profileId", profile.getProfileId(), "material", material.toString(), new DatabaseUpdate("amount", brokenBlocks.get(material)+currentAmount));
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         new BukkitRunnable() {
             @Override
             public void run() {
+                brokenBlocks.clear();
                 if(profile.getWorld() != null && profile.getWorld().getWorld() != null && profile.getActivePlayers().size() == 0) {
                     profile.scheduleCheckout();
                 }

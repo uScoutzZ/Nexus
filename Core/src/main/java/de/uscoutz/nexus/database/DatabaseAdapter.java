@@ -89,10 +89,43 @@ public class DatabaseAdapter {
         return value;
     }
 
+    public boolean keyExistsThree(String table, String whereKey, Object setKey, String whereKey2, Object setKey2, String whereKey3, Object setKey3) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        boolean value = false;
+
+        ResultSet resultSet = this.mySQL.query("SELECT * FROM `" + table + "` WHERE `" + whereKey + "`='" + setKey + "' AND " + whereKey2 + " = '" + setKey2 + "' AND " + whereKey3 + " = '" + setKey3 + "'");
+
+        try {
+            if(resultSet.next()) {
+                value = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return value;
+    }
+
     public boolean keyExistsTwoAsync(String table, String whereKey, Object setKey, String whereKey2, Object setKey2) {
         if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
 
         Future<Boolean> future = this.executorService.submit(() -> keyExistsTwo(table, whereKey, setKey, whereKey2, setKey2));
+
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean keyExistsThreeAsync(String table, String whereKey, Object setKey, String whereKey2, Object setKey2, String whereKey3, Object setKey3) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        Future<Boolean> future = this.executorService.submit(() -> keyExistsThree(table, whereKey, setKey, whereKey2, setKey2, whereKey3, setKey3));
 
         try {
             return future.get();
@@ -206,6 +239,33 @@ public class DatabaseAdapter {
         this.executorService.execute(() -> updateTwo(table, whereKey, setKey, secWhereKey, secSetKey, databases));
     }
 
+    public void updateThree(String table, String whereKey, Object setKey, String secWhereKey, Object secSetKey, String thirdWhereKey, Object thirdSetKey, DatabaseUpdate... databases) {
+        if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
+
+        StringBuilder stringBuilder = new StringBuilder("UPDATE `" + table + "` SET ");
+
+        short i = 1;
+
+        for(DatabaseUpdate data : databases) {
+            if(databases.length == i) {
+                stringBuilder.append("`").append(data.getKey()).append("`='").append(data.getValue()).append("' ");
+            } else {
+                stringBuilder.append("`").append(data.getKey()).append("`='").append(data.getValue()).append("', ");
+            }
+            i++;
+        }
+
+        stringBuilder.append("WHERE `").append(whereKey).append("`='").append(setKey).append("' AND `").append(secWhereKey).append("`='").append(secSetKey).append("'").append(" AND `").append(thirdWhereKey).append("`='").append(thirdSetKey).append("'");
+
+        System.out.println(stringBuilder);
+
+        this.mySQL.queryUpdate(stringBuilder.toString());
+    }
+
+    public void updateThreeAsync(String table, String whereKey, Object setKey, String secWhereKey, Object secSetKey, String thirdWhereKey, Object thirdSetKey, DatabaseUpdate... databases) {
+        this.executorService.execute(() -> updateThree(table, whereKey, setKey, secWhereKey, secSetKey, thirdWhereKey, thirdSetKey, databases));
+    }
+
     public void delete(String table, String whereKey, Object setKey) {
         if(setKey == null || table == null || whereKey == null) throw new NullPointerException("setKey, whereKey or table cannot be null");
 
@@ -240,6 +300,22 @@ public class DatabaseAdapter {
 
     public ResultSet getTwo(String table, String whereKey, String setkey, String secWhereKey, String secSetKey) {
         return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "' AND " + secWhereKey + "='" + secSetKey + "'");
+    }
+
+    public ResultSet getThreeAsync(String table, String whereKey, String setKey, String secWhereKey, String secSetKey, String thirdWhereKey, String thirdSetKey) {
+        Future<ResultSet> result = this.executorService.submit(() -> getThree(table, whereKey, setKey, secWhereKey, secSetKey, thirdWhereKey, thirdSetKey));
+
+        try {
+            return result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public ResultSet getThree(String table, String whereKey, String setkey, String secWhereKey, String secSetKey, String thirdWhereKey, String thirdSetKey) {
+        return this.mySQL.query("SELECT * FROM " + table + " WHERE " + whereKey + "='" + setkey + "' AND " + secWhereKey + "='" + secSetKey + "' AND " + thirdWhereKey + "='" + thirdSetKey + "'");
     }
 
     public ResultSet getTwoAsync(String table, String whereKey, String setKey, String secWhereKey, String secSetKey) {
@@ -289,6 +365,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS quests (profileId VARCHAR(36), task text, progress bigint, begun bigint, finished bigint)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS profileStats (profileId VARCHAR(36), lostRaids int, wonRaids int)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS playerStats (player VARCHAR(36), profileId VARCHAR(36), deaths int, kills int)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS brokenBlocks (player VARCHAR(36), profileId VARCHAR(36), material text, amount int)");
     }
 }
 

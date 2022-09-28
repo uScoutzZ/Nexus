@@ -2,9 +2,12 @@ package de.uscoutz.nexus.listeners.block;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
+import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -29,6 +32,8 @@ public class BlockBreakListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        Profile profile = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld());
+        ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
 
         if(player.getGameMode() == GameMode.CREATIVE) {
             event.setCancelled(false);
@@ -49,6 +54,8 @@ public class BlockBreakListener implements Listener {
         }
         if(breakingPower >= blockResistance) {
             event.setCancelled(false);
+            Material material = plugin.getToolManager().getBlockDrop().getOrDefault(event.getBlock().getType(), event.getBlock().getType());
+            profilePlayer.getBrokenBlocks().put(material, profilePlayer.getBrokenBlocks().getOrDefault(material, 0) + 1);
             int rangeMin = plugin.getConfig().getInt("respawn-range-min");
             int rangeMax = plugin.getConfig().getInt("respawn-range-max");
             long respawnAfter = new Random().nextLong(rangeMax-rangeMin)+rangeMin;
