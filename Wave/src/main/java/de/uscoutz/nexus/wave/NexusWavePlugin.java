@@ -13,6 +13,7 @@ import de.uscoutz.nexus.wave.listener.player.PlayerJoinListener;
 import de.uscoutz.nexus.wave.listener.player.PlayerRespawnListener;
 import de.uscoutz.nexus.wave.listener.profile.ProfileCheckoutListener;
 import de.uscoutz.nexus.wave.listener.profile.ProfileLoadListener;
+import de.uscoutz.nexus.wave.listener.schematic.SchematicUpdateListener;
 import de.uscoutz.nexus.wave.player.PlayerManager;
 import de.uscoutz.nexus.wave.profile.RaidManager;
 import lombok.Getter;
@@ -56,6 +57,7 @@ public class NexusWavePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new SchematicUpdateListener(this), this);
         getCommand("cancelraid").setExecutor(new CancelRaidCommand(this));
         Bukkit.getConsoleSender().sendMessage("[NexusWave] Enabled");
     }

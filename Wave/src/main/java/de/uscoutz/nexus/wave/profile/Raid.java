@@ -65,6 +65,11 @@ public class Raid {
         profile.getActivePlayers().forEach(player -> {
             RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getPlayer().getUniqueId());
             raidPlayer.leaveRaid(this);
+            if(won) {
+                player.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_won"));
+            } else {
+                player.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_lost"));
+            }
         });
         counterTask.cancel();
         plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);

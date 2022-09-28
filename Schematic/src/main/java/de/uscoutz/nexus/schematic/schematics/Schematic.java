@@ -7,6 +7,7 @@ import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
+import de.uscoutz.nexus.schematic.events.SchematicUpdateEvent;
 import de.uscoutz.nexus.schematic.laser.Laser;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.utilities.FireworkUtilities;
@@ -382,6 +383,7 @@ public class Schematic {
             builtSchematic.setHits(damage);
             builtSchematic.setBlocks(blocks1);
             builtSchematic.setSchematic(this);
+            Bukkit.getPluginManager().callEvent(new SchematicUpdateEvent(profile, builtSchematic));
         }
     }
 
