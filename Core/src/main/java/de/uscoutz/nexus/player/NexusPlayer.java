@@ -133,13 +133,13 @@ public class NexusPlayer {
                         ICloudService iCloudService = plugin.getNexusServer().getServiceByName(server);
                         if(iCloudService != null && iCloudService.isOnline()) {
                             new PacketPlayerChangeServer("123", uuid.toString(), profileSlot).send(iCloudService);
-                            /*new BukkitRunnable() {
+                            new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(uuid),
                                             iCloudService);
                                 }
-                            }.runTaskLater(plugin, 5);*/
+                            }.runTaskLater(plugin, 5);
                         } else {
                             plugin.getNexusServer().getProfilesServerMap().remove(profile.getProfileId());
                             return setActiveProfile(profileSlot, join);

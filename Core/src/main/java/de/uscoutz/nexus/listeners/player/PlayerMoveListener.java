@@ -27,7 +27,9 @@ public class PlayerMoveListener implements Listener {
 
         if(nexusPlayer.getBiome() == null || !nexusPlayer.getBiome().equals(biome)) {
             nexusPlayer.setBiome(biome);
-            nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.BIOME);
+            if(nexusPlayer.getNexusScoreboard() != null) {
+                nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.BIOME);
+            }
         }
     }
 }

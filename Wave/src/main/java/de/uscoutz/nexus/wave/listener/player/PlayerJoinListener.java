@@ -22,10 +22,12 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         RaidPlayer raidPlayer = new RaidPlayer(player, plugin);
         Profile newProfile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
-        RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
+        if(newProfile != null) {
+            RaidProfile newRaidProfile = plugin.getRaidManager().getRaidProfileMap().get(newProfile.getProfileId());
 
-        if(newRaidProfile.getRaid() != null) {
-            raidPlayer.joinRaid(newRaidProfile.getRaid());
+            if(newRaidProfile.getRaid() != null) {
+                raidPlayer.joinRaid(newRaidProfile.getRaid());
+            }
         }
     }
 }
