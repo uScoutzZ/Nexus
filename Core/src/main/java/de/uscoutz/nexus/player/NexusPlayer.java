@@ -122,7 +122,7 @@ public class NexusPlayer {
         }
         ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         joinedProfile = System.currentTimeMillis();
-        Bukkit.getConsoleSender().sendMessage("[Nexus] Set active profile");
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Set active profile to " + profileSlot);
         if(profile.isPrepared()) {
             Bukkit.getConsoleSender().sendMessage("[Nexus] Prepared");
             if(!profile.loaded()) {
@@ -133,13 +133,13 @@ public class NexusPlayer {
                         ICloudService iCloudService = plugin.getNexusServer().getServiceByName(server);
                         if(iCloudService != null && iCloudService.isOnline()) {
                             new PacketPlayerChangeServer("123", uuid.toString(), profileSlot).send(iCloudService);
-                            new BukkitRunnable() {
+                            /*new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(uuid),
                                             iCloudService);
                                 }
-                            }.runTaskLater(plugin, 5);
+                            }.runTaskLater(plugin, 5);*/
                         } else {
                             plugin.getNexusServer().getProfilesServerMap().remove(profile.getProfileId());
                             return setActiveProfile(profileSlot, join);
@@ -167,7 +167,7 @@ public class NexusPlayer {
                         player.closeInventory();
                         player.sendMessage("§dOther server is more empty, sending");
                         new PacketPlayerChangeServer("123", uuid.toString(), profileSlot).send(emptiestServer);
-                        CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);
+                        //CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);
                     }
                 }
             } else {
