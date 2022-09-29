@@ -158,6 +158,7 @@ public class NexusPlayer {
                         return false;
                     }
                     Bukkit.getConsoleSender().sendMessage("[Nexus] Load..");
+                    profile.setLastActivity(System.currentTimeMillis());
                     //profile.load();
                     if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
                         Bukkit.broadcastMessage("Loading slot " + profileSlot);
@@ -353,10 +354,16 @@ public class NexusPlayer {
                             members.append(profilePlayer.getGameProfile().getName()).append("§7, §6");
                         }
                     }
+                    String lastActivity;
+                    if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
+                        lastActivity = plugin.getLocaleManager().translate("de_DE", "right-now");
+                    } else {
+                        lastActivity = DateUtilities.getTime(profile.getLastActivity(), System.currentTimeMillis(), plugin);
+                    }
                     lore = Arrays.asList(" ", plugin.getLocaleManager().translate("de_DE", "profiles_owner", profile.getMembers().get(profile.getOwner()).getGameProfile().getName()),
                             plugin.getLocaleManager().translate("de_DE", "profiles_members", members), " ",
                             plugin.getLocaleManager().translate("de_DE", "profiles_nexus-level", profile.getNexusLevel()),
-                            plugin.getLocaleManager().translate("de_DE", "last-activity", DateUtilities.getTime(profile.getLastActivity(), System.currentTimeMillis(), plugin)));
+                            plugin.getLocaleManager().translate("de_DE", "last-activity", lastActivity));
                 } else {
                     material = Material.BARRIER;
                 }

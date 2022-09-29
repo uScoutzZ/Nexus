@@ -41,7 +41,7 @@ public class Profile {
     private Map<String, Container> storageBlocks;
     @Getter @Setter
     private int nexusLevel, concurrentlyBuilding, wonRaids, lostRaids, highestTower = -1;
-    @Getter
+    @Getter @Setter
     private long start, lastActivity;
     @Getter
     private NexusWorld world;
@@ -200,7 +200,6 @@ public class Profile {
         if(!loading) {
             loading = true;
             loadMembers();
-            lastActivity = System.currentTimeMillis();
             if(!plugin.getWorldManager().getEmptyWorlds().isEmpty()) {
                 ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("storages", "profileId", String.valueOf(profileId));
 
