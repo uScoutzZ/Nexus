@@ -1,4 +1,4 @@
-blank-worlds: 5
+blank-worlds: 1
 mysql:
   username: "username"
   password: "password"

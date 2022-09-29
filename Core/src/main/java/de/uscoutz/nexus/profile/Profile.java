@@ -75,6 +75,7 @@ public class Profile {
 
     public void scheduleCheckout() {
         timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
+        Bukkit.broadcastMessage("Checkout in " + timeToCheckout[0] + " seconds");
         checkoutTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -134,6 +135,7 @@ public class Profile {
     }
 
     public void checkout() {
+        Bukkit.broadcastMessage("Checkout now");
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
                 all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-unloaded"));
@@ -143,6 +145,8 @@ public class Profile {
             plugin.getWorldManager().getEmptyWorlds().add(world.getWorld());
             plugin.getWorldManager().getWorldProfileMap().remove(world.getWorld());
             plugin.getNexusServer().getProfilesServerMap().remove(profileId);
+            plugin.getNexusServer().getProfileCountByServer().replace(plugin.getNexusServer().getThisServiceName(),
+                    plugin.getNexusServer().getProfileCountByServer().get(plugin.getNexusServer().getThisServiceName())-1);
             plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
                     new DatabaseUpdate("nexusLevel", nexusLevel),
                     new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
@@ -153,6 +157,8 @@ public class Profile {
             world = null;
             loading = false;
         }
+
+        Bukkit.broadcastMessage("Checkout done");
     }
 
     public void saveStorages() {
@@ -211,6 +217,8 @@ public class Profile {
                 world = new NexusWorld(this, plugin);
                 Bukkit.getConsoleSender().sendMessage("[Nexus] Set world");
                 plugin.getNexusServer().getProfilesServerMap().put(profileId, plugin.getNexusServer().getThisServiceName());
+                plugin.getNexusServer().getProfileCountByServer().replace(plugin.getNexusServer().getThisServiceName(),
+                        plugin.getNexusServer().getProfileCountByServer().get(plugin.getNexusServer().getThisServiceName()) + 1);
                 new BukkitRunnable() {
                     @Override
                     public void run() {

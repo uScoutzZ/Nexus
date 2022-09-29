@@ -21,15 +21,17 @@ public class NexusServer {
     @Getter
     private RMap<UUID, String> profilesServerMap;
     @Getter
-    private RedissonClient redissonClient;
+    private RMap<String, Integer> profileCountByServer;
     @Getter
-    private Map<String, Integer> profileCountByServer;
+    private RedissonClient redissonClient;
+    /*@Getter
+    private Map<String, Integer> profileCountByServer;*/
     @Getter
     private Map<UUID, Integer> profileToLoad;
 
     public NexusServer(NexusPlugin plugin) {
         this.plugin = plugin;
-        profileCountByServer = new HashMap<>();
+
         profileToLoad = new HashMap<>();
         createRedisConnection();
     }
@@ -41,6 +43,8 @@ public class NexusServer {
         RedissonClient redissonClient = Redisson.create(config);
         this.redissonClient = redissonClient;
         profilesServerMap = redissonClient.getMap("nexus.profilesServer");
+        profileCountByServer = redissonClient.getMap("nexus.profileCount");
+        profileCountByServer.put(getThisServiceName(), 0);
     }
 
     public ICloudService getServiceByName(String name) {
@@ -74,7 +78,7 @@ public class NexusServer {
     }
 
     public ICloudService getEmptiestServer() {
-        updatePlayersOnServer();
+        //updatePlayersOnServer();
 
         String emptiestServer = getThisServiceName();
         int profileCount = getProfileCount();
@@ -83,6 +87,10 @@ public class NexusServer {
                 emptiestServer = server;
                 profileCount = profileCountByServer.get(server);
             }
+        }
+
+        if(emptiestServer.equals(getThisServiceName()) && plugin.getWorldManager().getEmptyWorlds().size() == 0) {
+            return null;
         }
 
         return getServiceByName(emptiestServer);

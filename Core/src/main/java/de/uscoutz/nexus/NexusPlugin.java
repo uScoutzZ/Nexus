@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 public class NexusPlugin extends JavaPlugin {
@@ -67,7 +68,7 @@ public class NexusPlugin extends JavaPlugin {
         worldManager = new WorldManager(this);
         databaseAdapter = new DatabaseAdapter(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()), this);
         nexusServer = new NexusServer(this);
-        nexusServer.updatePlayersOnServer();
+        //nexusServer.updatePlayersOnServer();
         localeManager = new LocaleManager(this);
         localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
         locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
@@ -118,6 +119,11 @@ public class NexusPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        nexusServer.getProfileCountByServer().remove(nexusServer.getThisServiceName());
+        /*for(UUID uuid : nexusServer.getProfilesServerMap().keySet()) {
+            if(nexusServer.getProfilesServerMap().get(uuid).equals(nexusServer.getThisServiceName())) {
+                nexusServer.getProfilesServerMap().remove(uuid);
+            }
+        }*/
     }
 }

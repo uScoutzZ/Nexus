@@ -19,6 +19,7 @@ import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.service.ICloudService;
+import eu.thesimplecloud.plugin.startup.CloudPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -54,7 +55,7 @@ public class NexusPlayer {
     @Getter
     private long firstLogin, generalPlaytime, joined, joinedProfile;
     @Getter @Setter
-    private int currentProfileSlot;
+    private int currentProfileSlot, oldProfileSlot;
     @Getter @Setter
     private Biome biome;
     @Getter
@@ -91,20 +92,27 @@ public class NexusPlayer {
     }
 
     public void switchProfile(int profileSlot) {
-        if(getCurrentProfile() != null && getCurrentProfile().getMembers().containsKey(uuid)) {
-            getCurrentProfile().getMembers().get(uuid).checkout(joined);
-            Quest mainQuest = getCurrentProfile().getMainQuest();
-            if(mainQuest != null) {
-                player.hideBossBar(mainQuest.getBossBars().get("de_DE"));
+        Profile oldProfile = getCurrentProfile();
+        if(setActiveProfile(profileSlot, false)) {
+            if(oldProfile != null && oldProfile.getMembers().containsKey(uuid)) {
+                oldProfile.getMembers().get(uuid).checkout(joined);
+                Quest mainQuest = oldProfile.getMainQuest();
+                if(mainQuest != null) {
+                    player.hideBossBar(mainQuest.getBossBars().get("de_DE"));
+                }
             }
         }
         //player.getInventory().clear();
-        currentProfileSlot = profileSlot;
-        setActiveProfile(profileSlot, false);
     }
 
     public boolean setActiveProfile(int profileSlot, boolean join) {
         Profile profile;
+        if(join) {
+            oldProfileSlot = -1;
+        } else {
+            oldProfileSlot = currentProfileSlot;
+        }
+
         if(plugin.getNexusServer().getProfileToLoad().containsKey(uuid)) {
             currentProfileSlot = plugin.getNexusServer().getProfileToLoad().remove(uuid);
             profile = profilesMap.get(currentProfileSlot);
@@ -112,8 +120,8 @@ public class NexusPlayer {
             currentProfileSlot = profileSlot;
             profile = profilesMap.get(profileSlot);
         }
+        ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         joinedProfile = System.currentTimeMillis();
-        //ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         Bukkit.getConsoleSender().sendMessage("[Nexus] Set active profile");
         if(profile.isPrepared()) {
             Bukkit.getConsoleSender().sendMessage("[Nexus] Prepared");
@@ -141,14 +149,25 @@ public class NexusPlayer {
                         return setActiveProfile(profileSlot, join);
                     }
                 } else {
+                    if(emptiestServer == null) {
+                        currentProfileSlot = oldProfileSlot;
+                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
+                        if(join) {
+                            player.kick();
+                        }
+                        return false;
+                    }
                     Bukkit.getConsoleSender().sendMessage("[Nexus] Load..");
-                    profile.load();
-                    /*if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
-                        profile.load(player);
+                    //profile.load();
+                    if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
+                        Bukkit.broadcastMessage("Loading slot " + profileSlot);
+                        profile.load();
                     } else {
+                        player.closeInventory();
                         player.sendMessage("§dOther server is more empty, sending");
+                        new PacketPlayerChangeServer("123", uuid.toString(), profileSlot).send(emptiestServer);
                         CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);
-                    }*/
+                    }
                 }
             } else {
                 Bukkit.getConsoleSender().sendMessage("[Nexus] Profile already loaded");
@@ -241,11 +260,20 @@ public class NexusPlayer {
         if(getCurrentProfile().loaded() && getCurrentProfile().getMembers().containsKey(uuid)) {
             getCurrentProfile().getMembers().get(uuid).checkout(joined);
         }
+        if(oldProfileSlot != -1) {
+            if(getOldProfile().loaded() && getOldProfile().getMembers().containsKey(uuid)) {
+                getOldProfile().getMembers().get(uuid).checkout(joined);
+            }
+        }
         plugin.getPlayerManager().getPlayersMap().remove(uuid);
     }
 
     public Profile getCurrentProfile() {
         return profilesMap.get(currentProfileSlot);
+    }
+
+    public Profile getOldProfile() {
+        return profilesMap.get(oldProfileSlot);
     }
 
     public boolean registered() {

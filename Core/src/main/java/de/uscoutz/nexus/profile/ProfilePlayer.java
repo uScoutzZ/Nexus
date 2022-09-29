@@ -106,7 +106,7 @@ public class ProfilePlayer {
                     profile.scheduleCheckout();
                 }
             }
-        }.runTaskLater(plugin, 10);
+        }.runTaskLater(plugin, 20);
     }
 
     public void addKill() {
