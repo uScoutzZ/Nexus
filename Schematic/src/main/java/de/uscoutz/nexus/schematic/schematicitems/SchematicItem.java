@@ -29,6 +29,8 @@ public class SchematicItem extends NexusItem {
     private List<ItemStack> ingredients;
     @Getter @Setter
     private Task task;
+    @Getter @Setter
+    private int maxObtainable;
     private NexusSchematicPlugin plugin;
 
     public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic, boolean obtainable) {

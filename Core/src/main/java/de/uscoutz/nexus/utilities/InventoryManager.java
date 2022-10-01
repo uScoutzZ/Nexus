@@ -2,6 +2,7 @@ package de.uscoutz.nexus.utilities;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
+import de.uscoutz.nexus.events.SchematicItemBoughtEvent;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.SimpleInventory;
@@ -13,12 +14,15 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -190,6 +194,9 @@ public class InventoryManager {
                 removeNeededItems(player, ingredients);
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
                 player.getInventory().addItem(itemStack);
+                PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+                String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
             }
         });
         return shopItem;

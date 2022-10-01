@@ -1,5 +1,6 @@
 package de.uscoutz.nexus.schematic.listener.profile;
 
+import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
@@ -26,9 +27,22 @@ public class ProfileCheckoutListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onProfileCheckout(ProfileCheckoutEvent event) {
         Profile profile = event.getProfile();
+        SchematicProfile sProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
 
-        for(BuiltSchematic builtSchematic : plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().values()) {
+        for(BuiltSchematic builtSchematic : sProfile.getSchematicsByRegion().values()) {
             builtSchematic.saveDamage();
+        }
+
+        for(String items : sProfile.getBoughtItems().keySet()) {
+            if(sProfile.getBoughtItems().get(items) != 0) {
+                if(plugin.getNexusPlugin().getDatabaseAdapter().keyExistsTwo("boughtItems", "profileId", String.valueOf(profile.getProfileId()), "item", items)) {
+                    plugin.getNexusPlugin().getDatabaseAdapter().updateTwo("boughtItems", "profileId",
+                            String.valueOf(profile.getProfileId()), "item", items,
+                            new DatabaseUpdate("amount", String.valueOf(sProfile.getBoughtItems().get(items))));
+                } else {
+                    plugin.getNexusPlugin().getDatabaseAdapter().set("boughtItems", String.valueOf(profile.getProfileId()), items, String.valueOf(sProfile.getBoughtItems().get(items)));
+                }
+            }
         }
 
         for(UUID schematicId : profile.getSchematicIds()) {

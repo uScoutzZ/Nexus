@@ -77,6 +77,11 @@ public class SchematicItemManager {
                         } catch (Exception ignored) {
                         }
                     }
+                    if(itemsConfig.getString(key + ".maxObtainable") != null) {
+                        schematicItem.setMaxObtainable(itemsConfig.getInt(key + ".maxObtainable"));
+                    } else {
+                        schematicItem.setMaxObtainable(100);
+                    }
                 }
 
                 schematicItem.build();
