@@ -7,6 +7,7 @@ import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.schematic.schematics.Condition;
+import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -40,9 +41,12 @@ public class Collector {
     private int requiredNexusLevel;
     private Material blockType;
     private Block block;
+    @Getter
     private String title;
+    @Getter
     private BuiltSchematic schematic;
     private Profile profile;
+    private SchematicProfile schematicProfile;
 
     public Collector(List<ItemStack> neededItems, UUID schematicId, NexusSchematicPlugin plugin, int requiredNexusLevel, Material blockType, String title) {
         this.plugin = plugin;
@@ -67,9 +71,10 @@ public class Collector {
         oldBlockType = block.getType();
         block.setType(blockType);
 
-        plugin.getCollectorManager().getCollectors().put(block, this);
         this.profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(blockLocation.getWorld());
+        schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
         this.schematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
+        schematicProfile.getCollectors().put(block, this);
     }
 
     private void spawnHolograms() {
@@ -196,9 +201,20 @@ public class Collector {
 
     public void destroy() {
         destroyed = true;
-        plugin.getCollectorManager().getCollectors().remove(block);
+        schematicProfile.getCollectors().remove(block);
         blockLocation.getBlock().setType(oldBlockType);
         destroyHolograms();
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+        for(ArmorStand armorStand : hologram.values()) {
+            if(armorStand.getPassengers().size() != 0) {
+                armorStand.customName(Component.text(title));
+            }
+
+            armorStand.remove();
+        }
     }
 
     public Collector setFilledAction(Consumer<Player> action) {

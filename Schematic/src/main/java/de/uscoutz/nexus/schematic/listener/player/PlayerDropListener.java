@@ -1,7 +1,9 @@
 package de.uscoutz.nexus.schematic.listener.player;
 
+import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.collector.Collector;
+import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -28,7 +30,9 @@ public class PlayerDropListener implements Listener {
             public void run() {
                 if(event.getItemDrop().isOnGround()) {
                     Block dropBlock = event.getItemDrop().getLocation().clone().subtract(0, 1, 0).getBlock();
-                    Collector collector = plugin.getCollectorManager().getCollectors().get(dropBlock);
+                    Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
+                    SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+                    Collector collector = schematicProfile.getCollectors().get(dropBlock);
                     if(collector != null) {
                         collector.collect(player, event.getItemDrop());
                         canPlayerPickup[0] = false;

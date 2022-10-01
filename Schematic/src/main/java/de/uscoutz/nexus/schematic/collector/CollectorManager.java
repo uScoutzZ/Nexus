@@ -25,15 +25,12 @@ public class CollectorManager {
     private NexusSchematicPlugin plugin;
 
     @Getter
-    private Map<Block, Collector> collectors;
-    @Getter
     private Map<SchematicType, Map<Condition, Map<Integer, List<ItemStack>>>> collectorNeededMap;
     @Getter
     private File schematicCollectorsFile;
 
     public CollectorManager(File schematicCollectorsFile, NexusSchematicPlugin plugin) {
         this.plugin = plugin;
-        collectors = new HashMap<>();
         collectorNeededMap = new HashMap<>();
         this.schematicCollectorsFile = schematicCollectorsFile;
         if(!schematicCollectorsFile.exists()) {

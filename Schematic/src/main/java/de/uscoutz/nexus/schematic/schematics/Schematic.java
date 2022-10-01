@@ -86,7 +86,7 @@ public class Schematic {
         xLength = maxX-minX;
         zLength = maxZ-minZ;
 
-        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.OAK_WALL_SIGN, Material.BEACON, Material.LANTERN, Material.TORCH, Material.LAVA);
+        List<Material> spawnLater = Arrays.asList(Material.IRON_DOOR, Material.OAK_SIGN, Material.OAK_WALL_SIGN, Material.BEACON, Material.LANTERN, Material.TORCH, Material.LAVA, Material.NETHER_PORTAL);
         List<Block> toAdd = new ArrayList<>();
         for(int j = minY; j <= maxY; j++) {
             for(int i = minX; i <= maxX; i++) {
@@ -255,6 +255,16 @@ public class Schematic {
                                 profile.setNexusLevel(level);
                                 for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
                                     nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
+                                }
+                                for(Collector collector : plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getCollectors().values()) {
+                                    if(!collector.getTitle().equals("§c§lREPAIR")) {
+                                        String upgrade = "§a§lUPGRADE";
+                                        int requiredNexusLevel = schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1));
+                                        if(requiredNexusLevel > profile.getNexusLevel() && collector.getSchematic().getSchematic().getSchematicType() != SchematicType.NEXUS) {
+                                            upgrade = "§e§lUPGRADE NEXUS FIRST";
+                                        }
+                                        collector.setTitle(upgrade);
+                                    }
                                 }
                             } else if(schematicType == SchematicType.TOWER) {
                                 if(profile.getHighestTower() < level) {
@@ -488,6 +498,7 @@ public class Schematic {
         }
 
         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
+        SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
         if(block.getState() instanceof Sign) {
             Block pastedBlock = blockLocation.getBlock();
             Sign sign = (Sign) block.getState();
@@ -514,13 +525,18 @@ public class Schematic {
                     plugin.getNexusPlugin().getDatabaseAdapter().set("collectors", schematicId, Collector.toString(neededItems), b);
                 }
 
-                Collector oldCollector = plugin.getCollectorManager().getCollectors().get(pastedSign.getLocation().clone().subtract(0, 1, 0).getBlock());
+                Collector oldCollector = schematicProfile.getCollectors().get(pastedSign.getLocation().clone().subtract(0, 1, 0).getBlock());
                 if(oldCollector != null) {
                     oldCollector.destroy();
                 }
                 Collector collector;
                 if(condition == Condition.INTACT) {
-                    collector = new Collector(neededItems, schematicId, plugin, schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1)), Material.EMERALD_BLOCK, "§a§lUPGRADE")
+                    String upgrade = "§a§lUPGRADE";
+                    int requiredNexusLevel = schematicType.getFileConfiguration().getInt("requiredNexus." + (level+1));
+                    if(requiredNexusLevel > profile.getNexusLevel() && schematicType != SchematicType.NEXUS) {
+                        upgrade = "§e§lUPGRADE NEXUS FIRST";
+                    }
+                        collector = new Collector(neededItems, schematicId, plugin, requiredNexusLevel, Material.EMERALD_BLOCK, upgrade)
                             .setFilledAction(player1 -> {
                                 destroy(profile, schematicId, plugin, schematicType);
                                 Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
@@ -699,7 +715,8 @@ public class Schematic {
         if(schematicType == SchematicType.WORKSHOP) {
             profile.saveStorages();
         }
-        BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
+        SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+        BuiltSchematic builtSchematic = schematicProfile.getBuiltSchematics().get(schematicId);
         int minHeight = builtSchematic.getBlocks().get(0).getBlockY();
         List<Location> toRemove = new ArrayList<>();
         for (Location blockLocation : builtSchematic.getBlocks()) {
@@ -728,7 +745,7 @@ public class Schematic {
 
         if(animation == DestroyAnimation.SILENT || animation == DestroyAnimation.PLAYER) {
             for(Location location : toRemove) {
-                Collector oldCollector = plugin.getCollectorManager().getCollectors().get(location.getBlock());
+                Collector oldCollector = schematicProfile.getCollectors().get(location.getBlock());
                 if(oldCollector != null) {
                     oldCollector.destroy();
                 }

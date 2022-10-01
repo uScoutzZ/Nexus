@@ -3,8 +3,10 @@ package de.uscoutz.nexus.schematic.schematics;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.Collector;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,10 +25,13 @@ public class SchematicProfile {
     private Map<Region, BuiltSchematic> schematicsByRegion;
     @Getter
     private Map<String, Integer> boughtItems;
+    @Getter
+    private Map<Block, Collector> collectors;
 
     public SchematicProfile(Profile profile, NexusSchematicPlugin plugin) {
         this.profile = profile;
         this.plugin = plugin;
+        collectors = new HashMap<>();
         builtSchematics = new HashMap<>();
         schematicsByRegion = new HashMap<>();
         schematics = new HashMap<>();

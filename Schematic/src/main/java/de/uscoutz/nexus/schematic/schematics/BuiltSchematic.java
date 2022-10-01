@@ -70,6 +70,10 @@ public class BuiltSchematic {
         return (hits /schematic.getDurability())*100;
     }
 
+    public Condition getCondition() {
+        return getCondition(getPercentDamage());
+    }
+
     public static Condition getCondition(double percentageDamage) {
         if(percentageDamage < 1) {
             return Condition.INTACT;
