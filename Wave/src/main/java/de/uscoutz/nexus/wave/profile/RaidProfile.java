@@ -64,9 +64,16 @@ public class RaidProfile {
         task = new BukkitRunnable() {
             @Override
             public void run() {
+                boolean isNexusIntact;
                 SchematicProfile schematicProfile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
-                BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(schematicProfile.getSchematics().get(SchematicType.NEXUS).get(0));
-                boolean isNexusIntact = builtSchematic.getCondition(builtSchematic.getPercentDamage()) == Condition.INTACT;
+                BuiltSchematic builtSchematic;
+                if(schematicProfile.getSchematics().get(SchematicType.NEXUS).size() != 0) {
+                    builtSchematic = schematicProfile.getSchematicsByRegion().get(schematicProfile.getSchematics().get(SchematicType.NEXUS).get(0));
+                    isNexusIntact = builtSchematic.getCondition(builtSchematic.getPercentDamage()) == Condition.INTACT;
+                } else {
+                    isNexusIntact = false;
+                }
+
                 if(isNexusIntact && profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0
                         && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished()) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
