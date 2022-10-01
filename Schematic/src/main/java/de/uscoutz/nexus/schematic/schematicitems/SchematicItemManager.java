@@ -82,6 +82,11 @@ public class SchematicItemManager {
                     } else {
                         schematicItem.setMaxObtainable(100);
                     }
+                    if(itemsConfig.getString(key + ".requiredLevel") != null) {
+                        schematicItem.setRequiredLevel(itemsConfig.getInt(key + ".requiredLevel"));
+                    } else {
+                        schematicItem.setRequiredLevel(0);
+                    }
                 }
 
                 schematicItem.build();

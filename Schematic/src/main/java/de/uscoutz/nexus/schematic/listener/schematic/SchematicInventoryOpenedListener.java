@@ -30,12 +30,12 @@ public class SchematicInventoryOpenedListener implements Listener {
 
         for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
             if(schematicItem.isObtainable() && (schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))) {
-                if(schematicItem.getMaxObtainable() >= schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
-                    ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
-                            event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
-
+                if(schematicItem.getRequiredLevel() <= profile.getNexusLevel()) {
+                    if(schematicItem.getMaxObtainable() >= schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
+                        ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
+                                event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
+                    }
                 }
-
                 //event.getSimpleInventory().addItem(itemStack);
             }
         }
