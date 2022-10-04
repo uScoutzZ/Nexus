@@ -56,12 +56,9 @@ public class PlayerInteractListener implements Listener {
             }
         }
 
-        player.sendMessage("interact");
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            player.sendMessage("rightclick");
             Block storage = event.getClickedBlock();
             if(storage != null && storage.getState() instanceof Container) {
-                player.sendMessage("container");
                 Container container = (Container) storage.getState();
                 Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
                 if(!profile.getStorageBlocks().containsValue(container)) {
@@ -71,7 +68,6 @@ public class PlayerInteractListener implements Listener {
                         }
                     }
                     event.setCancelled(true);
-                    player.sendMessage("storageblocks does not contain value");
                 }
             }
         } else if(event.getAction() == Action.LEFT_CLICK_BLOCK) {

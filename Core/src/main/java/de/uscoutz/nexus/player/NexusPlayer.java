@@ -161,7 +161,6 @@ public class NexusPlayer {
                     profile.setLastActivity(System.currentTimeMillis());
                     //profile.load();
                     if(CloudPlugin.getInstance().getThisServiceName().equals(emptiestServer.getName())) {
-                        Bukkit.broadcastMessage("Loading slot " + profileSlot);
                         profile.load();
                     } else {
                         if(player != null) {

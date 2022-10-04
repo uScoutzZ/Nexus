@@ -75,7 +75,6 @@ public class Profile {
 
     public void scheduleCheckout() {
         timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
-        Bukkit.broadcastMessage("Checkout in " + timeToCheckout[0] + " seconds");
         checkoutTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -137,7 +136,6 @@ public class Profile {
     }
 
     public void checkout() {
-        Bukkit.broadcastMessage("Checkout now");
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
                 all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-unloaded"));
@@ -159,8 +157,6 @@ public class Profile {
             world = null;
             loading = false;
         }
-
-        Bukkit.broadcastMessage("Checkout done");
     }
 
     public void saveStorages() {

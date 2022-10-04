@@ -604,10 +604,12 @@ public class Schematic {
                         try {
                             container.getInventory().setContents(InventoryManager.fromBase64(contents).getContents());
                         } catch (IllegalArgumentException exception) {
+                            int i = 0;
                             for(ItemStack itemStack : InventoryManager.fromBase64(contents).getContents()) {
                                 if(itemStack != null) {
-                                    container.getInventory().addItem(itemStack);
+                                    container.getInventory().setItem(i, itemStack);
                                 }
+                                i++;
                             }
                         }
                     }
@@ -755,9 +757,7 @@ public class Schematic {
         if(animation == DestroyAnimation.PLAYER) {
             plugin.getNexusPlugin().getDatabaseAdapter().delete("schematics", "schematicId", schematicId);
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(builtSchematic.getBlocks().get(0));
-            Bukkit.broadcastMessage("size before " + profile.getRegions().size());
             profile.getRegions().remove(region);
-            Bukkit.broadcastMessage("size after " + profile.getRegions().size());
             profile.getSchematicIds().remove(schematicId);
             plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().remove(schematicId);
             plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().remove(region);
