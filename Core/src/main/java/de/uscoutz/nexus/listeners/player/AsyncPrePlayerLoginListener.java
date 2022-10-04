@@ -2,6 +2,7 @@ package de.uscoutz.nexus.listeners.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.player.NexusPlayer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +30,10 @@ public class AsyncPrePlayerLoginListener implements Listener {
         if(registered && nexusPlayer.getProfilesMap().size() != 0) {
             assert nexusPlayer.getCurrentProfile() != null;
             Bukkit.getConsoleSender().sendMessage("[Nexus] " + nexusPlayer.getCurrentProfile());
-            nexusPlayer.setActiveProfile(nexusPlayer.getCurrentProfileSlot(), true);
+            if(!nexusPlayer.setActiveProfile(nexusPlayer.getCurrentProfileSlot(), true)) {
+                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+                //event.kickMessage(Component.text("§cYour join could not be processed. Probably all servers are full. Try again later."));
+            }
         } else {
             new BukkitRunnable() {
                 @Override

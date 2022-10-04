@@ -8,8 +8,10 @@ import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.SimpleInventory;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopAccepted;
+import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.player.PacketPlayerChangeServer;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketDeleteProfile;
+import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.quests.Quest;
@@ -174,9 +176,11 @@ public class NexusPlayer {
                 } else {
                     if(emptiestServer == null) {
                         currentProfileSlot = oldProfileSlot;
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
-                        if(join) {
-                            player.kick();
+                        if(player != null) {
+                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
+                            if(join) {
+                                player.kick();
+                            }
                         }
                         return false;
                     }
@@ -419,26 +423,37 @@ public class NexusPlayer {
                             simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
                                     .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"))
                                     .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile_lore")), deleteLeftClick -> {
-                                //if(finalCurrentSlot != 0) {
-                                    SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
-                                    deleteInventory.setItem(13, ItemBuilder.skull()
-                                            .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
-                                            .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm"))
-                                            .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
-                                        if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
-                                            new PacketDeleteProfile("123", profile.getProfileId())
-                                                    .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
-                                                            plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId())));
-                                        } else {
-                                            profile.delete();
-                                        }
-                                        player.closeInventory();
-                                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
-                                    });
-                                    deleteInventory.open(player);
-                                /*} else {
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_profile_delete_not-deletable"));
-                                }*/
+                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
+                                deleteInventory.setItem(13, ItemBuilder.skull()
+                                        .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
+                                        .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm"))
+                                        .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
+                                    if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
+                                        new PacketDeleteProfile("123", profile.getProfileId())
+                                                .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
+                                                        plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId())));
+                                    } else {
+                                        profile.delete();
+                                    }
+                                    player.closeInventory();
+                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
+                                });
+                                deleteInventory.open(player);
+                            });
+                        } else {
+                            simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
+                                    .name(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile"))
+                                    .lore(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile_lore")), deleteLeftClick -> {
+                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile"));
+                                deleteInventory.setItem(13, ItemBuilder.skull()
+                                        .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
+                                        .name(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile-confirm"))
+                                        .lore(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile_lore")), confirmLeftClick -> {
+
+                                    player.closeInventory();
+                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profiles_left-profile", (finalCurrentSlot+1)));
+                                });
+                                deleteInventory.open(player);
                             });
                         }
 
@@ -476,6 +491,15 @@ public class NexusPlayer {
                                 plugin.getNexusServer().getProfilesServerMap().get(profileId));
                         plugin.getProfileManager().getCoopInvitations().get(player.getUniqueId()).remove(profileId);
                         new PacketCoopAccepted("123", profileId, uuid, player.getName(), finalCurrentSlot, plugin.getNexusServer().getThisServiceName()).send(iCloudService);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                for(Profile profile1 : profilesMap.values()) {
+                                    profile1.loadMembers();
+                                }
+                            }
+                        }.runTaskLater(plugin, 20);
+                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_accepted_success"));
                     }
                 });
             }
