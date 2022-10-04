@@ -658,7 +658,7 @@ public class Schematic {
                 builtSchematic.getEntities().add(entity);
                 pastedSign.getBlock().setType(Material.AIR);
             }
-        } else if(block.getBlockData() instanceof Orientable) {
+        } else if(block.getBlockData() instanceof Orientable && block.getType() == Material.NETHER_PORTAL) {
             Orientable orientable = (Orientable) blockLocation.getBlock().getBlockData().clone();
             if(rotation == 90 || rotation == 270) {
                 orientable.setAxis(Axis.X);

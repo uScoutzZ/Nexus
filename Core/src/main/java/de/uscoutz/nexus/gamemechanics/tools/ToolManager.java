@@ -16,6 +16,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ToolManager {
@@ -23,7 +24,7 @@ public class ToolManager {
     private NexusPlugin plugin;
 
     @Getter
-    private Map<String, Tool> toolMap;
+    private LinkedHashMap<String, Tool> toolMap;
     @Getter
     private Map<Material, Material> blockDrop;
     @Getter
@@ -33,7 +34,7 @@ public class ToolManager {
 
     public ToolManager(NexusPlugin plugin, File toolsFile, File resistanceFile, File blockdropsFile) {
         this.plugin = plugin;
-        toolMap = new HashMap<>();
+        toolMap = new LinkedHashMap<>();
         blockDrop = new HashMap<>();
         this.toolsFile = toolsFile;
         this.resistanceFile = resistanceFile;

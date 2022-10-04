@@ -111,15 +111,6 @@ public class Profile {
             }
         }
 
-        for(UUID member : members.keySet()) {
-            ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(member).getBlockingOrNull();
-            if(cloudPlayer != null) {
-                if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
-                    new PacketCoopKicked("123", member, profileId).send(cloudPlayer.getConnectedServer());
-                }
-            }
-        }
-
         plugin.getDatabaseAdapter().delete("playerProfiles", "profileId", profileId);
         plugin.getDatabaseAdapter().delete("schematics", "profileId", profileId);
         plugin.getDatabaseAdapter().delete("quests", "profileId", profileId);
@@ -132,6 +123,17 @@ public class Profile {
                 checkout();
             }
         }.runTaskLater(plugin, 8);
+
+        for(UUID member : members.keySet()) {
+            ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(member).getBlockingOrNull();
+            if(cloudPlayer != null) {
+                if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
+                    new PacketCoopKicked("123", member, profileId).send(cloudPlayer.getConnectedServer());
+                }
+            }
+        }
+
+
     }
 
     public void checkout() {

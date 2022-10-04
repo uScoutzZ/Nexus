@@ -17,6 +17,6 @@ public class SchematicItemBoughtListener implements Listener {
     @EventHandler
     public void onSchematicItemBought(SchematicItemBoughtEvent event) {
         SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(event.getProfile().getProfileId());
-        schematicProfile.getBoughtItems().replace(event.getKey(), schematicProfile.getBoughtItems().get(event.getKey()) + 1);
+        schematicProfile.getBoughtItems().replace(event.getKey(), schematicProfile.getBoughtItems().getOrDefault(event.getKey()+1, + 1));
     }
 }

@@ -52,6 +52,7 @@ public class BlockBreakListener implements Listener {
                 breakingPower = plugin.getToolManager().getBreakingPower(itemMeta);
             }
         }
+
         if(breakingPower >= blockResistance) {
             event.setCancelled(false);
             Material material = plugin.getToolManager().getBlockDrop().getOrDefault(event.getBlock().getType(), event.getBlock().getType());

@@ -11,6 +11,7 @@ import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -79,6 +80,7 @@ public class Collector {
 
     private void spawnHolograms() {
         for(Material needed : neededItems.keySet()) {
+
             ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location.getBlock().getLocation().clone()
                     .add(0.5, hologram.size(), 0.5), EntityType.ARMOR_STAND);
 
@@ -97,16 +99,14 @@ public class Collector {
             hologram.put(needed, armorStand);
         }
 
-        if(title != null) {
-            ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location.getBlock().getLocation().clone()
-                    .add(0.5, hologram.size()-0.4, 0.5), EntityType.ARMOR_STAND);
-            armorStand.setSmall(true);
-            armorStand.customName(Component.text(title));
-            armorStand.setCustomNameVisible(true);
-            armorStand.setVisible(false);
-            armorStand.setGravity(false);
-            hologram.put(Material.AIR, armorStand);
-        }
+        ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location.getBlock().getLocation().clone()
+                .add(0.5, hologram.size()-0.4, 0.5), EntityType.ARMOR_STAND);
+        armorStand.setSmall(true);
+        armorStand.customName(Component.text(title));
+        armorStand.setCustomNameVisible(true);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        hologram.put(Material.AIR, armorStand);
     }
 
     public void collect(Player player, Item item) {
@@ -209,11 +209,10 @@ public class Collector {
     public void setTitle(String title) {
         this.title = title;
         for(ArmorStand armorStand : hologram.values()) {
-            if(armorStand.getPassengers().size() != 0) {
+            if(armorStand.getPassengers().size() == 0) {
                 armorStand.customName(Component.text(title));
+                break;
             }
-
-            armorStand.remove();
         }
     }
 

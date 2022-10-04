@@ -21,6 +21,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SchematicItemManager {
@@ -28,7 +29,7 @@ public class SchematicItemManager {
     private NexusSchematicPlugin plugin;
 
     @Getter
-    private Map<String, SchematicItem> schematicItemMap;
+    private LinkedHashMap<String, SchematicItem> schematicItemMap;
     private File itemsFile;
     private FileConfiguration itemsConfig;
 
@@ -37,7 +38,7 @@ public class SchematicItemManager {
 
     public SchematicItemManager(NexusSchematicPlugin plugin, File itemsFile) {
         this.plugin = plugin;
-        schematicItemMap = new HashMap<>();
+        schematicItemMap = new LinkedHashMap<>();
         schematicItemBySchematic = new HashMap<>();
         this.itemsFile = itemsFile;
         if(!itemsFile.exists()) {

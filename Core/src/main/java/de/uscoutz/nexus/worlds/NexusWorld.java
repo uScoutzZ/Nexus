@@ -8,10 +8,13 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NexusWorld {
@@ -28,11 +31,26 @@ public class NexusWorld {
     private int radius;
     @Getter
     private Map<Location, Map<Location, BlockData>> brokenBlocks;
+    @Getter
+    private List<Entity> worldEntities;
 
     public NexusWorld(Profile profile, NexusPlugin plugin) {
         this.plugin = plugin;
         this.profile = profile;
         world = plugin.getWorldManager().getEmptyWorlds().remove(0);
+        worldEntities = new ArrayList<>();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for(Entity entity : world.getEntities()) {
+                    if(entity.getType() != EntityType.PLAYER) {
+                        worldEntities.add(entity);
+                    }
+                }
+                world.spawnEntity(middle, EntityType.ENDER_CRYSTAL);
+            }
+        }.runTask(plugin);
+
         plugin.getWorldManager().getWorldProfileMap().put(world, profile);
         spawn = world.getSpawnLocation();
         middle = plugin.getLocationManager().getLocation("nexus-crystal", world);
@@ -40,12 +58,7 @@ public class NexusWorld {
         radius = plugin.getConfig().getInt("base-radius");
         brokenBlocks = new HashMap<>();
         assign();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                world.spawnEntity(middle, EntityType.ENDER_CRYSTAL);
-            }
-        }.runTask(plugin);
+
     }
 
     public boolean isLocationInBase(Location location) {
