@@ -55,7 +55,7 @@ public class CoopCommand implements CommandExecutor {
                                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop__kick_player-not-in-coop"));
                                     } else {
                                         if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
-                                            new PacketCoopKicked("123", uuid, nexusPlayer.getCurrentProfile().getProfileId()).send(cloudPlayer.getConnectedServer());
+                                            new PacketCoopKicked("123", uuid, nexusPlayer.getCurrentProfile().getProfileId(), true).send(cloudPlayer.getConnectedServer());
                                         } else {
                                             nexusPlayer.getCurrentProfile().kickPlayer(uuid);
                                         }

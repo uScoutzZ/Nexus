@@ -105,8 +105,10 @@ public class Profile {
     public void delete() {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
-                all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted-teleport"));
-                plugin.getPlayerManager().getPlayersMap().get(all.getUniqueId()).switchProfile(0);
+                if(all.getUniqueId().equals(owner)) {
+                    all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted-teleport"));
+                }
+                //plugin.getPlayerManager().getPlayersMap().get(all.getUniqueId()).switchProfile(0);
             }
         }
 
@@ -121,13 +123,13 @@ public class Profile {
             public void run() {
                 checkout();
             }
-        }.runTaskLater(plugin, 8);
+        }.runTaskLater(plugin, 20);
 
         for(UUID member : members.keySet()) {
             ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(member).getBlockingOrNull();
             if(cloudPlayer != null) {
                 if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
-                    new PacketCoopKicked("123", member, profileId).send(cloudPlayer.getConnectedServer());
+                    new PacketCoopKicked("123", member, profileId, !member.equals(owner)).send(cloudPlayer.getConnectedServer());
                 }
             }
         }

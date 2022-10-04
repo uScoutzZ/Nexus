@@ -70,7 +70,9 @@ public class NexusPlayer {
         if(registered()) {
             load();
             loadProfiles();
-        } else {
+        }
+
+        if(profilesMap.size() == 0) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -120,6 +122,27 @@ public class NexusPlayer {
             currentProfileSlot = profileSlot;
             profile = profilesMap.get(profileSlot);
         }
+        if(profile == null) {
+            int maxProfiles = NexusPlugin.getInstance().getConfig().getInt("profile-slots");
+            if(player !=  null && player.hasPermission("nexus.profile.unlimited")) {
+                maxProfiles = 45;
+            }
+            int lowestSlot = -1;
+            for(int i = 0; i < maxProfiles; i++) {
+                if(profilesMap.get(i) != null) {
+                    lowestSlot = i;
+                    break;
+                }
+            }
+            if(lowestSlot != -1) {
+                currentProfileSlot = lowestSlot;
+                profile = profilesMap.get(currentProfileSlot);
+            } else {
+                player.kick(Component.text("§cAn error occurred. Please try again."));
+                return false;
+            }
+        }
+
         ICloudService emptiestServer = plugin.getNexusServer().getEmptiestServer();
         joinedProfile = System.currentTimeMillis();
         Bukkit.getConsoleSender().sendMessage("[Nexus] Set active profile to " + profileSlot);
@@ -181,10 +204,11 @@ public class NexusPlayer {
         if(profile.loaded()) {
             profile.cancelCheckout();
             if(join) {
+                Profile finalProfile = profile;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        finishProfileLoading(false, profile);
+                        finishProfileLoading(false, finalProfile);
                     }
                 }.runTaskLater(plugin, 10);
             } else {
@@ -395,7 +419,7 @@ public class NexusPlayer {
                             simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
                                     .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"))
                                     .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile_lore")), deleteLeftClick -> {
-                                if(finalCurrentSlot != 0) {
+                                //if(finalCurrentSlot != 0) {
                                     SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
                                     deleteInventory.setItem(13, ItemBuilder.skull()
                                             .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
@@ -412,9 +436,9 @@ public class NexusPlayer {
                                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
                                     });
                                     deleteInventory.open(player);
-                                } else {
+                                /*} else {
                                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_profile_delete_not-deletable"));
-                                }
+                                }*/
                             });
                         }
 
