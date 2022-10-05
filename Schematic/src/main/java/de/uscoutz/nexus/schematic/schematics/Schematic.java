@@ -241,9 +241,7 @@ public class Schematic {
                     if(profile.loaded()) {
                         if(millis[0] <= 0) {
 
-                            for(Player player : profile.getWorld().getWorld().getPlayers()) {
-                                player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_finished-building"));
-                            }
+                            profile.broadcast("schematic_finished-building");
                             profile.setConcurrentlyBuilding(profile.getConcurrentlyBuilding()-1);
                             FireworkUtilities.spawnRandomFirework(countdown.getEyeLocation());
                             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);

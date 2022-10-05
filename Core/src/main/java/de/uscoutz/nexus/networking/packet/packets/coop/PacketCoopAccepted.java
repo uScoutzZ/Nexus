@@ -26,12 +26,9 @@ public class PacketCoopAccepted extends Packet {
 
     @Override
     public Object execute() {
-        NexusPlayer nexusPlayer = NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(
-                NexusPlugin.getInstance().getProfileManager().getProfilesMap().get(profileId).getOwner());
-
-        nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(
-                "de_DE", "command_coop_accept_success", acceptorName));
         Profile profile = NexusPlugin.getInstance().getProfileManager().getProfilesMap().get(profileId);
+        profile.broadcast("command_coop_accept_success", acceptorName);
+
         profile.addPlayer(profileSlot, acceptor);
         new PacketPlayerReloadProfiles("123", acceptor).send(
                 CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(serverName));

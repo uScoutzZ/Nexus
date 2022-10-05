@@ -65,18 +65,16 @@ public class Raid {
         profile.getActivePlayers().forEach(player -> {
             RaidPlayer raidPlayer = plugin.getPlayerManager().getRaidPlayerMap().get(player.getPlayer().getUniqueId());
             raidPlayer.leaveRaid(this);
-            if(won) {
-                player.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_won"));
-            } else {
-                player.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_lost"));
-            }
         });
+        if(won) {
+            profile.broadcast("raid_won");
+        } else {
+            profile.broadcast("raid_lost");
+        }
         counterTask.cancel();
         plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId()).setRaid(null);
 
-        profile.getActivePlayers().forEach(nexusPlayer -> {
-            nexusPlayer.getPlayer().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raid_ended"));
-        });
+        profile.broadcast("raid_ended");
         if(won) {
             profile.setWonRaids(profile.getWonRaids() + 1);
         } else {
@@ -144,9 +142,7 @@ public class Raid {
         for(BossBar bossBar : bossBars.values()) {
             bossBar.color(BossBar.Color.BLUE);
         }
-        for(Player player : players) {
-            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "raids_wave-start", wave));
-        }
+        profile.broadcast("raids_wave-start", wave);
 
         final int[] mobs = {raidType.getMobsPerWave().get(wave)};
 
@@ -219,7 +215,7 @@ public class Raid {
             entity = new NexusSkeleton(randomLocation, plugin, 2);
         }
 
-        boolean loaded = randomLocation.getChunk().load();
+        randomLocation.getChunk().load();
         world.tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         mobs.add(entity.getBukkitEntity().getUniqueId());
         updateWaveProgress();

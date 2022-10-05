@@ -73,6 +73,12 @@ public class Profile {
         }
     }
 
+    public void broadcast(String key, Object... args) {
+        for(NexusPlayer nexusPlayer : getActivePlayers()) {
+            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate("de_DE", key, args));
+        }
+    }
+
     public void scheduleCheckout() {
         timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
         checkoutTask = new BukkitRunnable() {

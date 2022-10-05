@@ -27,10 +27,7 @@ public class PacketPlayerLeftProfile extends Packet {
         ICloudPlayer playerLeft = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(player).getBlockingOrNull();
         if(playerLeft != null) {
             Profile profile = NexusPlugin.getInstance().getProfileManager().getProfilesMap().get(profileId);
-            for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
-                nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(
-                        "de_DE", "profiles_left-users-profile", playerLeft.getName()));
-            }
+            profile.broadcast("profiles_left-users-profile", playerLeft.getName());
         }
 
         return this;
