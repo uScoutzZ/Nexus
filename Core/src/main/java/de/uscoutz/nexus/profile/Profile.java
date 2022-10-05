@@ -174,7 +174,7 @@ public class Profile {
 
     public void loadMembers() {
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("playerProfiles", "profileId", String.valueOf(profileId));
-
+        List<UUID> tempMembers = new ArrayList<>(members.keySet());
         try {
             while(resultSet.next()) {
                 UUID player = UUID.fromString(resultSet.getString("player"));
@@ -187,7 +187,11 @@ public class Profile {
                     ProfilePlayer profilePlayer = members.get(player);
                     profilePlayer.setInventoryBase64(inventory);
                     profilePlayer.setPlaytime(profilePlaytime);
+                    tempMembers.remove(player);
                 }
+            }
+            for(UUID member : tempMembers) {
+                members.remove(member);
             }
             plugin.getProfileManager().getProfilesMap().put(profileId, this);
         } catch (SQLException e) {

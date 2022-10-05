@@ -8,6 +8,7 @@ import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -47,6 +48,8 @@ public class CoopCommand implements CommandExecutor {
                                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_already-in-coop"));
                                     }
                                 } else {
+                                    Bukkit.broadcastMessage(cloudPlayer.isOnline() +" "+ cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype")));
+                                    Bukkit.broadcastMessage(cloudPlayer.getConnectedServer().getGroupName() + " " + plugin.getConfig().getString("cloudtype"));
                                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_player-offline"));
                                 }
                             } else if(args[0].equalsIgnoreCase("kick")) {

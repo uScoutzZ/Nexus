@@ -11,7 +11,9 @@ import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopAccepted;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
 import de.uscoutz.nexus.networking.packet.packets.player.PacketPlayerChangeServer;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketDeleteProfile;
+import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerLeftProfile;
 import de.uscoutz.nexus.networking.packet.packets.profiles.PacketPlayerReloadProfiles;
+import de.uscoutz.nexus.networking.packet.packets.profiles.PacketReloadProfileMembers;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.quests.Quest;
@@ -452,6 +454,21 @@ public class NexusPlayer {
 
                                     player.closeInventory();
                                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profiles_left-profile", (finalCurrentSlot+1)));
+                                    profile.kickPlayer(player.getUniqueId());
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            loadProfiles();
+                                            if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
+                                                new PacketPlayerLeftProfile("123", player.getUniqueId(), profile.getProfileId())
+                                                        .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
+                                                                plugin.getNexusServer().getProfilesServerMap().get(profile.getProfileId())));
+                                            }
+                                            for(ICloudService service : NexusPlugin.getInstance().getNexusServer().getNexusServers()) {
+                                                new PacketReloadProfileMembers("123", profile.getProfileId()).send(service);
+                                            }
+                                        }
+                                    }.runTaskLater(plugin, 5);
                                 });
                                 deleteInventory.open(player);
                             });
