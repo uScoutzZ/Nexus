@@ -31,7 +31,7 @@ public class AsyncPrePlayerLoginListener implements Listener {
             assert nexusPlayer.getCurrentProfile() != null;
             Bukkit.getConsoleSender().sendMessage("[Nexus] " + nexusPlayer.getCurrentProfile());
             if(!nexusPlayer.setActiveProfile(nexusPlayer.getCurrentProfileSlot(), true)) {
-                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+                //event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
                 //event.kickMessage(Component.text("§cYour join could not be processed. Probably all servers are full. Try again later."));
             }
         } else {

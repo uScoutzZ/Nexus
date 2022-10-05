@@ -178,12 +178,18 @@ public class NexusPlayer {
                 } else {
                     if(emptiestServer == null) {
                         currentProfileSlot = oldProfileSlot;
-                        if(player != null) {
-                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
-                            if(join) {
-                                player.kick();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if(player != null) {
+                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
+                                    if(join) {
+                                        player.kick();
+                                    }
+                                }
                             }
-                        }
+                        }.runTaskLater(plugin, 10);
+
                         return false;
                     }
                     Bukkit.getConsoleSender().sendMessage("[Nexus] Load..");
