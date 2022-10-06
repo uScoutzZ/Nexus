@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -68,6 +69,17 @@ public class PlayerInteractListener implements Listener {
                         }
                     }
                     event.setCancelled(true);
+                }
+            } else {
+                if(storage.getBlockData() instanceof Openable) {
+                    Location clicked = event.getClickedBlock().getLocation();
+                    Region region = plugin.getNexusPlugin().getRegionManager().getRegion(clicked);
+                    Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(clicked.getWorld());
+                    SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+                    BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region);
+                    if(builtSchematic == null) {
+                        event.setCancelled(true);
+                    }
                 }
             }
         } else if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
