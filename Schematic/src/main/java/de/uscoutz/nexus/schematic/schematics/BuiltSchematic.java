@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
@@ -39,7 +40,7 @@ public class BuiltSchematic {
         this.profile = profile;
         this.location = location;
         this.rotation = rotation;
-        hits = percentDamage*schematic.getDurability();
+        hits = (percentDamage/100)*schematic.getDurability();
         this.blocks = blocks;
         this.entities = entities;
         this.isBuilt = isBuilt;
@@ -55,14 +56,15 @@ public class BuiltSchematic {
             if(newCondition == Condition.DESTROYED) {
                 plugin.getNexusPlugin().getDatabaseAdapter().deleteTwo("collectors", "schematicId", schematicId, "intact", "0");
             }
+            Bukkit.broadcastMessage("old: " + oldCondition + " new: " + newCondition + " damage: " + hits + " percent: " + getPercentDamage());
             Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematic.getSchematicType());
             Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematic.getSchematicType()).get(newCondition).get(schematic.getLevel());
-            repaired.build(location, rotation, schematicId, this.hits, true);
+            repaired.build(location, rotation, schematicId, getPercentDamage(), true);
         }
     }
 
     public void saveDamage() {
-        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", hits /schematic.getDurability()));
+        plugin.getNexusPlugin().getDatabaseAdapter().update("schematics", "schematicId", schematicId, new DatabaseUpdate("damage", getPercentDamage()));
     }
 
     public double getHits() {

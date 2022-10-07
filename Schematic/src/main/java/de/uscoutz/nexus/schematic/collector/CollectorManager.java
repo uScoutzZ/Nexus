@@ -48,44 +48,6 @@ public class CollectorManager {
     public void loadCollectors() {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(schematicCollectorsFile);
 
-        /*for(Condition condition : Condition.values()) {
-            if(condition != Condition.INTACT) {
-                for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
-                    collectorNeededMap.get(schematicType).put(condition, new HashMap<>());
-                    for(Schematic schematic : plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).values()) {
-                        if(schematic.getLevel() != 0) {
-                            String items = "";
-                            String key = Condition.INTACT.toString() + "." + schematicType.toString().toLowerCase() + "." + schematic.getLevel();
-                            String newKey = condition.toString() + "." + schematicType.toString().toLowerCase() + "." + (schematic.getLevel()-1);
-                            for(ItemStack itemStack : InventoryManager.getNeededItemsFromString(fileConfiguration.getString(key))) {
-
-                                int amount = itemStack.getAmount();
-                                int newAmount = amount/2;
-                                if(condition == Condition.DAMAGED) {
-                                    newAmount = amount/4;
-                                }
-                                if(amount == 1) {
-                                    newAmount = 0;
-                                }
-                                if(items.equals("")) {
-                                    items = items + itemStack.getType() + ":" + newAmount;
-                                } else {
-                                    items = items + ", " + itemStack.getType() + ":" + newAmount;
-                                }
-                            }
-                            fileConfiguration.set(newKey, items);
-                        }
-                    }
-                }
-            }
-        }
-
-        try {
-            fileConfiguration.save(schematicCollectorsFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
-
         for(Condition condition : Condition.values()) {
             for(SchematicType schematicType : plugin.getSchematicManager().getSchematicsMap().keySet()) {
                 collectorNeededMap.get(schematicType).put(condition, new HashMap<>());

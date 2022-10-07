@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.schematics.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -37,6 +38,16 @@ public class ProfileLoadListener implements Listener {
         plugin.getSchematicManager().getSchematicProfileMap().put(profile.getProfileId(), new SchematicProfile(profile, plugin));
         ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().getAsync("schematics", "profileId",
                 String.valueOf(profile.getProfileId()));
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage("Damaged: " + Collector.toString(plugin.getCollectorManager().getCollectorNeededMap().get(SchematicType.TOWER).get(Condition.DAMAGED).get(0)));
+                Bukkit.broadcastMessage("Destroyed: " + Collector.toString(plugin.getCollectorManager().getCollectorNeededMap().get(SchematicType.TOWER).get(Condition.DESTROYED).get(0)));
+
+            }
+        }.runTaskLater(plugin, 20);
+
         try {
             while(resultSet.next()) {
                 UUID schematicId = UUID.fromString(resultSet.getString("schematicId"));
@@ -49,8 +60,7 @@ public class ProfileLoadListener implements Listener {
                 int x = Integer.parseInt(stringLocation.split(", ")[0]),
                         y = Integer.parseInt(stringLocation.split(", ")[1]),
                         z = Integer.parseInt(stringLocation.split(", ")[2]);
-
-                Condition condition = BuiltSchematic.getCondition(damage*100);
+                Condition condition = BuiltSchematic.getCondition(damage);
                 Schematic schematic = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(condition).get(level);
 
                 schematic.build(new Location(profile.getWorld().getWorld(), x, y, z), rotation, placed+schematic.getTimeToFinish(), schematicId, damage);

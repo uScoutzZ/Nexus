@@ -366,6 +366,7 @@ public class Schematic {
             builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, false);
         }
 
+
         for(int j = 0; j < blocks.size(); j++) {
             Location block = setBlock(blocks.get(j), rotation, location, null, schematicId, damage);
             minX = Math.min(minX, block.getBlockX());
@@ -388,7 +389,7 @@ public class Schematic {
             finish(profile, location, minX, maxX, minZ, maxZ, rotation, damage, schematicId, blocks1, entities);
         } else {
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(location);
-            builtSchematic.setHits(damage);
+            builtSchematic.setHits((damage/100)*durability);
             builtSchematic.setBlocks(blocks1);
             builtSchematic.setSchematic(this);
             Bukkit.getPluginManager().callEvent(new SchematicUpdateEvent(profile, builtSchematic));
@@ -507,7 +508,13 @@ public class Schematic {
             }
             pastedSign.update();
             if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
-                Condition condition = BuiltSchematic.getCondition(damage*durability);
+                Condition condition = BuiltSchematic.getCondition((damage));
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.broadcastMessage(((damage)) + " " + condition + " " + schematicType);
+                    }
+                }.runTaskLater(plugin, 40);
                 List<ItemStack> neededItems = new ArrayList<>();
                 int b = condition == Condition.INTACT ? 1:0;
                 if(plugin.getNexusPlugin().getDatabaseAdapter().keyExistsTwo("collectors", "schematicId", schematicId, "intact", b)) {
