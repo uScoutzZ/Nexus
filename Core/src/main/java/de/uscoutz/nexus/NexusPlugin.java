@@ -26,7 +26,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 
 public class NexusPlugin extends JavaPlugin {
@@ -99,6 +98,8 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InvenvtoryOpenListener(this), this);
         Bukkit.getPluginManager().registerEvents(new FoodLevelChangeListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityPickupItemListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerArmorStandManipulateListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerFlowerPotManipulateListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));
@@ -107,6 +108,7 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("setlocation").setExecutor(new SetLocationCommand(this));
         getCommand("profileunload").setExecutor(new ProfileUnloadCommand(this));
         getCommand("fly").setExecutor(new FlyCommand(this));
+        getCommand("joinprofile").setExecutor(new JoinProfileCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
 

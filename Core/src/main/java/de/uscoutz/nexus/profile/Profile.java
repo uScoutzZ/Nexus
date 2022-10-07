@@ -5,6 +5,7 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.events.ProfileCheckoutEvent;
 import de.uscoutz.nexus.events.ProfileLoadEvent;
 import de.uscoutz.nexus.networking.packet.packets.coop.PacketCoopKicked;
+import de.uscoutz.nexus.networking.packet.packets.profiles.PacketReloadProfileMembers;
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
@@ -13,6 +14,7 @@ import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
+import eu.thesimplecloud.api.service.ICloudService;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -310,12 +312,9 @@ public class Profile {
         plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty");
         plugin.getDatabaseAdapter().set("playerStats", player, profileId, 0, 0);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loadMembers();
-            }
-        }.runTaskLater(plugin, 3);
+        for(ICloudService service : NexusPlugin.getInstance().getNexusServer().getNexusServers()) {
+            new PacketReloadProfileMembers("123", profileId).send(service);
+        }
     }
 
     public void kickPlayer(UUID player) {

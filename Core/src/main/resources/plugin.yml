@@ -12,6 +12,7 @@ commands:
   setlocation:
   profileunload:
   fly:
+  joinprofile:
 loadbefore:
   - NexusSchematic
   - NexusWave
