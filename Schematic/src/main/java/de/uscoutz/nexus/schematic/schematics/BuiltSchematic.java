@@ -29,8 +29,10 @@ public class BuiltSchematic {
     private List<Location> blocks;
     @Getter
     private List<Entity> entities;
+    @Getter @Setter
+    private boolean isBuilt;
 
-    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks, List<Entity> entities) {
+    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks, List<Entity> entities, boolean isBuilt) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
@@ -40,6 +42,7 @@ public class BuiltSchematic {
         hits = percentDamage*schematic.getDurability();
         this.blocks = blocks;
         this.entities = entities;
+        this.isBuilt = isBuilt;
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, this);
     }
 
