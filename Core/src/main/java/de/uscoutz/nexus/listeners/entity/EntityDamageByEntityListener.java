@@ -1,10 +1,7 @@
 package de.uscoutz.nexus.listeners.entity;
 
 import de.uscoutz.nexus.NexusPlugin;
-import org.bukkit.entity.EnderCrystal;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -22,8 +19,14 @@ public class EntityDamageByEntityListener implements Listener {
         Entity damager = event.getDamager();
         Entity hit = event.getEntity();
 
+        if(hit instanceof ArmorStand) {
+            event.setCancelled(true);
+            return;
+        }
+
         if(damager instanceof Player && hit instanceof Player) {
             event.setCancelled(true);
+            return;
         }
 
         if(hit instanceof EnderCrystal || hit instanceof ItemFrame) {

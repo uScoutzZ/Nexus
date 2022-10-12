@@ -34,6 +34,7 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -286,9 +287,46 @@ public class NexusPlayer {
             }
         }
 
-        /*for(Tool tool : plugin.getToolManager().getToolMap().values()) {
-            player.getInventory().addItem(tool.getItemStack());
-        }*/
+        if(!profile.getMembers().get(uuid).getEquipmentBase64().equals("empty")) {
+            Inventory equipmentBase64 = InventoryManager.fromBase64(profile.getMembers().get(
+                    player.getUniqueId()).getEquipmentBase64());
+            for(int i = 0; i < 4;  i++) {
+                ItemStack itemStack = equipmentBase64.getItem(i);
+                if(itemStack != null) {
+                    if(itemStack.getType().toString().contains("BOOTS")) {
+                        player.getEquipment().setBoots(itemStack);
+                    } else if(itemStack.getType().toString().contains("LEGGINGS")) {
+                        player.getEquipment().setLeggings(itemStack);
+                    } else if(itemStack.getType().toString().contains("CHESTPLATE")) {
+                        player.getEquipment().setChestplate(itemStack);
+                    } else if(itemStack.getType().toString().contains("HELMET")) {
+                        player.getEquipment().setHelmet(itemStack);
+                    }
+                }
+            }
+
+            for(ItemStack itemStack : player.getInventory().getArmorContents()) {
+                if(itemStack != null && itemStack.getItemMeta() != null) {
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    if(plugin.getToolManager().isTool(itemMeta)) {
+                        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+                        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                        Tool tool = plugin.getToolManager().getToolMap().get(key);
+
+                        if(tool.getLocale() != null) {
+                            String displayName = plugin.getLocaleManager().translate("de_DE", tool.getLocale());
+                            if(itemMeta.hasDisplayName() && !itemMeta.getDisplayName().equals(displayName)) {
+                                itemMeta.displayName(Component.text(displayName));
+                            }
+                        } else {
+                            itemMeta.displayName(Component.text(""));
+                        }
+
+                        itemStack.setItemMeta(itemMeta);
+                    }
+                }
+            }
+        }
     }
 
     public void checkout() {

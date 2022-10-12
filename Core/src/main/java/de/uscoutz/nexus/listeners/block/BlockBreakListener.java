@@ -14,19 +14,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class BlockBreakListener implements Listener {
 
     private NexusPlugin plugin;
+    private List<Location> destroyed;
 
     public BlockBreakListener(NexusPlugin plugin) {
         this.plugin = plugin;
+        destroyed = new ArrayList<>();
     }
 
     @EventHandler
@@ -63,8 +65,10 @@ public class BlockBreakListener implements Listener {
             if(event.getBlock().getType().toString().contains("_LOG") || event.getBlock().getType().toString().contains("_WOOD")) {
                 NexusWorld nexusWorld = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld()).getWorld();
                 boolean inList = false;
+                Location clonedLocation = event.getBlock().getLocation().clone();
                 for(Location location : nexusWorld.getBrokenBlocks().keySet()) {
-                    if(location.distance(event.getBlock().getLocation()) < 15) {
+                    clonedLocation.setY(location.getY());
+                    if(location.distance(clonedLocation) < 5) {
                         inList = true;
                         nexusWorld.getBrokenBlocks().get(location).put(event.getBlock().getLocation(), event.getBlock().getBlockData());
                         break;
@@ -89,13 +93,30 @@ public class BlockBreakListener implements Listener {
                 }
             } else {
                 BlockData blockData = event.getBlock().getBlockData().clone();
+                if(!destroyed.contains(event.getBlock().getLocation())) {
+                    destroyed.add(event.getBlock().getLocation());
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            event.getBlock().setType(blockData.getMaterial());
+                            event.getBlock().setBlockData(blockData);
+                            destroyed.remove(event.getBlock().getLocation());
+                        }
+                    }.runTaskLater(plugin, respawnAfter*20);
+                }
+                List<Material> toStone = Arrays.asList(Material.IRON_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
+                        Material.COAL_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_DIAMOND_ORE,
+                        Material.DEEPSLATE_IRON_ORE, Material.DEEPSLATE_COAL_ORE);
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        event.getBlock().setType(blockData.getMaterial());
-                        event.getBlock().setBlockData(blockData);
+                        if(blockData.getMaterial().isSolid() && toStone.contains(blockData.getMaterial())) {
+                            event.getBlock().setType(Material.STONE);
+                        } else {
+                            event.getBlock().setType(Material.BEDROCK);
+                        }
                     }
-                }.runTaskLater(plugin, respawnAfter*20);
+                }.runTaskLater(plugin, 1);
             }
         } else {
             player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
