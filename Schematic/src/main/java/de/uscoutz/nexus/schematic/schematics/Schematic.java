@@ -168,11 +168,19 @@ public class Schematic {
         point2 = new Location(location.getWorld(), minX, minY+1.2, minZ);
         point3 = new Location(location.getWorld(), minX, minY+1.2, maxZ+0.9);
         point4 = new Location(location.getWorld(), maxX+0.9, minY+1.2, minZ);
+        List<Location> corners = Arrays.asList(point1, point2, point3, point4);
 
         Color color1, color2;
         boolean overlap = false;
         for(Region profileRegion : profile.getRegions()) {
             if(profileRegion.overlap(minX, maxX, minZ, maxZ)) {
+                overlap = true;
+                break;
+            }
+        }
+
+        for(Location corner : corners) {
+            if (!profile.getWorld().isLocationInBase(corner)) {
                 overlap = true;
                 break;
             }

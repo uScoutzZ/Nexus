@@ -8,7 +8,7 @@ cloudtype: "NEXUS"
 profile-slots: 4
 profile-checkout-after: 420
 concurrently-building: 1
-base-radius: 90
+base-radius: 93
 villager-name: §eGeorge
 respawn-range-min: 300
 respawn-range-max: 500
