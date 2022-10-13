@@ -1,5 +1,5 @@
-cooldown: 900000
-raid-counter: 7500
-raid-range-min: 35000
-raid-range-max: 50000
-wave-counter: 30000
+cooldown: 2700000
+raid-counter: 600000
+raid-range-min: 600000
+raid-range-max: 1800000
+wave-counter: 60000

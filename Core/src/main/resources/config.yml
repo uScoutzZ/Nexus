@@ -1,4 +1,4 @@
-blank-worlds: 1
+blank-worlds: 10
 mysql:
   username: "username"
   password: "password"
@@ -6,7 +6,7 @@ mysql:
   database: "nexus"
 cloudtype: "NEXUS"
 profile-slots: 4
-profile-checkout-after: 30
+profile-checkout-after: 420
 concurrently-building: 1
 base-radius: 90
 villager-name: §eGeorge
