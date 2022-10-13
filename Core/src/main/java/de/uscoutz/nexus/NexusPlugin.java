@@ -102,6 +102,7 @@ public class NexusPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerFlowerPotManipulateListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerBucketFillListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerBucketEmptyListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PrepareItemCraftListener(this), this);
         getCommand("profile").setExecutor(new ProfileCommand(this));
         getCommand("coop").setExecutor(new CoopCommand(this));
         getCommand("stop").setExecutor(new StopCommand(this));
