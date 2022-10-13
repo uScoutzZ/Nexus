@@ -107,16 +107,18 @@ public class BlockBreakListener implements Listener {
                 List<Material> toStone = Arrays.asList(Material.IRON_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
                         Material.COAL_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_DIAMOND_ORE,
                         Material.DEEPSLATE_IRON_ORE, Material.DEEPSLATE_COAL_ORE);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if(blockData.getMaterial().isSolid() && toStone.contains(blockData.getMaterial())) {
-                            event.getBlock().setType(Material.STONE);
-                        } else {
-                            event.getBlock().setType(Material.BEDROCK);
+                if(blockData.getMaterial().isSolid()) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if(toStone.contains(blockData.getMaterial())) {
+                                event.getBlock().setType(Material.STONE);
+                            } else {
+                                event.getBlock().setType(Material.BEDROCK);
+                            }
                         }
-                    }
-                }.runTaskLater(plugin, 1);
+                    }.runTaskLater(plugin, 1);
+                }
             }
         } else {
             player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
