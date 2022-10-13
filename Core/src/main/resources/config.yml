@@ -10,6 +10,6 @@ profile-checkout-after: 30
 concurrently-building: 1
 base-radius: 90
 villager-name: §eGeorge
-respawn-range-min: 35
-respawn-range-max: 60
+respawn-range-min: 300
+respawn-range-max: 500
 nexus-color: "#6be000"

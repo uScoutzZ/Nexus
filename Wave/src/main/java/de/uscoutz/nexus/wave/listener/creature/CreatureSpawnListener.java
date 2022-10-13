@@ -15,7 +15,7 @@ public class CreatureSpawnListener implements Listener {
 
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if(event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM) {
+        if(event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM && event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER) {
             event.setCancelled(true);
         }
     }

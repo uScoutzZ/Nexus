@@ -2,9 +2,13 @@ package de.uscoutz.nexus.wave.profile;
 
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
-import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.*;
+import de.uscoutz.nexus.wave.customentities.others.NexusCaveSpider;
+import de.uscoutz.nexus.wave.customentities.others.NexusGolem;
+import de.uscoutz.nexus.wave.customentities.others.NexusSpider;
+import de.uscoutz.nexus.wave.customentities.skeletons.*;
+import de.uscoutz.nexus.wave.customentities.zombies.*;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
@@ -207,12 +211,32 @@ public class Raid {
         Location randomLocation = plugin.getRaidManager().getSpawnLocations().get((int)(Math.random() * plugin.getRaidManager().getSpawnLocations().size()));
         randomLocation.setWorld(profile.getWorld().getWorld());
         Entity entity = null;
-        if(nexusEntityType == NexusEntityType.ZOMBIE) {
-            entity = new NexusZombie(randomLocation, plugin, 1);
-        } else if(nexusEntityType == NexusEntityType.GOLEM) {
+        if(nexusEntityType == NexusEntityType.GOLEM) {
             entity = new NexusGolem(randomLocation, plugin, 2);
+        } else if(nexusEntityType == NexusEntityType.SPIDER) {
+            entity = new NexusSpider(randomLocation, plugin, 1);
+        } else if(nexusEntityType == NexusEntityType.CAVE_SPIDER) {
+            entity = new NexusCaveSpider(randomLocation, plugin, 3);
+        } else if(nexusEntityType == NexusEntityType.ZOMBIE) {
+            entity = new NexusZombie(randomLocation, plugin, 1);
         } else if(nexusEntityType == NexusEntityType.SKELETON) {
-            entity = new NexusSkeleton(randomLocation, plugin, 2);
+            entity = new NexusSkeleton(randomLocation, plugin, 1);
+        } else if(nexusEntityType == NexusEntityType.LEATHER_SKELETON) {
+            entity = new NexusLeatherSkeleton(randomLocation, plugin, 2);
+        } else if(nexusEntityType == NexusEntityType.LEATHER_ZOMBIE) {
+            entity = new NexusLeatherZombie(randomLocation, plugin, 2);
+        } else if(nexusEntityType == NexusEntityType.IRON_SKELETON) {
+            entity = new NexusIronSkeleton(randomLocation, plugin, 3);
+        } else if(nexusEntityType == NexusEntityType.IRON_ZOMBIE) {
+            entity = new NexusIronZombie(randomLocation, plugin, 3);
+        } else if(nexusEntityType == NexusEntityType.DIAMOND_SKELETON) {
+            entity = new NexusDiamondSkeleton(randomLocation, plugin, 4);
+        } else if(nexusEntityType == NexusEntityType.DIAMOND_ZOMBIE) {
+            entity = new NexusDiamondZombie(randomLocation, plugin, 4);
+        } else if(nexusEntityType == NexusEntityType.NETHERITE_SKELETON) {
+            entity = new NexusNetheriteSkeleton(randomLocation, plugin, 5);
+        } else if(nexusEntityType == NexusEntityType.NETHERITE_ZOMBIE) {
+            entity = new NexusNetheriteZombie(randomLocation, plugin, 5);
         }
 
         randomLocation.getChunk().load();
