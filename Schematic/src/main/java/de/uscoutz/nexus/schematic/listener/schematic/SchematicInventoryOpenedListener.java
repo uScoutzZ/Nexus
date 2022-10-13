@@ -8,6 +8,7 @@ import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +32,7 @@ public class SchematicInventoryOpenedListener implements Listener {
         for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
             if(schematicItem.isObtainable() && (schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))) {
                 if(schematicItem.getRequiredLevel() <= profile.getNexusLevel()) {
-                    if(schematicItem.getMaxObtainable() >= schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
+                    if(schematicItem.getMaxObtainable() > schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
                         ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
                                 event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
                     }

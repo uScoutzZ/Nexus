@@ -56,7 +56,6 @@ public class BuiltSchematic {
             if(newCondition == Condition.DESTROYED) {
                 plugin.getNexusPlugin().getDatabaseAdapter().deleteTwo("collectors", "schematicId", schematicId, "intact", "0");
             }
-            Bukkit.broadcastMessage("old: " + oldCondition + " new: " + newCondition + " damage: " + hits + " percent: " + getPercentDamage());
             Schematic.destroy(profile, schematicId, plugin, DestroyAnimation.SILENT, schematic.getSchematicType());
             Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematic.getSchematicType()).get(newCondition).get(schematic.getLevel());
             repaired.build(location, rotation, schematicId, getPercentDamage(), true);

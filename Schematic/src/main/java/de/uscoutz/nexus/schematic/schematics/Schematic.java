@@ -509,12 +509,6 @@ public class Schematic {
             pastedSign.update();
             if(pastedSign.getLine(0).equalsIgnoreCase("[COLLECTOR]")) {
                 Condition condition = BuiltSchematic.getCondition((damage));
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        Bukkit.broadcastMessage(((damage)) + " " + condition + " " + schematicType);
-                    }
-                }.runTaskLater(plugin, 40);
                 List<ItemStack> neededItems = new ArrayList<>();
                 int b = condition == Condition.INTACT ? 1:0;
                 if(plugin.getNexusPlugin().getDatabaseAdapter().keyExistsTwo("collectors", "schematicId", schematicId, "intact", b)) {

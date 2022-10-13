@@ -39,15 +39,6 @@ public class ProfileLoadListener implements Listener {
         ResultSet resultSet = plugin.getNexusPlugin().getDatabaseAdapter().getAsync("schematics", "profileId",
                 String.valueOf(profile.getProfileId()));
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Bukkit.broadcastMessage("Damaged: " + Collector.toString(plugin.getCollectorManager().getCollectorNeededMap().get(SchematicType.TOWER).get(Condition.DAMAGED).get(0)));
-                Bukkit.broadcastMessage("Destroyed: " + Collector.toString(plugin.getCollectorManager().getCollectorNeededMap().get(SchematicType.TOWER).get(Condition.DESTROYED).get(0)));
-
-            }
-        }.runTaskLater(plugin, 20);
-
         try {
             while(resultSet.next()) {
                 UUID schematicId = UUID.fromString(resultSet.getString("schematicId"));

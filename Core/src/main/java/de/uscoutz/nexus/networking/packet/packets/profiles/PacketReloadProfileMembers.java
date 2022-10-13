@@ -19,7 +19,6 @@ public class PacketReloadProfileMembers extends Packet {
     @Override
     public Object execute() {
         if(NexusPlugin.getInstance().getProfileManager().getProfilesMap().containsKey(profileId)) {
-            Bukkit.broadcastMessage("Packet reload members received");
             Profile profile = NexusPlugin.getInstance().getProfileManager().getProfilesMap().get(profileId);
             profile.loadMembers();
         }
