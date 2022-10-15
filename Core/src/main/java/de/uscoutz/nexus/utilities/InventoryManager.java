@@ -5,6 +5,7 @@ import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
 import de.uscoutz.nexus.events.SchematicItemBoughtEvent;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
+import de.uscoutz.nexus.inventory.PaginatedInventory;
 import de.uscoutz.nexus.inventory.SimpleInventory;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.quests.Quest;
@@ -18,6 +19,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class InventoryManager {
 
@@ -140,7 +144,7 @@ public class InventoryManager {
     }
 
     public void openWorkshopSchematics(Player player) {
-        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "workshop_schematics"));
+        SimpleInventory inventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "workshop_schematics"));
 
         Bukkit.getPluginManager().callEvent(new SchematicInventoryOpenedEvent(inventory, player));
 
@@ -149,7 +153,10 @@ public class InventoryManager {
     }
 
     public void openWorkshopTools(Player player) {
-        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
+        PaginatedInventory inventory = InventoryBuilder.createPaginated(4*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
+        inventory.setPageSwitcherForwardSlot(inventory.getInventory().getSize()-1);
+        inventory.setPageSwitcherBackSlot(inventory.getInventory().getSize()-2);
+        inventory.addDynamicSlots(IntStream.range(0, 2*9).toArray());
 
         for(Tool tool : plugin.getToolManager().getToolMap().values()) {
             getShopItem(player, inventory, tool.getItemStack(), tool.getIngredients());
@@ -185,7 +192,13 @@ public class InventoryManager {
         }
         shopItem.lore(lore);
         boolean finalPlayerHasItems = playerHasItems;
-        simpleInventory.addItem(shopItem, event -> {
+        PaginatedInventory paginatedInventory = null;
+        if(simpleInventory instanceof PaginatedInventory) {
+            paginatedInventory = (PaginatedInventory) simpleInventory;
+            simpleInventory = paginatedInventory;
+        }
+
+        Consumer<InventoryClickEvent> clickEventConsumer = event -> {
             if(!finalPlayerHasItems) {
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0F, 1.0F);
                 player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
@@ -198,7 +211,12 @@ public class InventoryManager {
                 String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
                 Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
             }
-        });
+        };
+        if(paginatedInventory != null) {
+            paginatedInventory.addItem(shopItem, clickEventConsumer);
+        } else {
+            simpleInventory.addItem(shopItem, clickEventConsumer);
+        }
         return shopItem;
     }
 
@@ -221,10 +239,10 @@ public class InventoryManager {
                     .flag(ItemFlag.HIDE_ENCHANTS);
         }
 
-        inventory.setItem(36, schematics, event -> openWorkshopSchematics(player));
-        inventory.setItem(37, tools, event -> openWorkshopTools(player));
-        inventory.setItem(38, rescued, event -> openRescuedItems(player));
-        inventory.fill(27, 36, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
+        inventory.setItem(inventory.getInventory().getSize()-9, schematics, event -> openWorkshopSchematics(player));
+        inventory.setItem(inventory.getInventory().getSize()-8, tools, event -> openWorkshopTools(player));
+        inventory.setItem(inventory.getInventory().getSize()-7, rescued, event -> openRescuedItems(player));
+        inventory.fill(inventory.getInventory().getSize()-18, inventory.getInventory().getSize()-9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
     }
 
     private enum FilterType {

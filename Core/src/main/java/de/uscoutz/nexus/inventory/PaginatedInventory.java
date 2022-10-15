@@ -54,7 +54,17 @@ public class PaginatedInventory extends SimpleInventory {
     }
 
     public void addDynamicSlots(Integer... slots) {
-        getDynamicSlots().addAll(Arrays.asList(slots));
+        dynamicSlots.addAll(Arrays.asList(slots));
+    }
+
+    public void addDynamicSlots(List<Integer> slots) {
+        dynamicSlots.addAll(slots);
+    }
+
+    public void addDynamicSlots(int[] slots) {
+        for (int slot : slots) {
+            dynamicSlots.add(slot);
+        }
     }
 
     public void removeDynamicSlots(Integer... slots) {
@@ -140,7 +150,7 @@ public class PaginatedInventory extends SimpleInventory {
         }
         int targetSlot = slot + getOffsetForPage(page);
         this.inventoryContents.put(targetSlot, item);
-        super.getRightclickHandlers().put(targetSlot, eventConsumer);
+        super.getLeftclickHandlers().put(targetSlot, eventConsumer);
         return this;
     }
 

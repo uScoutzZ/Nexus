@@ -1,11 +1,13 @@
 package de.uscoutz.nexus.inventory;
 
 import de.uscoutz.nexus.NexusPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -68,6 +70,9 @@ public class InventoryListener implements Listener {
                 return;
             }
             int targetSlot = event.getSlot() + paginatedInventory.getOffsetForPage(paginatedInventory.getCurrentPage());
+            if(!paginatedInventory.getDynamicSlots().contains(event.getSlot())) {
+                targetSlot = event.getSlot();
+            }
             Consumer<InventoryClickEvent> listener = handlers.get(targetSlot);
             if(listener == null) {
                 return;
