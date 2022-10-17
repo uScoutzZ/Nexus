@@ -1,5 +1,6 @@
 package de.uscoutz.nexus;
 
+import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.biomes.BiomeManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
@@ -17,15 +18,23 @@ import de.uscoutz.nexus.networking.NexusServer;
 import de.uscoutz.nexus.player.PlayerManager;
 import de.uscoutz.nexus.profile.ProfileManager;
 import de.uscoutz.nexus.regions.RegionManager;
+import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.utilities.LocaleManager;
 import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.sql.ResultSet;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 public class NexusPlugin extends JavaPlugin {

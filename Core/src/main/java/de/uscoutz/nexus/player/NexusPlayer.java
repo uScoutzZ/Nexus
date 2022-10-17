@@ -17,6 +17,7 @@ import de.uscoutz.nexus.networking.packet.packets.profiles.PacketReloadProfileMe
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.quests.Quest;
+import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.utilities.DateUtilities;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
@@ -27,6 +28,7 @@ import eu.thesimplecloud.plugin.startup.CloudPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -45,6 +47,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -251,6 +254,11 @@ public class NexusPlayer {
         Quest mainQuest = profile.getMainQuest();
         if(mainQuest != null) {
             mainQuest.display(player);
+            if(mainQuest.getTask() == Task.TALK_TO_GEORGE) {
+                Quest quest = profile.getQuests().get(Task.TALK_TO_GEORGE);
+                player.showTitle(Title.title(Component.text(plugin.getLocaleManager().translate("de_DE", quest.getTitleKey())),
+                        Component.text(plugin.getLocaleManager().translate("de_DE", quest.getDescriptionKey())), Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(1))));
+            }
         }
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
