@@ -97,7 +97,7 @@ public class CoopCommand implements CommandExecutor {
                                 if(nexusPlayer.getProfilesMap().size() >= plugin.getConfig().getInt("profile-slots")) {
                                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_accept_no-slot"));
                                 } else {
-                                    nexusPlayer.openProfiles(profileId.toString());
+                                    nexusPlayer.openProfiles(profileId.toString(), true);
                                 }
                             } else if(args[0].equalsIgnoreCase("deny")) {
                                 player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_denied"));

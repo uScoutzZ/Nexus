@@ -401,20 +401,26 @@ public class NexusPlayer {
         }
     }
 
-    public void openProfiles() {
-        openProfiles(null);
+    public SimpleInventory openProfiles() {
+        return openProfiles(null, true);
     }
 
-    public void openProfiles(String coopInvitation) {
+    public SimpleInventory openProfiles(String coopInvitation, boolean open) {
 
         int[] slots;
         int size;
         if(player.hasPermission("nexus.profile.unlimited")) {
             size = 5*9;
             slots = IntStream.range(0, size).toArray();
+            if(!open) {
+                size = 6*9;
+            }
         } else {
             slots = new int[]{11, 12, 14, 15};
             size = 3*9;
+            if(!open) {
+                size = 5*9;
+            }
         }
 
         SimpleInventory inventory = InventoryBuilder.create(size, plugin.getLocaleManager().translate("de_DE", "profiles-title"));
@@ -576,6 +582,10 @@ public class NexusPlayer {
             currentSlot++;
         }
 
-        inventory.open(player);
+        if(open) {
+            inventory.open(player);
+        }
+
+        return inventory;
     }
 }
