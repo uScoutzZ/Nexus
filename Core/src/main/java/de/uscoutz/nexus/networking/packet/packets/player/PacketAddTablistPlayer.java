@@ -51,7 +51,7 @@ public class PacketAddTablistPlayer extends Packet {
             if(gameProfileResultSet.next()) {
                 gameProfile = GameProfileSerializer.fromString(gameProfileResultSet.getString("gameprofile"));
                 ServerPlayer serverPlayer = new ServerPlayer(nmsServer, nmsWorld, gameProfile, null);
-                serverPlayer.setPos(0, 0, 0);
+                serverPlayer.setPos(2220, 0, 2220);
                 serverPlayer.listName = Component.literal(displayName);
 
                 for(Player players : Bukkit.getOnlinePlayers()) {

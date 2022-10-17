@@ -30,14 +30,24 @@ public class SchematicInventoryOpenedListener implements Listener {
         SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
 
         for(SchematicItem schematicItem : plugin.getSchematicItemManager().getSchematicItemMap().values()) {
-            if(schematicItem.isObtainable() && (schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))) {
-                if(schematicItem.getRequiredLevel() <= profile.getNexusLevel()) {
+            if(schematicItem.isObtainable()) {
+                if((schematicItem.getTask() == null || profile.getQuests().containsKey(schematicItem.getTask()))
+                        && schematicItem.getRequiredLevel() <= profile.getNexusLevel()) {
                     if(schematicItem.getMaxObtainable() > schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
                         ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
                                 event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
+                    } else {
+                        ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
+                                event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients(),
+                                plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "tool_maximum-reached",
+                                        schematicProfile.getBoughtItems().get(schematicItem.getKey()), schematicItem.getMaxObtainable()));
                     }
+                    //event.getSimpleInventory().addItem(itemStack);
+                } else {
+                    ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
+                            event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients(),
+                            plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "tool_not-unlocked"));
                 }
-                //event.getSimpleInventory().addItem(itemStack);
             }
         }
     }

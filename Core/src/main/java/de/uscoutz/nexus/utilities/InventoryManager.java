@@ -174,6 +174,10 @@ public class InventoryManager {
     }
 
     public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, List<ItemStack> ingredients) {
+        return getShopItem(player, simpleInventory, itemStack, ingredients, null);
+    }
+
+    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, List<ItemStack> ingredients, String message) {
         List<Component> lore = new ArrayList<>();
         ItemStack shopItem = itemStack.clone();
         lore.add(Component.text(plugin.getLocaleManager().translate("de_DE", "workshop_needed-items")));
@@ -190,6 +194,10 @@ public class InventoryManager {
                 }
             }
         }
+        if(message != null) {
+            lore.add(Component.text(" "));
+            lore.add(Component.text(message));
+        }
         shopItem.lore(lore);
         boolean finalPlayerHasItems = playerHasItems;
         PaginatedInventory paginatedInventory = null;
@@ -198,20 +206,28 @@ public class InventoryManager {
             simpleInventory = paginatedInventory;
         }
 
-        Consumer<InventoryClickEvent> clickEventConsumer = event -> {
-            if(!finalPlayerHasItems) {
+        Consumer<InventoryClickEvent> clickEventConsumer;
+        if(message == null) {
+            clickEventConsumer = event -> {
+                if(!finalPlayerHasItems) {
+                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0F, 1.0F);
+                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
+                } else {
+                    player.closeInventory();
+                    removeNeededItems(player, ingredients);
+                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+                    player.getInventory().addItem(itemStack);
+                    PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+                    String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                    Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
+                }
+            };
+        } else {
+            clickEventConsumer = event -> {
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0F, 1.0F);
-                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
-            } else {
-                player.closeInventory();
-                removeNeededItems(player, ingredients);
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
-                player.getInventory().addItem(itemStack);
-                PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
-                String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
-                Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
-            }
-        };
+            };
+        }
+
         if(paginatedInventory != null) {
             paginatedInventory.addItem(shopItem, clickEventConsumer);
         } else {
