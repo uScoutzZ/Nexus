@@ -166,6 +166,13 @@ public class InventoryManager {
         inventory.open(player);
     }
 
+    public void openProfiles(Player player) {
+        SimpleInventory inventory = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).openProfiles(null, false);
+
+        setNavigationItems(inventory, player, FilterType.PROFILES);
+        inventory.open(player);
+    }
+
     public void openRescuedItems(Player player) {
         SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "villager_rescue"));
 
@@ -241,6 +248,8 @@ public class InventoryManager {
                 .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_schematics"));
         ItemBuilder tools = ItemBuilder.create(Material.GOLDEN_PICKAXE)
                 .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_tools"));
+        ItemBuilder profiles = ItemBuilder.create(Material.COMPARATOR)
+                .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_profiles"));
         ItemBuilder rescued = ItemBuilder.create(Material.ENDER_CHEST)
                 .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_rescue"));
 
@@ -250,20 +259,26 @@ public class InventoryManager {
         } else if(filterType == FilterType.TOOLS) {
             tools.enchant(Enchantment.FROST_WALKER, 1)
                     .flag(ItemFlag.HIDE_ENCHANTS);
-        } else {
+        } else if(filterType == FilterType.PROFILES) {
+            profiles.enchant(Enchantment.FROST_WALKER, 1)
+                    .flag(ItemFlag.HIDE_ENCHANTS);
+        } else if(filterType == FilterType.RESCUED) {
             rescued.enchant(Enchantment.FROST_WALKER, 1)
                     .flag(ItemFlag.HIDE_ENCHANTS);
         }
 
+        inventory.fill(inventory.getInventory().getSize()-9, inventory.getInventory().getSize(), ItemBuilder.create(Material.AIR));
         inventory.setItem(inventory.getInventory().getSize()-9, schematics, event -> openWorkshopSchematics(player));
         inventory.setItem(inventory.getInventory().getSize()-8, tools, event -> openWorkshopTools(player));
-        inventory.setItem(inventory.getInventory().getSize()-7, rescued, event -> openRescuedItems(player));
+        inventory.setItem(inventory.getInventory().getSize()-7, profiles, event -> openProfiles(player));
+        inventory.setItem(inventory.getInventory().getSize()-6, rescued, event -> openRescuedItems(player));
         inventory.fill(inventory.getInventory().getSize()-18, inventory.getInventory().getSize()-9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
     }
 
     private enum FilterType {
         SCHEMATICS,
         TOOLS,
-        RESCUED;
+        RESCUED,
+        PROFILES;
     }
 }
