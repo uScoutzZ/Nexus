@@ -3,11 +3,14 @@ package de.uscoutz.nexus.profile;
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.skills.Skill;
+import de.uscoutz.nexus.utilities.BiMap;
 import de.uscoutz.nexus.utilities.DateUtilities;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,6 +41,8 @@ public class ProfilePlayer {
     private GameProfile gameProfile;
     @Getter
     private Map<Material, Integer> brokenBlocks;
+    @Getter
+    private BiMap<Skill, Integer, Integer> skillMap;
 
     public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, NexusPlugin plugin) {
         this.profile = profile;
@@ -47,6 +52,23 @@ public class ProfilePlayer {
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
         brokenBlocks = new HashMap<>();
+        skillMap = new BiMap<>();
+
+        for(Skill skill : Skill.values()) {
+            skillMap.put(skill, 0, 0);
+        }
+
+        ResultSet skillsResultSet = plugin.getDatabaseAdapter().getTwo("skills", "player", String.valueOf(playerUUID), "profileId", String.valueOf(profile.getProfileId()));
+        try {
+            if(skillsResultSet.next()) {
+                Skill skill = Skill.valueOf(skillsResultSet.getString("skill"));
+                int level = skillsResultSet.getInt("level");
+                int xp = skillsResultSet.getInt("xp");
+                skillMap.put(skill, level, xp);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         ResultSet resultSet = plugin.getDatabaseAdapter().getTwo("playerStats", "player", String.valueOf(playerUUID), "profileId", String.valueOf(profile.getProfileId()));
         try {
@@ -71,6 +93,18 @@ public class ProfilePlayer {
             throw new RuntimeException(e);
         }
         profile.getMembers().put(playerUUID, this);
+    }
+
+    public boolean addSkillXP(Skill skill, int xp) {
+        skillMap.getValues2().replace(skill, skillMap.getValues2().get(skill) + xp);
+        Player player = Bukkit.getPlayer(playerUUID);
+        Bukkit.broadcastMessage("add xp to " + player.getName() + " for " + skill.getTitle() + " with " + xp + " xp");
+        if(player != null) {
+            player.sendActionBar(Component.text("§3+" + xp + " " + skill.getTitle() + " (" +
+                    skillMap.getValues2().get(skill) + "/" + skill.getNeededXP()[skillMap.getValues1().get(skill)] + ")"));
+        }
+
+        return true;
     }
 
     public void checkout(long joined) {
@@ -101,6 +135,17 @@ public class ProfilePlayer {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+        for(Skill skill : skillMap.getValues1().keySet()) {
+            if(!plugin.getDatabaseAdapter().keyExistsThreeAsync("skills", "player", playerUUID, "profileId", profile.getProfileId(), "skill", skill.toString())) {
+                plugin.getDatabaseAdapter().setAsync("skills", playerUUID, profile.getProfileId(), skill.toString(), skillMap.getValues1().get(skill), skillMap.getValues2().get(skill));
+            } else {
+                plugin.getDatabaseAdapter().updateThreeAsync("skills", "player", playerUUID,
+                        "profileId", profile.getProfileId(), "skill", skill.toString(),
+                        new DatabaseUpdate("level", skillMap.getValues1().get(skill)),
+                        new DatabaseUpdate("xp", skillMap.getValues2().get(skill)));
             }
         }
         new BukkitRunnable() {

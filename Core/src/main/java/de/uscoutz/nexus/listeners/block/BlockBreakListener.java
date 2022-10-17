@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
+import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -56,6 +57,7 @@ public class BlockBreakListener implements Listener {
         }
 
         if(breakingPower >= blockResistance) {
+            int addedXP = 1;
             event.setCancelled(false);
             Material material = plugin.getToolManager().getBlockDrop().getOrDefault(event.getBlock().getType(), event.getBlock().getType());
             profilePlayer.getBrokenBlocks().put(material, profilePlayer.getBrokenBlocks().getOrDefault(material, 0) + 1);
@@ -121,6 +123,8 @@ public class BlockBreakListener implements Listener {
                     }.runTaskLater(plugin, 1);
                 }
             }
+
+            profilePlayer.addSkillXP(Skill.MINING, addedXP);
         } else {
             player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
             event.setCancelled(true);
