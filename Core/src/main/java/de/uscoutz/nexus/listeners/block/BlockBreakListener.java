@@ -62,7 +62,8 @@ public class BlockBreakListener implements Listener {
             int rangeMin = plugin.getConfig().getInt("respawn-range-min");
             int rangeMax = plugin.getConfig().getInt("respawn-range-max");
             long respawnAfter = new Random().nextLong(rangeMax-rangeMin)+rangeMin;
-            if(event.getBlock().getType().toString().contains("_LOG") || event.getBlock().getType().toString().contains("_WOOD")) {
+            if(event.getBlock().getType().toString().contains("_LOG") || event.getBlock().getType().toString().contains("_WOOD")
+                    || event.getBlock().getType().toString().contains("_LEAVES")) {
                 NexusWorld nexusWorld = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld()).getWorld();
                 boolean inList = false;
                 Location clonedLocation = event.getBlock().getLocation().clone();

@@ -67,7 +67,7 @@ public class NexusWorld {
 
     public void assign() {
         Block block = world.getSpawnLocation().add(0, 1, 0).getBlock();
-        new BukkitRunnable() {
+        /*new BukkitRunnable() {
             @Override
             public void run() {
                 block.setType(Material.OAK_SIGN);
@@ -75,7 +75,7 @@ public class NexusWorld {
                 sign.line(0, Component.text(profile.getOwner() + ""));
                 sign.update();
             }
-        }.runTask(plugin);
+        }.runTask(plugin);*/
     }
 
     /*13000 = RUNNING,
