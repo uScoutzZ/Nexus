@@ -57,7 +57,8 @@ public class BlockBreakListener implements Listener {
         }
 
         if(breakingPower >= blockResistance) {
-            int addedXP = 1;
+            int addedXP = 0;
+            Skill skill = null;
             event.setCancelled(false);
             Material material = plugin.getToolManager().getBlockDrop().getOrDefault(event.getBlock().getType(), event.getBlock().getType());
             profilePlayer.getBrokenBlocks().put(material, profilePlayer.getBrokenBlocks().getOrDefault(material, 0) + 1);
@@ -66,6 +67,10 @@ public class BlockBreakListener implements Listener {
             long respawnAfter = new Random().nextLong(rangeMax-rangeMin)+rangeMin;
             if(event.getBlock().getType().toString().contains("_LOG") || event.getBlock().getType().toString().contains("_WOOD")
                     || event.getBlock().getType().toString().contains("_LEAVES")) {
+                if(!event.getBlock().getType().toString().contains("_LEAVES")) {
+                    addedXP = 6;
+                    skill = Skill.WOODCUTTING;
+                }
                 NexusWorld nexusWorld = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld()).getWorld();
                 boolean inList = false;
                 Location clonedLocation = event.getBlock().getLocation().clone();
@@ -111,6 +116,12 @@ public class BlockBreakListener implements Listener {
                         Material.COAL_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_DIAMOND_ORE,
                         Material.DEEPSLATE_IRON_ORE, Material.DEEPSLATE_COAL_ORE);
                 if(blockData.getMaterial().isSolid()) {
+                    skill = Skill.MINING;
+                    if(toStone.contains(blockData.getMaterial())) {
+                        addedXP = 4;
+                    } else {
+                        addedXP = 2;
+                    }
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -121,10 +132,15 @@ public class BlockBreakListener implements Listener {
                             }
                         }
                     }.runTaskLater(plugin, 1);
+                } else {
+                    skill = Skill.FARMING;
+                    addedXP = 4;
                 }
             }
 
-            profilePlayer.addSkillXP(Skill.MINING, addedXP);
+            if(skill != null) {
+                profilePlayer.addSkillXP(skill, addedXP);
+            }
         } else {
             player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
             event.setCancelled(true);

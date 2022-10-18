@@ -154,8 +154,6 @@ public class InventoryManager {
 
     public void openWorkshopTools(Player player) {
         PaginatedInventory inventory = InventoryBuilder.createPaginated(4*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
-        inventory.setPageSwitcherForwardSlot(inventory.getInventory().getSize()-1);
-        inventory.setPageSwitcherBackSlot(inventory.getInventory().getSize()-2);
         inventory.addDynamicSlots(IntStream.range(0, 2*9).toArray());
 
         for(Tool tool : plugin.getToolManager().getToolMap().values()) {
@@ -163,6 +161,8 @@ public class InventoryManager {
         }
 
         setNavigationItems(inventory, player, FilterType.TOOLS);
+        inventory.setPageSwitcherForwardSlot(inventory.getInventory().getSize()-1);
+        inventory.setPageSwitcherBackSlot(inventory.getInventory().getSize()-2);
         inventory.open(player);
     }
 

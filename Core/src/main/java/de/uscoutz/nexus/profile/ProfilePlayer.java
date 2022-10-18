@@ -13,6 +13,7 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -60,7 +61,7 @@ public class ProfilePlayer {
 
         ResultSet skillsResultSet = plugin.getDatabaseAdapter().getTwo("skills", "player", String.valueOf(playerUUID), "profileId", String.valueOf(profile.getProfileId()));
         try {
-            if(skillsResultSet.next()) {
+            while(skillsResultSet.next()) {
                 Skill skill = Skill.valueOf(skillsResultSet.getString("skill"));
                 int level = skillsResultSet.getInt("level");
                 int xp = skillsResultSet.getInt("xp");
@@ -96,12 +97,29 @@ public class ProfilePlayer {
     }
 
     public boolean addSkillXP(Skill skill, int xp) {
-        skillMap.getValues2().replace(skill, skillMap.getValues2().get(skill) + xp);
+        boolean levelUp = false;
+        if(skill.getNeededXP().length > skillMap.getValues1().get(skill) &&  skillMap.getValues2().get(skill)+xp >= skill.getNeededXP()[skillMap.getValues1().get(skill)]) {
+            skillMap.put(skill, skillMap.getValues1().get(skill)+1, skillMap.getValues2().get(skill)+xp - skill.getNeededXP()[skillMap.getValues1().get(skill)]);
+            levelUp = true;
+        } else {
+            skillMap.getValues2().replace(skill, skillMap.getValues2().get(skill) + xp);
+        }
         Player player = Bukkit.getPlayer(playerUUID);
-        Bukkit.broadcastMessage("add xp to " + player.getName() + " for " + skill.getTitle() + " with " + xp + " xp");
         if(player != null) {
-            player.sendActionBar(Component.text("§3+" + xp + " " + skill.getTitle() + " (" +
-                    skillMap.getValues2().get(skill) + "/" + skill.getNeededXP()[skillMap.getValues1().get(skill)] + ")"));
+            if(skill.getNeededXP().length > skillMap.getValues1().get(skill)) {
+                player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added",
+                        xp, skill.getTitle(), skillMap.getValues2().get(skill), skill.getNeededXP()[skillMap.getValues1().get(skill)])));
+            } else {
+                player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added-maximum",
+                        xp, skill.getTitle())));
+            }
+
+            if(levelUp) {
+                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "skill_level-up", skill.getTitle(), skillMap.getValues1().get(skill)));
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+            } else {
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F);
+            }
         }
 
         return true;
@@ -140,7 +158,7 @@ public class ProfilePlayer {
 
         for(Skill skill : skillMap.getValues1().keySet()) {
             if(!plugin.getDatabaseAdapter().keyExistsThreeAsync("skills", "player", playerUUID, "profileId", profile.getProfileId(), "skill", skill.toString())) {
-                plugin.getDatabaseAdapter().setAsync("skills", playerUUID, profile.getProfileId(), skill.toString(), skillMap.getValues1().get(skill), skillMap.getValues2().get(skill));
+                plugin.getDatabaseAdapter().setAsync("skills", profile.getProfileId(), playerUUID, skill.toString(), skillMap.getValues1().get(skill), skillMap.getValues2().get(skill));
             } else {
                 plugin.getDatabaseAdapter().updateThreeAsync("skills", "player", playerUUID,
                         "profileId", profile.getProfileId(), "skill", skill.toString(),
