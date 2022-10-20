@@ -9,9 +9,12 @@ import org.bukkit.entity.Player;
 public class MoneyReward implements SkillReward{
 
     private String display;
-
-    @Setter
     private int rewardMoney;
+
+    public MoneyReward(int rewardMoney) {
+        this.rewardMoney = rewardMoney;
+        display = "§e" + rewardMoney + "§7 Coins";
+    }
 
     @Override
     public String getDisplay() {

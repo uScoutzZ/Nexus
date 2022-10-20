@@ -60,7 +60,7 @@ public class NexusScoreboard {
         entriesByType.put(ScoreboardUpdateType.MONEY, "§3§a");
         scoresByType.put(ScoreboardUpdateType.MONEY, maxScore+1);
 
-        objective.getScore("§2").setScore(maxScore--);
+        objective.getScore("§3").setScore(maxScore--);
 
         objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_biome")).setScore(maxScore--);
         Team biome = scoreboard.registerNewTeam("biome");
@@ -71,7 +71,7 @@ public class NexusScoreboard {
         entriesByType.put(ScoreboardUpdateType.BIOME, "§1§a");
         scoresByType.put(ScoreboardUpdateType.BIOME, maxScore+1);
 
-        objective.getScore("§3").setScore(maxScore--);
+        objective.getScore("§4").setScore(maxScore--);
     }
 
     public void setup(Player player) {

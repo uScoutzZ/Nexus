@@ -1,20 +1,30 @@
 package de.uscoutz.nexus.skills;
 
+import de.uscoutz.nexus.skills.rewards.ItemReward;
+import de.uscoutz.nexus.skills.rewards.MoneyReward;
 import lombok.Getter;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public enum Skill {
 
-    MINING("Mining", 100, 750, 5000),
-    WOODCUTTING("Woodcutting", 100, 300, 5000),
-    FARMING("Farming", 100, 500, 5000);
+    MINING("Mining",
+            new SkillLevel(100, new MoneyReward(100), new ItemReward(new ItemStack(Material.COAL, 8))),
+            new SkillLevel(300, new ItemReward(new ItemStack(Material.IRON_INGOT, 3)))),
+    WOODCUTTING("Woodcutting",
+            new SkillLevel(100, new MoneyReward(100), new ItemReward(new ItemStack(Material.DARK_OAK_LOG, 8))),
+            new SkillLevel(300, new ItemReward(new ItemStack(Material.ACACIA_LOG, 8)))),
+    FARMING("Farming",
+            new SkillLevel(100, new MoneyReward(100)),
+            new SkillLevel(300, new MoneyReward(300)));
 
     @Getter
-    private final int[] neededXP;
+    private final SkillLevel[] skillLevels;
     @Getter
     private String title;
 
-    Skill(String title, int... neededXP) {
+    Skill(String title, SkillLevel... skillLevels) {
         this.title = title;
-        this.neededXP = neededXP;
+        this.skillLevels = skillLevels;
     }
 }

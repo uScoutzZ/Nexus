@@ -5,6 +5,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.skills.Skill;
+import de.uscoutz.nexus.skills.rewards.SkillReward;
 import de.uscoutz.nexus.utilities.BiMap;
 import de.uscoutz.nexus.utilities.DateUtilities;
 import de.uscoutz.nexus.utilities.GameProfileSerializer;
@@ -100,17 +101,17 @@ public class ProfilePlayer {
 
     public boolean addSkillXP(Skill skill, int xp) {
         boolean levelUp = false;
-        if(skill.getNeededXP().length > skillMap.getValues1().get(skill) &&  skillMap.getValues2().get(skill)+xp >= skill.getNeededXP()[skillMap.getValues1().get(skill)]) {
-            skillMap.put(skill, skillMap.getValues1().get(skill)+1, skillMap.getValues2().get(skill)+xp - skill.getNeededXP()[skillMap.getValues1().get(skill)]);
+        if(skill.getSkillLevels().length > skillMap.getValues1().get(skill) &&  skillMap.getValues2().get(skill)+xp >= skill.getSkillLevels()[skillMap.getValues1().get(skill)].getNeededXP()) {
+            skillMap.put(skill, skillMap.getValues1().get(skill)+1, skillMap.getValues2().get(skill)+xp - skill.getSkillLevels()[skillMap.getValues1().get(skill)].getNeededXP());
             levelUp = true;
         } else {
             skillMap.getValues2().replace(skill, skillMap.getValues2().get(skill) + xp);
         }
         Player player = Bukkit.getPlayer(playerUUID);
         if(player != null) {
-            if(skill.getNeededXP().length > skillMap.getValues1().get(skill)) {
+            if(skill.getSkillLevels().length > skillMap.getValues1().get(skill)) {
                 player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added",
-                        xp, skill.getTitle(), skillMap.getValues2().get(skill), skill.getNeededXP()[skillMap.getValues1().get(skill)])));
+                        xp, skill.getTitle(), skillMap.getValues2().get(skill), skill.getSkillLevels()[skillMap.getValues1().get(skill)].getNeededXP())));
             } else {
                 player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added-maximum",
                         xp, skill.getTitle())));
@@ -118,6 +119,11 @@ public class ProfilePlayer {
 
             if(levelUp) {
                 player.sendMessage(plugin.getLocaleManager().translate("de_DE", "skill_level-up", skill.getTitle(), skillMap.getValues1().get(skill)));
+                for(SkillReward skillReward : skill.getSkillLevels()[skillMap.getValues1().get(skill)-1].getRewards()) {
+                    player.sendMessage("§f    " + skillReward.getDisplay());
+                    skillReward.addReward(player);
+                }
+                player.sendMessage("§f ");
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             } else {
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F);
