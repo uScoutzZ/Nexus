@@ -65,15 +65,24 @@ public class InventoryManager {
     }
 
     public static Inventory fromBase64(String data) {
+        return  fromBase64(data, null);
+    }
+
+    public static Inventory fromBase64(String data, Inventory playerInventory) {
         Inventory inventory = Bukkit.createInventory(null, 9, Component.text("An error occurred"));
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            int size = dataInput.readInt();
 
             try {
-                inventory = Bukkit.createInventory(null, dataInput.readInt(), Component.text(" "));
+                inventory = Bukkit.createInventory(null, size, Component.text(" "));
             } catch (Exception var6) {
-                inventory = Bukkit.createInventory(null, 36, Component.text(" "));
+                inventory = Bukkit.createInventory(null, 3*9, Component.text(" "));
+            }
+
+            if(playerInventory != null) {
+                inventory = playerInventory;
             }
 
             for(int i = 0; i < inventory.getSize(); ++i) {

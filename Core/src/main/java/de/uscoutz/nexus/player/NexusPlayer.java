@@ -263,7 +263,7 @@ public class NexusPlayer {
 
         if(!profile.getMembers().get(uuid).getInventoryBase64().equals("empty")) {
             player.getInventory().setContents(InventoryManager.fromBase64(profile.getMembers().get(
-                    player.getUniqueId()).getInventoryBase64()).getContents());
+                    player.getUniqueId()).getInventoryBase64(), player.getInventory()).getContents());
             for(ItemStack itemStack : player.getInventory().getContents()) {
                 if(itemStack != null && itemStack.getItemMeta() != null) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
@@ -295,7 +295,7 @@ public class NexusPlayer {
             }
         }
 
-        if(!profile.getMembers().get(uuid).getEquipmentBase64().equals("empty")) {
+        /*if(!profile.getMembers().get(uuid).getEquipmentBase64().equals("empty")) {
             Inventory equipmentBase64 = InventoryManager.fromBase64(profile.getMembers().get(
                     player.getUniqueId()).getEquipmentBase64());
             for(int i = 0; i < 4;  i++) {
@@ -334,7 +334,7 @@ public class NexusPlayer {
                     }
                 }
             }
-        }
+        }*/
     }
 
     public void checkout() {

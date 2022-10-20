@@ -37,7 +37,7 @@ public class ProfilePlayer {
     @Getter
     private UUID playerUUID;
     @Getter @Setter
-    private String inventoryBase64, equipmentBase64;
+    private String inventoryBase64;
     @Getter
     private GameProfile gameProfile;
     @Getter
@@ -128,14 +128,10 @@ public class ProfilePlayer {
     public void checkout(long joined) {
         Player player = Bukkit.getPlayer(playerUUID);
         inventoryBase64 = InventoryManager.toBase64(player.getInventory());
-        Inventory equipment = Bukkit.createInventory(null, 9, "Equipment");
-        equipment.setContents(player.getInventory().getArmorContents());
-        equipmentBase64 = InventoryManager.toBase64(equipment);
         playtime = playtime + (System.currentTimeMillis()-joined);
         plugin.getDatabaseAdapter().updateTwo("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
-                new DatabaseUpdate("inventory", inventoryBase64),
-                new DatabaseUpdate("equipment", equipmentBase64));
+                new DatabaseUpdate("inventory", inventoryBase64));
         plugin.getDatabaseAdapter().updateTwo("playerStats", "player", playerUUID,
                 "profileId", profile.getProfileId(),
                 new DatabaseUpdate("deaths", deaths),

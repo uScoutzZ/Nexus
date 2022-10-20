@@ -189,13 +189,11 @@ public class Profile {
                 long joinedProfile = resultSet.getLong("joinedProfile"),
                         profilePlaytime = resultSet.getLong("playtime");
                 String inventory = resultSet.getString("inventory");
-                String equipment = resultSet.getString("equipment");
                 if(!members.containsKey(player)) {
                     new ProfilePlayer(this, player, profilePlaytime, joinedProfile, inventory, plugin);
                 } else {
                     ProfilePlayer profilePlayer = members.get(player);
                     profilePlayer.setInventoryBase64(inventory);
-                    profilePlayer.setEquipmentBase64(equipment);
                     profilePlayer.setPlaytime(profilePlaytime);
                     tempMembers.remove(player);
                 }
