@@ -189,14 +189,12 @@ public class Profile {
                 long joinedProfile = resultSet.getLong("joinedProfile"),
                         profilePlaytime = resultSet.getLong("playtime");
                 String inventory = resultSet.getString("inventory");
-                String equipment = resultSet.getString("equipment");
                 long money = resultSet.getLong("money");
                 if(!members.containsKey(player)) {
                     new ProfilePlayer(this, player, profilePlaytime, joinedProfile, inventory, money, plugin);
                 } else {
                     ProfilePlayer profilePlayer = members.get(player);
                     profilePlayer.setInventoryBase64(inventory);
-                    profilePlayer.setEquipmentBase64(equipment);
                     profilePlayer.setPlaytime(profilePlaytime);
                     tempMembers.remove(player);
                 }
@@ -297,7 +295,7 @@ public class Profile {
         plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
         plugin.getDatabaseAdapter().set("profileStats", profileId, 0, 0);
         plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
-                System.currentTimeMillis(), 0, "empty", "empty", 0);
+                System.currentTimeMillis(), 0, "empty", "empty");
         plugin.getDatabaseAdapter().set("playerStats", owner, profileId, 0, 0);
 
         Location realNexusLocation = plugin.getLocationManager().getLocation("nexus", Bukkit.getWorlds().get(0)).subtract(0, 1, 0);
@@ -313,7 +311,7 @@ public class Profile {
 
     public void addPlayer(int profileSlot, UUID player) {
         plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
-                System.currentTimeMillis(), 0, "empty", "empty", 0);
+                System.currentTimeMillis(), 0, "empty", "empty");
         plugin.getDatabaseAdapter().set("playerStats", player, profileId, 0, 0);
         for(ICloudService service : NexusPlugin.getInstance().getNexusServer().getNexusServers()) {
             new PacketReloadProfileMembers("123", profileId).send(service);

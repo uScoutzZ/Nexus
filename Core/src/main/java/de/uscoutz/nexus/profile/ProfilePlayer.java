@@ -3,7 +3,6 @@ package de.uscoutz.nexus.profile;
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
-import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.skills.rewards.SkillReward;
 import de.uscoutz.nexus.utilities.BiMap;
@@ -39,7 +38,7 @@ public class ProfilePlayer {
     @Getter
     private UUID playerUUID;
     @Getter @Setter
-    private String inventoryBase64, equipmentBase64;
+    private String inventoryBase64;
     @Getter
     private GameProfile gameProfile;
     @Getter
@@ -47,14 +46,13 @@ public class ProfilePlayer {
     @Getter
     private BiMap<Skill, Integer, Integer> skillMap;
 
-    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, long money, NexusPlugin plugin) {
+    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, NexusPlugin plugin) {
         this.profile = profile;
         this.plugin = plugin;
         this.joinedProfile = joinedProfile;
         this.playtime = playtime;
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
-        this.money = money;
         brokenBlocks = new HashMap<>();
         skillMap = new BiMap<>();
 
@@ -138,13 +136,10 @@ public class ProfilePlayer {
         inventoryBase64 = InventoryManager.toBase64(player.getInventory());
         Inventory equipment = Bukkit.createInventory(null, 9, "Equipment");
         equipment.setContents(player.getInventory().getArmorContents());
-        equipmentBase64 = InventoryManager.toBase64(equipment);
         playtime = playtime + (System.currentTimeMillis()-joined);
         plugin.getDatabaseAdapter().updateTwo("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
-                new DatabaseUpdate("inventory", inventoryBase64),
-                new DatabaseUpdate("equipment", equipmentBase64),
-                new DatabaseUpdate("money", money));
+                new DatabaseUpdate("inventory", inventoryBase64));
         plugin.getDatabaseAdapter().updateTwo("playerStats", "player", playerUUID,
                 "profileId", profile.getProfileId(),
                 new DatabaseUpdate("deaths", deaths),
@@ -196,10 +191,5 @@ public class ProfilePlayer {
 
     public String getOnlineTime() {
         return DateUtilities.getTime(0, playtime, plugin);
-    }
-
-    public void addMoney(int money) {
-        this.money += money;
-        plugin.getPlayerManager().getPlayersMap().get(playerUUID).getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.MONEY);
     }
 }
