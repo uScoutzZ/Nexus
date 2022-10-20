@@ -248,8 +248,9 @@ public class NexusPlayer {
         biome = plugin.getBiomeManager().getBiome(player.getLocation());
         nexusScoreboard = new NexusScoreboard(plugin);
         nexusScoreboard.setup(player);
-        nexusScoreboard.update(NexusScoreboard.ScoreboardUpdateType.BIOME);
-        nexusScoreboard.update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
+        for(NexusScoreboard.ScoreboardUpdateType scoreboardUpdateType : NexusScoreboard.ScoreboardUpdateType.values()) {
+            nexusScoreboard.update(scoreboardUpdateType);
+        }
 
         Quest mainQuest = profile.getMainQuest();
         if(mainQuest != null) {

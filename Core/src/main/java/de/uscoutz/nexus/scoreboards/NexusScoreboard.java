@@ -34,7 +34,7 @@ public class NexusScoreboard {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective("abcd", "abcd");
 
-        int maxScore = 7;
+        int maxScore = 10;
 
         objective.displayName(Component.text("§lAPOTOX.NET"));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -48,6 +48,17 @@ public class NexusScoreboard {
         objective.getScore("§2§a").setScore(maxScore--);
         entriesByType.put(ScoreboardUpdateType.NEXUSLEVEL, "§2§a");
         scoresByType.put(ScoreboardUpdateType.NEXUSLEVEL, maxScore+1);
+
+        objective.getScore("§2").setScore(maxScore--);
+
+        objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_money")).setScore(maxScore--);
+        Team money = scoreboard.registerNewTeam("money");
+        money.addEntry("§3§a");
+        money.setSuffix("§cLoading...");
+        money.setPrefix("");
+        objective.getScore("§3§a").setScore(maxScore--);
+        entriesByType.put(ScoreboardUpdateType.MONEY, "§3§a");
+        scoresByType.put(ScoreboardUpdateType.MONEY, maxScore+1);
 
         objective.getScore("§2").setScore(maxScore--);
 
@@ -81,6 +92,9 @@ public class NexusScoreboard {
         } else if(type == ScoreboardUpdateType.NEXUSLEVEL) {
             Team nexusLevel = scoreboard.getTeam("nexuslevel");
             nexusLevel.setSuffix("§b" + profile.getNexusLevel());
+        } else if(type == ScoreboardUpdateType.MONEY) {
+            Team money = scoreboard.getTeam("money");
+            money.setSuffix("§a" + profile.getMembers().get(player.getUniqueId()).getMoney() + "§2$");
         }
         objective.getScore(entriesByType.get(type)).setScore(scoresByType.get(type));
     }
@@ -88,6 +102,7 @@ public class NexusScoreboard {
     public enum ScoreboardUpdateType {
 
         BIOME,
-        NEXUSLEVEL;
+        NEXUSLEVEL,
+        MONEY;
     }
 }

@@ -3,6 +3,7 @@ package de.uscoutz.nexus.profile;
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.utilities.BiMap;
 import de.uscoutz.nexus.utilities.DateUtilities;
@@ -31,7 +32,7 @@ public class ProfilePlayer {
     @Getter
     private Profile profile;
     @Getter @Setter
-    private long playtime, joinedProfile;
+    private long playtime, joinedProfile, money;
     @Getter
     private int kills, deaths;
     @Getter
@@ -45,13 +46,14 @@ public class ProfilePlayer {
     @Getter
     private BiMap<Skill, Integer, Integer> skillMap;
 
-    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, NexusPlugin plugin) {
+    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, long money, NexusPlugin plugin) {
         this.profile = profile;
         this.plugin = plugin;
         this.joinedProfile = joinedProfile;
         this.playtime = playtime;
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
+        this.money = money;
         brokenBlocks = new HashMap<>();
         skillMap = new BiMap<>();
 
@@ -135,7 +137,8 @@ public class ProfilePlayer {
         plugin.getDatabaseAdapter().updateTwo("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
                 new DatabaseUpdate("inventory", inventoryBase64),
-                new DatabaseUpdate("equipment", equipmentBase64));
+                new DatabaseUpdate("equipment", equipmentBase64),
+                new DatabaseUpdate("money", money));
         plugin.getDatabaseAdapter().updateTwo("playerStats", "player", playerUUID,
                 "profileId", profile.getProfileId(),
                 new DatabaseUpdate("deaths", deaths),
@@ -187,5 +190,10 @@ public class ProfilePlayer {
 
     public String getOnlineTime() {
         return DateUtilities.getTime(0, playtime, plugin);
+    }
+
+    public void addMoney(int money) {
+        this.money += money;
+        plugin.getPlayerManager().getPlayersMap().get(playerUUID).getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.MONEY);
     }
 }
