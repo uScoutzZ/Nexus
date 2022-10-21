@@ -17,7 +17,8 @@ public enum SchematicType {
     WALL,
     WORKSHOP,
     HOME,
-    PORTAL;
+    PORTAL,
+    AUTOMINER;
 
     @Getter
     private int zDistance;

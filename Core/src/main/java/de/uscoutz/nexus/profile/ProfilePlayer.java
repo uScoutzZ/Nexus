@@ -3,6 +3,7 @@ package de.uscoutz.nexus.profile;
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.skills.rewards.SkillReward;
 import de.uscoutz.nexus.utilities.BiMap;
@@ -46,13 +47,14 @@ public class ProfilePlayer {
     @Getter
     private BiMap<Skill, Integer, Integer> skillMap;
 
-    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, NexusPlugin plugin) {
+    public ProfilePlayer(Profile profile, UUID playerUUID, long playtime, long joinedProfile, String inventoryBase64, long money, NexusPlugin plugin) {
         this.profile = profile;
         this.plugin = plugin;
         this.joinedProfile = joinedProfile;
         this.playtime = playtime;
         this.inventoryBase64 = inventoryBase64;
         this.playerUUID = playerUUID;
+        this.money = money;
         brokenBlocks = new HashMap<>();
         skillMap = new BiMap<>();
 
@@ -179,6 +181,11 @@ public class ProfilePlayer {
                 }
             }
         }.runTaskLater(plugin, 20);
+    }
+
+    public void addMoney(int money) {
+        this.money += money;
+        plugin.getPlayerManager().getPlayersMap().get(playerUUID).getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.MONEY);
     }
 
     public void addKill() {
