@@ -6,6 +6,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.autominer.AutoMiner;
 import de.uscoutz.nexus.schematic.collector.Collector;
 import de.uscoutz.nexus.schematic.events.SchematicUpdateEvent;
 import de.uscoutz.nexus.schematic.laser.Laser;
@@ -655,11 +656,16 @@ public class Schematic {
                     if(entity instanceof LivingEntity) {
                         LivingEntity livingEntity = (LivingEntity) entity;
                         livingEntity.setAI(false);
-                        if(entityType == EntityType.VILLAGER && schematicType == SchematicType.WORKSHOP) {
+                        if(entityType == EntityType.VILLAGER) {
                             entity.setCustomNameVisible(true);
-                            entity.customName(Component.text(plugin.getNexusPlugin().getConfig().getString("villager-name")));
                             Villager villager = (Villager) entity;
-                            villager.setProfession(Villager.Profession.ARMORER);
+                            if(schematicType == SchematicType.WORKSHOP) {
+                                entity.customName(Component.text(plugin.getNexusPlugin().getConfig().getString("villager-name")));
+                                villager.setProfession(Villager.Profession.ARMORER);
+                            } else if(schematicType == SchematicType.AUTOMINER) {
+                                entity.customName(Component.text("§bWalter"));
+                                villager.setProfession(Villager.Profession.WEAPONSMITH);
+                            }
                         }
                     }
                 }
@@ -724,6 +730,9 @@ public class Schematic {
     public static void destroy(Profile profile, UUID schematicId, NexusSchematicPlugin plugin, DestroyAnimation animation, SchematicType schematicType) {
         if(schematicType == SchematicType.WORKSHOP) {
             profile.saveStorages();
+        } else if(schematicType == SchematicType.AUTOMINER) {
+            AutoMiner autoMiner = plugin.getAutoMinerManager().getAutoMinersPerProfile().get(profile.getProfileId()).get(schematicId);
+            autoMiner.save();
         }
         SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
         BuiltSchematic builtSchematic = schematicProfile.getBuiltSchematics().get(schematicId);

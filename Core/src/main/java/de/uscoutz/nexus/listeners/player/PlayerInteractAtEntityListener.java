@@ -37,38 +37,6 @@ public class PlayerInteractAtEntityListener implements Listener {
 
         if(event.getRightClicked() instanceof Villager) {
             event.setCancelled(true);
-            String name = event.getRightClicked().getCustomName();
-            if(profile.getUnfinishedQuests().containsKey(Task.TALK_TO_GEORGE)) {
-                profile.getQuests().get(Task.TALK_TO_GEORGE).finish(player);
-            } else {
-                if(profile.getUnfinishedQuests().containsKey(Task.COLLECT_LOG)) {
-                    Quest quest = profile.getUnfinishedQuests().get(Task.COLLECT_LOG);
-
-                    int progress = InventoryManager.removeNeededItems(player, Arrays.asList(new ItemStack(Material.DARK_OAK_LOG,
-                            (int) (quest.getTask().getGoal()-quest.getProgress()))));
-                    if(progress != 0) {
-                        long finalProgress = profile.getQuests().get(Task.COLLECT_LOG).addProgress(player, progress);
-                        if(finalProgress < quest.getTask().getGoal()) {
-                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_collected-wood", name, progress));
-                        }
-                    } else {
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_no-wood", name));
-                    }
-                } else {
-                    if(profile.getUnfinishedQuests().containsKey(Task.UPGRADE_NEXUS)) {
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "george_upgrade-nexus", name));
-                    } else {
-                        if(profile.getQuests().containsKey(Task.BUILD_WALLS)) {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    plugin.getInventoryManager().openWorkshopSchematics(player);
-                                }
-                            }.runTaskLater(plugin, 1);
-                        }
-                    }
-                }
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.schematic.autominer.AutoMinerManager;
 import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
 import de.uscoutz.nexus.schematic.gateways.GatewayManager;
 import de.uscoutz.nexus.schematic.listener.block.*;
@@ -45,6 +46,8 @@ public class NexusSchematicPlugin extends JavaPlugin {
     private SchematicItemManager schematicItemManager;
     @Getter
     private GatewayManager gatewayManager;
+    @Getter
+    private AutoMinerManager autoMinerManager;
 
     @Getter
     private final String NO_PERMISSION = "§cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.";
@@ -65,6 +68,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         schematicItemManager.loadItems();
         gatewayManager = new GatewayManager(new File("/home/networksync/nexus/gateways.yml"), this);
         gatewayManager.loadGateways();
+        autoMinerManager = new AutoMinerManager(this);
 
         getCommand("schematicwand").setExecutor(new SchematicWand(this));
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));
@@ -87,6 +91,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new SchematicInventoryOpenedListener(this), this);
         Bukkit.getPluginManager().registerEvents(new EntityPortalEnterListener(this), this);
         Bukkit.getPluginManager().registerEvents(new SchematicItemBoughtListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractAtEntityListener(this), this);
         Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Enabled");
     }
 }

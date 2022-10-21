@@ -3,12 +3,14 @@ package de.uscoutz.nexus.schematic.schematics;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
+import de.uscoutz.nexus.schematic.autominer.AutoMiner;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,13 @@ public class BuiltSchematic {
         this.entities = entities;
         this.isBuilt = isBuilt;
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, this);
+
+        if(schematic.getSchematicType() == SchematicType.AUTOMINER) {
+            if(!plugin.getAutoMinerManager().getAutoMinersPerProfile().containsKey(profile.getProfileId())) {
+                plugin.getAutoMinerManager().getAutoMinersPerProfile().put(profile.getProfileId(), new HashMap<>());
+            }
+            plugin.getAutoMinerManager().getAutoMinersPerProfile().get(profile.getProfileId()).put(schematicId, new AutoMiner(this, plugin));
+        }
     }
 
     public void damage(double damage) {
