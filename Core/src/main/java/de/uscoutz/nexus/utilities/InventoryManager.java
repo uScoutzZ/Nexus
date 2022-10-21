@@ -3,6 +3,9 @@ package de.uscoutz.nexus.utilities;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
 import de.uscoutz.nexus.events.SchematicItemBoughtEvent;
+import de.uscoutz.nexus.gamemechanics.shops.ItemPrice;
+import de.uscoutz.nexus.gamemechanics.shops.MoneyPrice;
+import de.uscoutz.nexus.gamemechanics.shops.NexusPrice;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.PaginatedInventory;
@@ -166,7 +169,7 @@ public class InventoryManager {
         inventory.addDynamicSlots(IntStream.range(0, 2*9).toArray());
 
         for(Tool tool : plugin.getToolManager().getToolMap().values()) {
-            getShopItem(player, inventory, tool.getItemStack(), tool.getIngredients());
+            getShopItem(player, inventory, tool.getItemStack(), tool.getPrices());
         }
 
         setNavigationItems(inventory, player, FilterType.TOOLS);
@@ -189,39 +192,47 @@ public class InventoryManager {
         inventory.open(player);
     }
 
-    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, List<ItemStack> ingredients) {
-        return getShopItem(player, simpleInventory, itemStack, ingredients, null);
+
+    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, NexusPrice... prices) {
+        return getShopItem(player, simpleInventory, itemStack, null, prices);
     }
 
-    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, List<ItemStack> ingredients, String message) {
+    public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, String message, NexusPrice... prices) {
         List<Component> lore = new ArrayList<>();
         ItemStack shopItem = itemStack.clone();
         lore.add(Component.text(plugin.getLocaleManager().translate("de_DE", "workshop_needed-items")));
         boolean playerHasItems = true;
-        if(ingredients != null) {
-            if(ingredients.size() == 0) {
-                lore.add(Component.text("§cNot configured"));
-            }
-            for(ItemStack neededStack : ingredients) {
-                Translatable translatable = neededStack;
-                lore.add(Component.text("§e" + neededStack.getAmount() + "x " + LegacyComponentSerializer.legacyAmpersand().serialize(Component.translatable(translatable.translationKey()))));
-                if(!player.getInventory().containsAtLeast(neededStack, neededStack.getAmount())) {
-                    playerHasItems = false;
+
+        if(prices.length == 0) {
+            lore.add(Component.text("§cNot configured"));
+        }
+        for(NexusPrice nexusPrice : prices) {
+            if(nexusPrice instanceof ItemPrice itemPrice) {
+                for(String string : itemPrice.getDisplayList()) {
+                    lore.add(Component.text(string));
                 }
+            } else {
+                lore.add(Component.text(nexusPrice.getDisplay()));
+            }
+
+            if(!nexusPrice.containsNeeded(player)) {
+                playerHasItems = false;
             }
         }
+
         if(message != null) {
             lore.add(Component.text(" "));
             lore.add(Component.text(message));
         }
         shopItem.lore(lore);
-        boolean finalPlayerHasItems = playerHasItems;
+
         PaginatedInventory paginatedInventory = null;
         if(simpleInventory instanceof PaginatedInventory) {
             paginatedInventory = (PaginatedInventory) simpleInventory;
             simpleInventory = paginatedInventory;
         }
 
+        boolean finalPlayerHasItems = playerHasItems;
         Consumer<InventoryClickEvent> clickEventConsumer;
         if(message == null) {
             clickEventConsumer = event -> {
@@ -230,7 +241,9 @@ public class InventoryManager {
                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
                 } else {
                     player.closeInventory();
-                    removeNeededItems(player, ingredients);
+                    for(NexusPrice nexusPrice : prices) {
+                        nexusPrice.remove(player);
+                    }
                     player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
                     player.getInventory().addItem(itemStack);
                     PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();

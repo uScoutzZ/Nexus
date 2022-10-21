@@ -92,7 +92,7 @@ public class Schematic {
             for(int i = minX; i <= maxX; i++) {
                 for(int k = minZ; k <= maxZ; k++) {
                     Block block = corner1.getWorld().getBlockAt(i, j, k);
-                    if(block.getType() != Material.AIR) {
+                    if(block.getType() != Material.AIR || j == minY) {
                         if(spawnLater.contains(block.getType())) {
                             toAdd.add(block);
                         } else {

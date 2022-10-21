@@ -26,8 +26,6 @@ public class SchematicItem extends NexusItem {
     @Getter
     private boolean obtainable;
     @Getter @Setter
-    private List<ItemStack> ingredients;
-    @Getter @Setter
     private Task task;
     @Getter @Setter
     private int maxObtainable, requiredLevel;

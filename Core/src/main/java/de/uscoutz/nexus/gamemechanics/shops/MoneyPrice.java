@@ -25,7 +25,7 @@ public class MoneyPrice implements NexusPrice{
     @Override
     public void remove(Player player) {
         Profile profile = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld());
-        profile.getMembers().get(player.getUniqueId()).getMoney();
+        profile.getMembers().get(player.getUniqueId()).addMoney(-money);
     }
 
     @Override

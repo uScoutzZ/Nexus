@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.listener.schematic;
 
 import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
+import de.uscoutz.nexus.gamemechanics.shops.ItemPrice;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
@@ -35,18 +36,21 @@ public class SchematicInventoryOpenedListener implements Listener {
                         && schematicItem.getRequiredLevel() <= profile.getNexusLevel()) {
                     if(schematicItem.getMaxObtainable() > schematicProfile.getBoughtItems().get(schematicItem.getKey())) {
                         ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
-                                event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients());
+                                event.getSimpleInventory(), schematicItem.getItemStack(),
+                                schematicItem.getPrices());
                     } else {
                         ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
-                                event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients(),
+                                event.getSimpleInventory(), schematicItem.getItemStack(),
                                 plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "tool_maximum-reached",
-                                        schematicProfile.getBoughtItems().get(schematicItem.getKey()), schematicItem.getMaxObtainable()));
+                                        schematicProfile.getBoughtItems().get(schematicItem.getKey()), schematicItem.getMaxObtainable()),
+                                schematicItem.getPrices());
                     }
                     //event.getSimpleInventory().addItem(itemStack);
                 } else {
                     ItemStack itemStack = plugin.getNexusPlugin().getInventoryManager().getShopItem(event.getPlayer(),
-                            event.getSimpleInventory(), schematicItem.getItemStack(), schematicItem.getIngredients(),
-                            plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "tool_not-unlocked"));
+                            event.getSimpleInventory(), schematicItem.getItemStack(),
+                            plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "tool_not-unlocked"),
+                            schematicItem.getPrices());
                 }
             }
         }

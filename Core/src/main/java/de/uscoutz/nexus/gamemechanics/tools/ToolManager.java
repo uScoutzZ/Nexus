@@ -74,7 +74,11 @@ public class ToolManager {
                 tool.name(toolsConfig.getString(key + ".locale"));
             }
             String ingredients = toolsConfig.getString(key+ ".ingredients");
-            tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+            tool.setMoneyPrice(toolsConfig.getInt(key + ".money"));
+            if(ingredients != null) {
+                tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+            }
+
 
             tool.build();
             toolMap.put(key, tool);

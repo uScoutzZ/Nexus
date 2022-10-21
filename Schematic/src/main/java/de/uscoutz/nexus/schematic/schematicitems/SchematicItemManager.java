@@ -70,7 +70,10 @@ public class SchematicItemManager {
                 }
                 if(obtainable) {
                     String ingredients = itemsConfig.getString(key+ ".ingredients");
-                    schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+                    schematicItem.setMoneyPrice(itemsConfig.getInt(key + ".money"));
+                    if(ingredients != null) {
+                        schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+                    }
                     String taskName = itemsConfig.getString(key+ ".quest");
                     if(taskName != null) {
                         try {

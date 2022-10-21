@@ -16,8 +16,6 @@ public class Tool extends NexusItem {
 
     @Getter
     private int breakingPower;
-    @Getter @Setter
-    private List<ItemStack> ingredients;
 
     private NexusPlugin nexusPlugin;
 

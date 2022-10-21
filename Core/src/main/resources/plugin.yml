@@ -13,6 +13,7 @@ commands:
   profileunload:
   fly:
   joinprofile:
+  addmoney:
 loadbefore:
   - NexusSchematic
   - NexusWave
