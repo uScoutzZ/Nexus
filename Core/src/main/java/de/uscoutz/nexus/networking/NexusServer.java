@@ -117,8 +117,10 @@ public class NexusServer {
         int profileCount = getProfileCount();
         for(String server : profileCountByServer.keySet()) {
             if(profileCountByServer.get(server) < profileCount) {
-                emptiestServer = server;
-                profileCount = profileCountByServer.get(server);
+                if(server.split("-")[0].equals(getThisServiceName().split("-")[0])) {
+                    emptiestServer = server;
+                    profileCount = profileCountByServer.get(server);
+                }
             }
         }
 
