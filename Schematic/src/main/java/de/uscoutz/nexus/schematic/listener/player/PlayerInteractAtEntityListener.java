@@ -43,12 +43,11 @@ public class PlayerInteractAtEntityListener implements Listener {
             BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().get(region);
             if(builtSchematic.getSchematic().getSchematicType() == SchematicType.AUTOMINER) {
                 AutoMiner autoMiner = plugin.getAutoMinerManager().getAutoMinersPerProfile().get(profile.getProfileId()).get(builtSchematic.getSchematicId());
-                Inventory inventory = Bukkit.createInventory(null, 2*9, "AutoMiner");
-                inventory.setContents(autoMiner.getInventory().getContents());
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        player.openInventory(autoMiner.getInventory());
+                        autoMiner.getInventory().open(player);
+                        //player.openInventory(autoMiner.getInventory());
                     }
                 }.runTaskLater(plugin, 1);
             } else if(builtSchematic.getSchematic().getSchematicType() == SchematicType.WORKSHOP) {
