@@ -45,7 +45,12 @@ public class PlayerInteractAtEntityListener implements Listener {
                 AutoMiner autoMiner = plugin.getAutoMinerManager().getAutoMinersPerProfile().get(profile.getProfileId()).get(builtSchematic.getSchematicId());
                 Inventory inventory = Bukkit.createInventory(null, 2*9, "AutoMiner");
                 inventory.setContents(autoMiner.getInventory().getContents());
-                player.openInventory(autoMiner.getInventory());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        player.openInventory(autoMiner.getInventory());
+                    }
+                }.runTaskLater(plugin, 1);
             } else if(builtSchematic.getSchematic().getSchematicType() == SchematicType.WORKSHOP) {
                 if(profile.getUnfinishedQuests().containsKey(Task.TALK_TO_GEORGE)) {
                     profile.getQuests().get(Task.TALK_TO_GEORGE).finish(player);
