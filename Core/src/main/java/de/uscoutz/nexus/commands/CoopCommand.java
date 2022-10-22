@@ -40,7 +40,8 @@ public class CoopCommand implements CommandExecutor {
                         if(cloudPlayer != null) {
                             UUID uuid = cloudPlayer.getUniqueId();
                             if(args[0].equalsIgnoreCase("invite")) {
-                                if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
+                                if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getName().startsWith(plugin.getConfig().getString("cloudtype"))) {
+                                    player.sendMessage(cloudPlayer.getConnectedServer().getName() + " " + plugin.getConfig().getString("cloudtype"));
                                     if(!nexusPlayer.getCurrentProfile().getMembers().containsKey(uuid)) {
                                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop-request-sent", args[1]));
                                         new PacketCoopInvite("123", uuid, nexusPlayer.getCurrentProfile().getProfileId(), player.getName()).send(cloudPlayer.getConnectedServer());
@@ -48,8 +49,8 @@ public class CoopCommand implements CommandExecutor {
                                         player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_already-in-coop"));
                                     }
                                 } else {
-                                    Bukkit.broadcastMessage(cloudPlayer.isOnline() +" "+ cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype")));
-                                    Bukkit.broadcastMessage(cloudPlayer.getConnectedServer().getGroupName() + " " + plugin.getConfig().getString("cloudtype"));
+                                    player.sendMessage(cloudPlayer.isOnline() +" "+ cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype")));
+                                    player.sendMessage(cloudPlayer.getConnectedServer().getGroupName() + " " + plugin.getConfig().getString("cloudtype"));
                                     player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_player-offline"));
                                 }
                             } else if(args[0].equalsIgnoreCase("kick")) {
