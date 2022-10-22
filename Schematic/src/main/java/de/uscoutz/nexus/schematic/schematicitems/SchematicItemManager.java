@@ -54,45 +54,49 @@ public class SchematicItemManager {
     public void loadItems() {
         for(String key : itemsConfig.getKeys(false)) {
             Material material = Material.getMaterial(itemsConfig.getString(key + ".material"));
-            SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
-            int level = itemsConfig.getInt(key + ".level");
-            int requiredLevel;
+            try {
+                SchematicType schematicType = SchematicType.valueOf(itemsConfig.getString(key + ".schematicType"));
+                int level = itemsConfig.getInt(key + ".level");
+                int requiredLevel;
 
-            boolean obtainable = itemsConfig.getBoolean(key + ".obtainable");
-            Schematic schematic = plugin.getSchematicManager()
-                    .getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
-            if(schematic == null) {
-                Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
-            } else {
-                SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic, obtainable);
-                if(itemsConfig.getString(key + ".locale") != null) {
-                    schematicItem.name(itemsConfig.getString(key + ".locale"));
-                }
-                if(obtainable) {
-                    String ingredients = itemsConfig.getString(key+ ".ingredients");
-                    schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
-                    String taskName = itemsConfig.getString(key+ ".quest");
-                    if(taskName != null) {
-                        try {
-                            schematicItem.setTask(Task.valueOf(taskName));
-                        } catch (Exception ignored) {
+                boolean obtainable = itemsConfig.getBoolean(key + ".obtainable");
+                Schematic schematic = plugin.getSchematicManager()
+                        .getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level);
+                if(schematic == null) {
+                    Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
+                } else {
+                    SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic, obtainable);
+                    if(itemsConfig.getString(key + ".locale") != null) {
+                        schematicItem.name(itemsConfig.getString(key + ".locale"));
+                    }
+                    if(obtainable) {
+                        String ingredients = itemsConfig.getString(key+ ".ingredients");
+                        schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+                        String taskName = itemsConfig.getString(key+ ".quest");
+                        if(taskName != null) {
+                            try {
+                                schematicItem.setTask(Task.valueOf(taskName));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        if(itemsConfig.getString(key + ".maxObtainable") != null) {
+                            schematicItem.setMaxObtainable(itemsConfig.getInt(key + ".maxObtainable"));
+                        } else {
+                            schematicItem.setMaxObtainable(100);
+                        }
+                        if(itemsConfig.getString(key + ".requiredLevel") != null) {
+                            schematicItem.setRequiredLevel(itemsConfig.getInt(key + ".requiredLevel"));
+                        } else {
+                            schematicItem.setRequiredLevel(0);
                         }
                     }
-                    if(itemsConfig.getString(key + ".maxObtainable") != null) {
-                        schematicItem.setMaxObtainable(itemsConfig.getInt(key + ".maxObtainable"));
-                    } else {
-                        schematicItem.setMaxObtainable(100);
-                    }
-                    if(itemsConfig.getString(key + ".requiredLevel") != null) {
-                        schematicItem.setRequiredLevel(itemsConfig.getInt(key + ".requiredLevel"));
-                    } else {
-                        schematicItem.setRequiredLevel(0);
-                    }
-                }
 
-                schematicItem.build();
-                schematicItemMap.put(key, schematicItem);
-                schematicItemBySchematic.put(schematic, schematicItem);
+                    schematicItem.build();
+                    schematicItemMap.put(key, schematicItem);
+                    schematicItemBySchematic.put(schematic, schematicItem);
+                }
+            } catch (Exception exception) {
+                Bukkit.getLogger().warning("SchematicItem " + key + " has an invalid material!");
             }
         }
     }
