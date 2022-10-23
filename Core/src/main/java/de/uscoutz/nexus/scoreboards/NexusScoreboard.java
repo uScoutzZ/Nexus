@@ -94,7 +94,8 @@ public class NexusScoreboard {
             nexusLevel.setSuffix("§b" + profile.getNexusLevel());
         } else if(type == ScoreboardUpdateType.MONEY) {
             Team money = scoreboard.getTeam("money");
-            money.setSuffix("§a" + profile.getMembers().get(player.getUniqueId()).getMoney() + "§2$");
+            money.setSuffix(plugin.getLocaleManager().translate("de_DE", "scoreboard_money-display",
+                    profile.getMembers().get(player.getUniqueId()).getMoney()));
         }
         objective.getScore(entriesByType.get(type)).setScore(scoresByType.get(type));
     }

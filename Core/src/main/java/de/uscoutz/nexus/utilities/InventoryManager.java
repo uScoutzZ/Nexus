@@ -212,7 +212,7 @@ public class InventoryManager {
                     lore.add(Component.text(string));
                 }
             } else {
-                lore.add(Component.text(nexusPrice.getDisplay()));
+                lore.add(Component.text(nexusPrice.getDisplay(player)));
             }
 
             if(!nexusPrice.containsNeeded(player)) {

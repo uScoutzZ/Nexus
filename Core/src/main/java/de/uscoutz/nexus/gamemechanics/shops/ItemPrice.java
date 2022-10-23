@@ -30,7 +30,7 @@ public class ItemPrice implements NexusPrice{
     }
 
     @Override
-    public String getDisplay() {
+    public String getDisplay(Player player) {
         return display;
     }
 

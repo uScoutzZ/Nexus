@@ -4,6 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.gamemechanics.shops.ItemPrice;
 import de.uscoutz.nexus.gamemechanics.shops.MoneyPrice;
 import de.uscoutz.nexus.gamemechanics.shops.NexusPrice;
+import de.uscoutz.nexus.gamemechanics.shops.VotetokenPrice;
 import de.uscoutz.nexus.item.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class NexusItem {
     @Getter @Setter
     private List<ItemStack> ingredients;
     @Getter @Setter
-    private int moneyPrice;
+    private int moneyPrice, votetokensPrice;
 
     public NexusItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusPlugin plugin) {
         this.key = key;
@@ -61,6 +62,9 @@ public class NexusItem {
         List<NexusPrice> prices = new ArrayList<>();
         if(moneyPrice != 0) {
             prices.add(new MoneyPrice(moneyPrice, plugin));
+        }
+        if(votetokensPrice != 0) {
+            prices.add(new VotetokenPrice(votetokensPrice, plugin));
         }
         if(ingredients != null && ingredients.size() != 0) {
             prices.add(new ItemPrice(ingredients, plugin));

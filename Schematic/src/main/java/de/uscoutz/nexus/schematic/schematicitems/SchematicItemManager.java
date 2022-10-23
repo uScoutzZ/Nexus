@@ -73,6 +73,7 @@ public class SchematicItemManager {
                     if(obtainable) {
                         String ingredients = itemsConfig.getString(key+ ".ingredients");
                         schematicItem.setMoneyPrice(itemsConfig.getInt(key + ".money"));
+                        schematicItem.setVotetokensPrice(itemsConfig.getInt(key + ".votetokens"));
                         if(ingredients != null) {
                             schematicItem.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
                         }

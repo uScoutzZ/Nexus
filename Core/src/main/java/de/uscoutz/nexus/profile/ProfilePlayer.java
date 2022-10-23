@@ -141,7 +141,8 @@ public class ProfilePlayer {
         playtime = playtime + (System.currentTimeMillis()-joined);
         plugin.getDatabaseAdapter().updateTwo("playerProfiles", "profileId", profile.getProfileId(),
                 "player", playerUUID, new DatabaseUpdate("playtime", playtime),
-                new DatabaseUpdate("inventory", inventoryBase64));
+                new DatabaseUpdate("inventory", inventoryBase64),
+                new DatabaseUpdate("money", money));
         plugin.getDatabaseAdapter().updateTwo("playerStats", "player", playerUUID,
                 "profileId", profile.getProfileId(),
                 new DatabaseUpdate("deaths", deaths),

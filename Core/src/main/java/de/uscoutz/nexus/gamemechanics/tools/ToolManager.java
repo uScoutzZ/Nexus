@@ -75,6 +75,7 @@ public class ToolManager {
             }
             String ingredients = toolsConfig.getString(key+ ".ingredients");
             tool.setMoneyPrice(toolsConfig.getInt(key + ".money"));
+            tool.setVotetokensPrice(toolsConfig.getInt(key + ".votetokens"));
             if(ingredients != null) {
                 tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
             }

@@ -8,18 +8,18 @@ public class MoneyPrice implements NexusPrice{
 
     private NexusPlugin plugin;
 
-    private String display;
+    private String localeKey;
     private int money;
 
     public MoneyPrice(int money, NexusPlugin plugin) {
         this.money = money;
         this.plugin = plugin;
-        this.display = "§e" + money + "§7 Coins";
+        this.localeKey = "price_coins";
     }
 
     @Override
-    public String getDisplay() {
-        return display;
+    public String getDisplay(Player player) {
+        return plugin.getLocaleManager().translate("de_DE", localeKey, money);
     }
 
     @Override

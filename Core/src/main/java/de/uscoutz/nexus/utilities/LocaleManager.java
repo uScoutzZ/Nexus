@@ -8,6 +8,8 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,6 +84,25 @@ public class LocaleManager {
 
             int i = 0;
             for(Object argument : variables) {
+                try {
+                    int number = Integer.parseInt(argument.toString());
+                    NumberFormat anotherFormat;
+                    if(languageKey.equals("de_DE")) {
+                        anotherFormat = NumberFormat.getNumberInstance(Locale.GERMAN);
+                    } else if(languageKey.equals("fr_FR")) {
+                        anotherFormat = NumberFormat.getNumberInstance(Locale.FRENCH);
+                    } else {
+                        anotherFormat = NumberFormat.getNumberInstance(Locale.US);
+                    }
+
+                    if(anotherFormat instanceof DecimalFormat) {
+                        DecimalFormat anotherDFormat = (DecimalFormat) anotherFormat;
+                        anotherDFormat.setGroupingUsed(true);
+                        anotherDFormat.setGroupingSize(3);
+                        variables[i] = anotherDFormat.format(number);
+                    }
+                } catch (Exception ignored) {
+                }
                 message = message.replace("{" + i + "}", String.valueOf(variables[i]));
                 i++;
             }
