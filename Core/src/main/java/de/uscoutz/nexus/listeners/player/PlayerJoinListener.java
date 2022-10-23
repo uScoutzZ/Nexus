@@ -78,45 +78,5 @@ public class PlayerJoinListener implements Listener {
                 }
             }
         }.runTaskLater(plugin, 20);
-
-
-        /*
-
-        Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard == null) {
-            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-            player.setScoreboard(scoreboard);
-        }
-
-
-        for(UUID onlinePlayer : plugin.getNexusServer().getOnlinePlayers()) {
-            if(!onlinePlayer.equals(player.getUniqueId())) {
-                Bukkit.getConsoleSender().sendMessage("[Nexus] Onlineplayer: " + onlinePlayer);
-                ServerPlayer serverPlayer = plugin.getNexusServer().getServerPlayerMap().get(onlinePlayer);
-                String name = serverPlayer.getName().getString();
-                *//*ComponentUtils.
-                String name = net.minecraft.network.chat.Component.Serializer.*//*
-
-                Scoreboard finalScoreboard = scoreboard;
-                Piglin.getInstance().getPlayerData().loadPlayerData(onlinePlayer, playerData -> {
-                    Piglin.getInstance().getGroupManager().getGroup(playerData.getRang().toLowerCase()).ifPresent(group -> {
-                        int joinPower = group.getJoinPower();
-                        Bukkit.getConsoleSender().sendMessage("[Nexus] Joinpower: " + joinPower + " Name: " + name);
-
-                        Team sbTeam = finalScoreboard.getTeam(group.getJoinPower() + name);
-
-                        if (sbTeam == null) {
-                            sbTeam = finalScoreboard.registerNewTeam(joinPower + name);
-                        }
-                        sbTeam.addEntry(name);
-
-                        ServerGamePacketListenerImpl ps = ((CraftPlayer) player).getHandle().connection;
-
-                        ps.send(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, serverPlayer));
-                        ps.send(new ClientboundAddPlayerPacket(serverPlayer));
-                    });
-                });
-            }
-        }*/
     }
 }

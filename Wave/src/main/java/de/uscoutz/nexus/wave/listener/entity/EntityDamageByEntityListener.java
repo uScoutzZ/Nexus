@@ -2,7 +2,9 @@ package de.uscoutz.nexus.wave.listener.entity;
 
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.profile.ProfilePlayer;
+import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import de.uscoutz.nexus.wave.profile.RaidProfile;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,7 +30,11 @@ public class EntityDamageByEntityListener implements Listener {
             if(damager instanceof Player player) {
                 Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(damaged.getWorld());
                 ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
-                profilePlayer.addKill();
+                profilePlayer.addSkillXP(Skill.COMBAT, 4);
+                RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
+                if(raidProfile.getRaid() != null) {
+                    profilePlayer.addKill();
+                }
             }
         }
     }

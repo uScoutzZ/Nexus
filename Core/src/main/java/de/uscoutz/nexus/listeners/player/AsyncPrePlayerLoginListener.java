@@ -26,6 +26,9 @@ public class AsyncPrePlayerLoginListener implements Listener {
         boolean registered = nexusPlayer.registered();
 
         Bukkit.getConsoleSender().sendMessage("[Nexus] " + registered);
+        if(plugin.getNexusServer().getSpectators().containsKey(playerUUID)) {
+            return;
+        }
 
         if(registered && nexusPlayer.getProfilesMap().size() != 0) {
             assert nexusPlayer.getCurrentProfile() != null;

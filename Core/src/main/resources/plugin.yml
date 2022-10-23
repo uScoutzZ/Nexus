@@ -13,6 +13,8 @@ commands:
   profileunload:
   fly:
   joinprofile:
+  loadprofile:
+    aliases: [spectate]
   addmoney:
 loadbefore:
   - NexusSchematic

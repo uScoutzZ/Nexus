@@ -80,24 +80,7 @@ public class AutoMiner {
                 autoMinerType = AutoMinerManager.AutoMinerType.STONE;
                 plugin.getNexusPlugin().getDatabaseAdapter().setAsync("autoMiners", profile.getProfileId().toString(), builtSchematic.getSchematicId().toString(), autoMinerType.toString(), plugin.getNexusPlugin().getInventoryManager().toBase64(inventory.getInventory()));
             }
-            inventory.setItem(26, ItemBuilder.create(Material.COMPARATOR)
-                    .name(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_change-type"))
-                    .lore(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_current-type",
-                            plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + autoMinerType.toString().toLowerCase()))), inventoryClickEvent -> {
-                SimpleInventory simpleInventory = InventoryBuilder.create(1*9, "AutoMiner");
-                for(AutoMinerManager.AutoMinerType minerType : AutoMinerManager.AutoMinerType.values()) {
-                    simpleInventory.addItem(ItemBuilder
-                            .create(plugin.getAutoMinerManager().getMaterialsPerType().get(minerType).get(0))
-                            .name(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + minerType.toString().toLowerCase()))
-                            .lore(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_click-to-change")), inventoryClickEvent1 -> {
-                        autoMinerType = minerType;
-                        inventoryClickEvent1.getWhoClicked().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_changed-type",
-                                plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + autoMinerType.toString().toLowerCase())));
-                        inventoryClickEvent1.getWhoClicked().closeInventory();
-                    });
-                }
-                simpleInventory.open((Player) inventoryClickEvent.getWhoClicked());
-            });
+            setTypeSwitcher();
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -111,6 +94,28 @@ public class AutoMiner {
                 }
             }
         }.runTaskTimer(plugin, 0, 100);
+    }
+
+    private void setTypeSwitcher() {
+        inventory.setItem(26, ItemBuilder.create(Material.COMPARATOR)
+                .name(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_change-type"))
+                .lore(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_current-type",
+                        plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + autoMinerType.toString().toLowerCase()))), inventoryClickEvent -> {
+            SimpleInventory simpleInventory = InventoryBuilder.create(1*9, "AutoMiner");
+            for(AutoMinerManager.AutoMinerType minerType : AutoMinerManager.AutoMinerType.values()) {
+                simpleInventory.addItem(ItemBuilder
+                        .create(plugin.getAutoMinerManager().getMaterialsPerType().get(minerType).get(0))
+                        .name(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + minerType.toString().toLowerCase()))
+                        .lore(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_click-to-change")), inventoryClickEvent1 -> {
+                    autoMinerType = minerType;
+                    inventoryClickEvent1.getWhoClicked().sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_changed-type",
+                            plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + autoMinerType.toString().toLowerCase())));
+                    inventoryClickEvent1.getWhoClicked().closeInventory();
+                    setTypeSwitcher();
+                });
+            }
+            simpleInventory.open((Player) inventoryClickEvent.getWhoClicked());
+        });
     }
 
     public void save() {

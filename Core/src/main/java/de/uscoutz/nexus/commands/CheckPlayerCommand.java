@@ -6,6 +6,7 @@ import de.uscoutz.nexus.profile.Profile;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -49,9 +50,14 @@ public class CheckPlayerCommand implements CommandExecutor {
                 try {
                     while(resultSet.next()) {
                         String profileId  = resultSet.getString("profileId");
-                        TextComponent message = new TextComponent("- #" + resultSet.getString("slot") + " " + profileId + " §7(Clickt to join)");
-                        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinprofile " + profileId));
-                        sender.sendMessage(message);
+
+                        ComponentBuilder message = new ComponentBuilder("- #" + resultSet.getString("slot") + " " + profileId + " ");
+                        message.append("§a[load] ");
+                        message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/loadprofile " + profileId));
+                        message.append("§b[join]");
+                        message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinprofile " + profileId));
+
+                        sender.spigot().sendMessage(message.create());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

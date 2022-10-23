@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -77,8 +78,16 @@ public class PlayerInteractListener implements Listener {
                     Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(clicked.getWorld());
                     SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
                     BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region);
-                    if(builtSchematic == null) {
+                    if(builtSchematic == null || !(storage.getBlockData() instanceof Gate)) {
                         event.setCancelled(true);
+                    }
+                } else {
+                    if(event.getClickedBlock().getType() == Material.COMPOSTER) {
+                        event.setCancelled(true);
+                    } else {
+                        if(event.getItem() != null && event.getItem().getType() == Material.BONE_MEAL) {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }

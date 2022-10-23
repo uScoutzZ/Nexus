@@ -131,6 +131,7 @@ public class NexusPlayer {
             currentProfileSlot = profileSlot;
             profile = profilesMap.get(profileSlot);
         }
+
         if(profile == null) {
             int maxProfiles = NexusPlugin.getInstance().getConfig().getInt("profile-slots");
             if(player !=  null && player.hasPermission("nexus.profile.unlimited")) {

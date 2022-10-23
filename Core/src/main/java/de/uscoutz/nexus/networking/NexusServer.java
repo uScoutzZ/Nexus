@@ -34,12 +34,12 @@ public class NexusServer {
     private RMap<String, Integer> profileCountByServer;
     @Getter
     private RedissonClient redissonClient;
-    /*@Getter
-    private Map<String, Integer> profileCountByServer;*/
     @Getter
     private Map<UUID, Integer> profileToLoad;
     @Getter
     private Map<UUID, ServerPlayer> serverPlayerMap;
+    @Getter
+    private RMap<UUID, UUID> spectators;
     @Getter
     private RList<UUID> onlinePlayers;
 
@@ -77,6 +77,7 @@ public class NexusServer {
         profilesServerMap = redissonClient.getMap("nexus.profilesServer");
         profileCountByServer = redissonClient.getMap("nexus.profileCount");
         onlinePlayers = redissonClient.getList("nexus.onlinePlayers");
+        spectators = redissonClient.getMap("nexus.spectators");
         profileCountByServer.put(getThisServiceName(), 0);
     }
 
