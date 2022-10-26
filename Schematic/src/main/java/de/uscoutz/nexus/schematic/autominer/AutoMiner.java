@@ -7,6 +7,7 @@ import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
+import de.uscoutz.nexus.schematic.schematics.Condition;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -88,9 +89,11 @@ public class AutoMiner {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(builtSchematic.isBuilt()) {
-                    List<Material> list = plugin.getAutoMinerManager().getMaterialsPerType().get(autoMinerType);
-                    inventory.getInventory().addItem(new ItemStack(list.get((int) (Math.random() * list.size()))));
+                if(builtSchematic.isBuilt() && builtSchematic.getCondition() != Condition.DESTROYED) {
+                    double random = Math.random();
+                    if(random > 0.5 || builtSchematic.getCondition() == Condition.INTACT) {
+                        inventory.getInventory().addItem(new ItemStack(autoMinerType.getRandomMaterial().getMaterial()));
+                    }
                 }
             }
         }.runTaskTimer(plugin, 0, 100);
@@ -104,7 +107,7 @@ public class AutoMiner {
             SimpleInventory simpleInventory = InventoryBuilder.create(1*9, "AutoMiner");
             for(AutoMinerManager.AutoMinerType minerType : AutoMinerManager.AutoMinerType.values()) {
                 simpleInventory.addItem(ItemBuilder
-                        .create(plugin.getAutoMinerManager().getMaterialsPerType().get(minerType).get(0))
+                        .create(plugin.getAutoMinerManager().getMaterialsPerType().get(minerType).get(0).getMaterial())
                         .name(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_type_" + minerType.toString().toLowerCase()))
                         .lore(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "autominer_click-to-change")), inventoryClickEvent1 -> {
                     autoMinerType = minerType;

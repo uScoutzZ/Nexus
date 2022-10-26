@@ -88,7 +88,7 @@ public class BuiltSchematic {
     }
 
     public static Condition getCondition(double percentageDamage) {
-        if(percentageDamage < 1) {
+        if(percentageDamage < 10) {
             return Condition.INTACT;
         } else if(percentageDamage >= 50) {
             return Condition.DESTROYED;
