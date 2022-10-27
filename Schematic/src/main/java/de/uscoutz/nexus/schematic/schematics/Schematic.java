@@ -736,6 +736,11 @@ public class Schematic {
         }
         SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
         BuiltSchematic builtSchematic = schematicProfile.getBuiltSchematics().get(schematicId);
+
+        if(builtSchematic.getBlocks().size() == 0) {
+            Bukkit.getConsoleSender().sendMessage("[NexusSchematic ERROR] Tried to destroy schematic with no blocks: " + builtSchematic.getSchematic().schematicType + " " + builtSchematic.getSchematic().level);
+            return;
+        }
         int minHeight = builtSchematic.getBlocks().get(0).getBlockY();
         List<Location> toRemove = new ArrayList<>();
         for (Location blockLocation : builtSchematic.getBlocks()) {

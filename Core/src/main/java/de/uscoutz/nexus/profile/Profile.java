@@ -311,7 +311,7 @@ public class Profile {
 
     public void addPlayer(int profileSlot, UUID player) {
         plugin.getDatabaseAdapter().set("playerProfiles", player, profileId, profileSlot,
-                System.currentTimeMillis(), 0, "empty", "empty", 0);
+                System.currentTimeMillis(), 0, "empty", 0);
         plugin.getDatabaseAdapter().set("playerStats", player, profileId, 0, 0);
         for(ICloudService service : NexusPlugin.getInstance().getNexusServer().getNexusServers()) {
             new PacketReloadProfileMembers("123", profileId).send(service);

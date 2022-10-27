@@ -5,6 +5,7 @@ import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.ICloudPlayer;
+import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -30,7 +31,7 @@ public class CheckPlayerCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender.hasPermission("nexus.command.checkplayer")) {
             if(args.length == 1) {
-                ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(args[0]).getBlockingOrNull();
+                IOfflineCloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(args[0]).getBlockingOrNull();
                 Player target = Bukkit.getPlayer(args[0]);
                 if(target != null && target.isOnline()) {
                     sender.sendMessage("isPlayerLoaded=" + plugin.getPlayerManager().getPlayersMap().containsKey(target.getUniqueId()));

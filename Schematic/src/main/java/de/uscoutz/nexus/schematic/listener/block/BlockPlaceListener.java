@@ -63,7 +63,7 @@ public class BlockPlaceListener implements Listener {
                         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
                         if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
                             event.setCancelled(true);
-                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                            player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", profile.getConcurrentlyBuilding(), maxConcurrentBuildings));
                         } else {
                             if(!schematicItem.getSchematic().preview(location, rotation, true)) {
                                 event.setCancelled(true);

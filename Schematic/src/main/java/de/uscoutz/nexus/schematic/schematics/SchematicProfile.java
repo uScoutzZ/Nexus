@@ -30,6 +30,7 @@ public class SchematicProfile {
 
     public SchematicProfile(Profile profile, NexusSchematicPlugin plugin) {
         this.profile = profile;
+        profile.setConcurrentlyBuilding(0);
         this.plugin = plugin;
         collectors = new HashMap<>();
         builtSchematics = new HashMap<>();

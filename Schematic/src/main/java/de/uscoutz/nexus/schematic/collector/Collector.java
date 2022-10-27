@@ -119,7 +119,7 @@ public class Collector {
                 player.getInventory().addItem(item.getItemStack());
             } else {
                 if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
-                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", maxConcurrentBuildings));
+                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_too-much-concurrent-buildings", profile.getConcurrentlyBuilding(), maxConcurrentBuildings));
                     player.getInventory().addItem(item.getItemStack());
                 } else {
                     int b = blockType == Material.EMERALD_BLOCK ? 1:0;
