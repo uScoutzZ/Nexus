@@ -206,7 +206,6 @@ public class NexusPlayer {
                     } else {
                         if(player != null) {
                             player.closeInventory();
-                            player.sendMessage("§dOther server is more empty, sending");
                         }
                         new PacketPlayerChangeServer("123", uuid.toString(), profileSlot).send(emptiestServer);
                         //CloudAPI.getInstance().getCloudPlayerManager().connectPlayer(CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(player.getUniqueId()), emptiestServer);

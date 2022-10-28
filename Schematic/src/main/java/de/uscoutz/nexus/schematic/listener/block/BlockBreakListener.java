@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.listener.block;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +25,7 @@ public class BlockBreakListener implements Listener {
 
         Region region = plugin.getNexusPlugin().getRegionManager().getRegion(event.getBlock().getLocation());
         if(region != null) {
-            if(profile.getSchematicsByRegion().containsKey(region)) {
+            if(profile.getSchematicsByRegion().containsKey(region) && player.getGameMode() == GameMode.CREATIVE) {
                 player.sendMessage(profile.getSchematicsByRegion().get(region).getSchematic().getSchematicType() + " "
                         + profile.getSchematicsByRegion().get(region).getSchematic().getLevel());
                 player.sendMessage("id: " + profile.getSchematicsByRegion().get(region).getSchematicId());

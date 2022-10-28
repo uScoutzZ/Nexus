@@ -23,17 +23,18 @@ public class EntityDamageByEntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        LivingEntity damaged = (LivingEntity) event.getEntity();
-        Entity damager = event.getDamager();
+        if(event.getEntity() instanceof LivingEntity damaged) {
+            Entity damager = event.getDamager();
 
-        if(event.getDamage() >= damaged.getHealth()) {
-            if(damager instanceof Player player) {
-                Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(damaged.getWorld());
-                ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
-                profilePlayer.addSkillXP(Skill.COMBAT, 4);
-                RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
-                if(raidProfile.getRaid() != null) {
-                    profilePlayer.addKill();
+            if(event.getDamage() >= damaged.getHealth()) {
+                if(damager instanceof Player player) {
+                    Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(damaged.getWorld());
+                    ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
+                    profilePlayer.addSkillXP(Skill.COMBAT, 4);
+                    RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
+                    if(raidProfile.getRaid() != null) {
+                        profilePlayer.addKill();
+                    }
                 }
             }
         }

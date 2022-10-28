@@ -21,8 +21,9 @@ public class BlockPhysicsListener implements Listener {
         if(event.getChangedBlockData() instanceof Door) {
             Door door = (Door) event.getChangedBlockData();
             if(door.getHalf() == Bisected.Half.TOP) {
-                Door down = (Door) event.getBlock().getLocation().clone().subtract(0, 1, 0).getBlock().getBlockData();
-                event.setCancelled(down.isOpen() == door.isOpen());
+                if(event.getBlock().getLocation().clone().subtract(0, 1, 0).getBlock().getBlockData() instanceof Door down) {
+                    event.setCancelled(down.isOpen() == door.isOpen());
+                }
             }
         } else {
             event.setCancelled(true);
