@@ -81,6 +81,16 @@ public class Profile {
         }
     }
 
+    public void broadcast(boolean isKeyArgument, String key, String... keyArgument) {
+        for(NexusPlayer nexusPlayer : getActivePlayers()) {
+            String[] args = new String[keyArgument.length];
+            for(int i = 0; i < keyArgument.length; i++) {
+                args[i] = plugin.getLocaleManager().translate("de_DE", keyArgument[i]);
+            }
+            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate("de_DE", key, args));
+        }
+    }
+
     public void scheduleCheckout() {
         timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
         checkoutTask = new BukkitRunnable() {

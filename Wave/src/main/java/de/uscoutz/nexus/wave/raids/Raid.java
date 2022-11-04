@@ -1,7 +1,8 @@
-package de.uscoutz.nexus.wave.profile;
+package de.uscoutz.nexus.wave.raids;
 
 import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
+import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.*;
 import de.uscoutz.nexus.wave.customentities.others.NexusCaveSpider;
@@ -10,6 +11,7 @@ import de.uscoutz.nexus.wave.customentities.others.NexusSpider;
 import de.uscoutz.nexus.wave.customentities.skeletons.*;
 import de.uscoutz.nexus.wave.customentities.zombies.*;
 import de.uscoutz.nexus.wave.player.RaidPlayer;
+import de.uscoutz.nexus.wave.profile.RaidProfile;
 import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -41,6 +43,8 @@ public class Raid {
     @Getter
     private List<Player> players;
     @Getter
+    private List<BuiltSchematic> attacked;
+    @Getter
     private RaidType raidType;
     @Getter
     private int killedInCurrentWave, wave, kills;
@@ -55,6 +59,7 @@ public class Raid {
 
         players = new ArrayList<>();
         mobs = new ArrayList<>();
+        attacked = new ArrayList<>();
         bossBars = new HashMap<>();
     }
 

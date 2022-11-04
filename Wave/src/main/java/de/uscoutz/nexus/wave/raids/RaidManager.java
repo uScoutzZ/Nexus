@@ -1,8 +1,9 @@
-package de.uscoutz.nexus.wave.profile;
+package de.uscoutz.nexus.wave.raids;
 
 import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import de.uscoutz.nexus.wave.profile.RaidProfile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

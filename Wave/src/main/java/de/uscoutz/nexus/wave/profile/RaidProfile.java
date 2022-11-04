@@ -7,9 +7,10 @@ import de.uscoutz.nexus.schematic.schematics.Condition;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import de.uscoutz.nexus.wave.raids.Raid;
+import de.uscoutz.nexus.wave.raids.RaidType;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -66,22 +67,27 @@ public class RaidProfile {
             public void run() {
                 boolean isNexusIntact;
                 SchematicProfile schematicProfile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
-                BuiltSchematic builtSchematic;
+                BuiltSchematic builtNexusSchematic, builtWorkshopSchematic = null;
                 if(schematicProfile.getSchematics().get(SchematicType.NEXUS).size() != 0) {
-                    builtSchematic = schematicProfile.getSchematicsByRegion().get(schematicProfile.getSchematics().get(SchematicType.NEXUS).get(0));
-                    isNexusIntact = builtSchematic.getCondition(builtSchematic.getPercentDamage()) == Condition.INTACT;
+                    builtNexusSchematic = schematicProfile.getSchematicsByRegion().get(schematicProfile.getSchematics().get(SchematicType.NEXUS).get(0));
+                    builtWorkshopSchematic = schematicProfile.getSchematicsByRegion().get(schematicProfile.getSchematics().get(SchematicType.WORKSHOP).get(0));
+                    isNexusIntact = builtNexusSchematic.getCondition(builtNexusSchematic.getPercentDamage()) == Condition.INTACT;
                 } else {
                     isNexusIntact = false;
                 }
 
-                if(isNexusIntact && profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0
-                        && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished()) {
+                if((isNexusIntact && profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0
+                        && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished())
+                        && builtWorkshopSchematic == null || builtWorkshopSchematic.isBuilt()) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
                     RaidType raidType;
                     try {
                         raidType = raidTypes.get((int)(Math.random() * raidTypes.size())).clone();
                     } catch (CloneNotSupportedException e) {
                         throw new RuntimeException(e);
+                    }
+                    if(raid != null) {
+                        return;
                     }
                     raid = new Raid(raidType, profile, plugin);
                     raid.schedule();

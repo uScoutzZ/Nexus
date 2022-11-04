@@ -4,6 +4,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
+import de.uscoutz.nexus.wave.raids.Raid;
 import lombok.Getter;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Location;
@@ -14,18 +15,20 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public enum NexusAttackType {
 
     NORMAL((entity, builtSchematic, damage) -> {
         World world = entity.getWorld();
-        /*UUID profileId = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(world).getProfileId();
-        SchematicProfile profile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profileId);
+        /*SchematicProfile profile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profileId);
         Region region = plugin.getSchematicPlugin().getNexusPlugin().getRegionManager().getRegion(this.getBukkitEntity().getLocation());
         BuiltSchematic builtSchematic = profile.getSchematicsByRegion().get(region);
         */
         builtSchematic.damage(damage);
+        UUID profileId = NexusWavePlugin.getInstance().getNexusPlugin().getWorldManager().getWorldProfileMap().get(world).getProfileId();
+        Raid raid = NexusWavePlugin.getInstance().getRaidManager().getRaidProfileMap().get(profileId).getRaid();
         Block block = ((LivingEntity)entity).getTargetBlock(3);
         if(block != null) {
             world.spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 35, 1, 1, 1, block.getBlockData());

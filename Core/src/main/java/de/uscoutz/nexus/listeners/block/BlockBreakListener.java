@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -32,11 +33,15 @@ public class BlockBreakListener implements Listener {
         destroyed = new ArrayList<>();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Profile profile = plugin.getWorldManager().getWorldProfileMap().get(player.getWorld());
         ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
+
+        if(event.isCancelled()) {
+            return;
+        }
 
         if(player.getGameMode() == GameMode.CREATIVE) {
             event.setCancelled(false);
@@ -116,31 +121,40 @@ public class BlockBreakListener implements Listener {
                         Material.COAL_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_DIAMOND_ORE,
                         Material.DEEPSLATE_IRON_ORE, Material.DEEPSLATE_COAL_ORE);
                 if(blockData.getMaterial().isSolid()) {
-                    skill = Skill.MINING;
-                    if(toStone.contains(blockData.getMaterial())) {
-                        addedXP = 4;
-                    } else {
-                        addedXP = 2;
-                    }
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if(toStone.contains(blockData.getMaterial())) {
-                                event.getBlock().setType(Material.STONE);
-                            } else {
-                                event.getBlock().setType(Material.BEDROCK);
-                            }
+                    if(blockResistance != 0) {
+                        skill = Skill.MINING;
+                        if(toStone.contains(blockData.getMaterial())) {
+                            addedXP = 4;
+                        } else {
+                            addedXP = 2;
                         }
-                    }.runTaskLater(plugin, 1);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if(toStone.contains(blockData.getMaterial())) {
+                                    event.getBlock().setType(Material.STONE);
+                                } else {
+                                    event.getBlock().setType(Material.BEDROCK);
+                                }
+                            }
+                        }.runTaskLater(plugin, 1);
+                    }
                 } else {
                     skill = Skill.FARMING;
                     addedXP = 4;
                 }
             }
+            Skill finalSkill = skill;
+            int finalAddedXP = addedXP;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if(finalSkill != null && (finalSkill == Skill.MINING || event.getBlock().getLocation().getBlock().getType() == Material.AIR)) {
+                        profilePlayer.addSkillXP(finalSkill, finalAddedXP);
+                    }
+                }
+            }.runTaskLater(plugin, 1);
 
-            if(skill != null) {
-                profilePlayer.addSkillXP(skill, addedXP);
-            }
         } else {
             player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
             event.setCancelled(true);

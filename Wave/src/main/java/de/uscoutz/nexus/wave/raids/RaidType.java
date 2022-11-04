@@ -1,4 +1,4 @@
-package de.uscoutz.nexus.wave.profile;
+package de.uscoutz.nexus.wave.raids;
 
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.NexusEntityType;
@@ -23,7 +23,7 @@ public class RaidType implements Cloneable {
     private String raidTypeId;
 
     @Override
-    protected RaidType clone() throws CloneNotSupportedException {
+    public RaidType clone() throws CloneNotSupportedException {
         return (RaidType) super.clone();
     }
 

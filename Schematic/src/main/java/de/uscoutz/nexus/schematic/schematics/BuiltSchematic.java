@@ -4,6 +4,8 @@ import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.autominer.AutoMiner;
+import de.uscoutz.nexus.schematic.events.SchematicDamagedEvent;
+import de.uscoutz.nexus.schematic.events.SchematicUpdateEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -69,6 +71,8 @@ public class BuiltSchematic {
             Schematic repaired = plugin.getSchematicManager().getSchematicsMap().get(schematic.getSchematicType()).get(newCondition).get(schematic.getLevel());
             repaired.build(location, rotation, schematicId, getPercentDamage(), true);
         }
+
+        Bukkit.getPluginManager().callEvent(new SchematicDamagedEvent(profile, this, oldCondition != newCondition));
     }
 
     public void saveDamage() {

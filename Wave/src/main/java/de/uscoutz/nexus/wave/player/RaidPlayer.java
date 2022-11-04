@@ -1,7 +1,7 @@
 package de.uscoutz.nexus.wave.player;
 
 import de.uscoutz.nexus.wave.NexusWavePlugin;
-import de.uscoutz.nexus.wave.profile.Raid;
+import de.uscoutz.nexus.wave.raids.Raid;
 import org.bukkit.entity.Player;
 
 public class RaidPlayer {

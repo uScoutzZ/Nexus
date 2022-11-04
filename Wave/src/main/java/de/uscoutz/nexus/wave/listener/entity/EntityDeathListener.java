@@ -2,12 +2,9 @@ package de.uscoutz.nexus.wave.listener.entity;
 
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
-import de.uscoutz.nexus.wave.player.RaidPlayer;
-import de.uscoutz.nexus.wave.profile.Raid;
+import de.uscoutz.nexus.wave.raids.Raid;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;

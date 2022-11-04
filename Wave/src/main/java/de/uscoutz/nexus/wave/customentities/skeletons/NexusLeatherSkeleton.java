@@ -32,6 +32,7 @@ public class NexusLeatherSkeleton extends Skeleton implements NexusMob {
 
         this.setPos(loc.getX(), loc.getY(), loc.getZ());
 
+        this.setHealth(10);
         this.setCanPickUpLoot(false); // Can Pick up Loot
         this.setAggressive(true); // Aggressive
         /*this.setCustomNameVisible(true); // Custom Name Visible*/
