@@ -83,7 +83,7 @@ public class RaidProfile {
 
                 if((isNexusIntact && profile.getNexusLevel() != 0 && profile.getActivePlayers().size() != 0
                         && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished())
-                        && builtWorkshopSchematic == null || builtWorkshopSchematic.isBuilt()) {
+                        && (builtWorkshopSchematic == null || builtWorkshopSchematic.isBuilt())) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
                     RaidType raidType;
                     try {

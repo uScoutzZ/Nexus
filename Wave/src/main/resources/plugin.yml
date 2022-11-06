@@ -5,6 +5,7 @@ main: de.uscoutz.nexus.wave.NexusWavePlugin
 api-version: 1.19
 commands:
   cancelraid:
+  triggerraid:
 depend:
   - NexusCore
   - NexusSchematic

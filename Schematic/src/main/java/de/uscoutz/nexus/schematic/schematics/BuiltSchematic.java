@@ -26,18 +26,19 @@ public class BuiltSchematic {
     private final UUID schematicId;
     @Setter
     private double hits;
-    private Profile profile;
-    private int rotation;
     @Getter
     private Location location;
     @Getter @Setter
     private List<Location> blocks;
     @Getter
     private List<Entity> entities;
-    @Getter @Setter
-    private boolean isBuilt;
+    @Setter
+    private long finished;
 
-    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks, List<Entity> entities, boolean isBuilt) {
+    private Profile profile;
+    private int rotation;
+
+    public BuiltSchematic(NexusSchematicPlugin plugin, Schematic schematic, double percentDamage, UUID schematicId, Profile profile, int rotation, Location location, List<Location> blocks, List<Entity> entities, long finished) {
         this.plugin = plugin;
         this.schematic = schematic;
         this.schematicId = schematicId;
@@ -47,7 +48,7 @@ public class BuiltSchematic {
         hits = (percentDamage/100)*schematic.getDurability();
         this.blocks = blocks;
         this.entities = entities;
-        this.isBuilt = isBuilt;
+        this.finished = finished;
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().put(schematicId, this);
 
         if(schematic.getSchematicType() == SchematicType.AUTOMINER) {
@@ -58,8 +59,12 @@ public class BuiltSchematic {
         }
     }
 
+    public boolean isBuilt() {
+        return System.currentTimeMillis() >= finished;
+    }
+
     public void damage(double damage) {
-        if(!isBuilt) {
+        if(!isBuilt()) {
             return;
         }
         Condition oldCondition = getCondition(getPercentDamage());

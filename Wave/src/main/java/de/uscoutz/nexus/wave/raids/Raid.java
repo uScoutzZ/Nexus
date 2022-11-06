@@ -102,11 +102,8 @@ public class Raid {
         }
     }
 
-    public void schedule() {
-        Bukkit.getConsoleSender().sendMessage("[NexusWave] Scheduled raid " + raidType.getRaidTypeId() + " for " + profile.getProfileId());
-        long raidCounter = plugin.getConfig().getLong("raid-counter");
-        int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(raidCounter);
-        final int[] countdown = {(int) TimeUnit.MILLISECONDS.toSeconds(raidCounter)};
+    public void schedule(int timer) {
+        final int[] countdown = {timer};
         for(String key : plugin.getNexusPlugin().getLocaleManager().getLanguageKeys()) {
             bossBars.put(key, BossBar.bossBar(Component.text(""), 1, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6));
         }
@@ -128,7 +125,7 @@ public class Raid {
                         String counter = String.format("%02d:%02d:%02d", TimeUnit.SECONDS.toHours(countdown[0]),
                                 TimeUnit.SECONDS.toMinutes(countdown[0]) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(countdown[0])),
                                 TimeUnit.SECONDS.toSeconds(countdown[0]) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(countdown[0])));
-                        double progress = (double) countdown[0]/raidCounterSeconds;
+                        double progress = (double) countdown[0]/timer;
                         for(String key : bossBars.keySet()) {
                             BossBar bossBar = bossBars.get(key);
                             bossBar.name(Component.text(plugin.getNexusPlugin().getLocaleManager().translate(
@@ -142,6 +139,13 @@ public class Raid {
                 }
             }
         }.runTaskTimer(plugin, 0, 20);
+    }
+
+    public void schedule() {
+        Bukkit.getConsoleSender().sendMessage("[NexusWave] Scheduled raid " + raidType.getRaidTypeId() + " for " + profile.getProfileId());
+        long raidCounter = plugin.getConfig().getLong("raid-counter");
+        int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(raidCounter);
+        schedule(raidCounterSeconds);
     }
 
     public void startWave(int wave) {

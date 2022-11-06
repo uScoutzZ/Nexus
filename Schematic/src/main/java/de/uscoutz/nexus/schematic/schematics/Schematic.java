@@ -243,7 +243,7 @@ public class Schematic {
             countdown.customName(Component.text(counter[0]));
             List<Location> blocks1 = new ArrayList<>();
             List<Entity> entities = new ArrayList<>();
-            BuiltSchematic builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, false);
+            new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, finished);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -372,9 +372,8 @@ public class Schematic {
         BuiltSchematic builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(
                 profile.getProfileId()).getBuiltSchematics().get(schematicId);
         if(builtSchematic == null && !update) {
-            builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, false);
+            builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, 0);
         }
-
 
         for(int j = 0; j < blocks.size(); j++) {
             Location block = setBlock(blocks.get(j), rotation, location, null, schematicId, damage);
@@ -416,9 +415,8 @@ public class Schematic {
         BuiltSchematic builtSchematic;
         if(plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().containsKey(schematicId)) {
             builtSchematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
-            builtSchematic.setBuilt(true);
         } else {
-            builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, true);
+            builtSchematic = new BuiltSchematic(plugin, this, damage, schematicId, profile, rotation, location, blocks1, entities, System.currentTimeMillis()-timeToFinish);
         }
         plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().put(region,
                 builtSchematic);
