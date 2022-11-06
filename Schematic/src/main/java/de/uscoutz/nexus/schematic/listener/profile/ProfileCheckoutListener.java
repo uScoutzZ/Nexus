@@ -52,7 +52,7 @@ public class ProfileCheckoutListener implements Listener {
         }
 
         for(Entity entity : profile.getWorld().getWorld().getEntities()) {
-            if(entity.getType() != EntityType.ENDER_CRYSTAL && !!profile.getWorld().getWorldEntities().contains(entity)) {
+            if(entity.getType() != EntityType.ENDER_CRYSTAL && !profile.getWorld().getWorldEntities().contains(entity)) {
                 entity.remove();
             }
         }
