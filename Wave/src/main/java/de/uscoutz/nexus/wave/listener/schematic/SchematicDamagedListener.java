@@ -5,6 +5,7 @@ import de.uscoutz.nexus.schematic.events.SchematicDamagedEvent;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
 import de.uscoutz.nexus.wave.raids.Raid;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

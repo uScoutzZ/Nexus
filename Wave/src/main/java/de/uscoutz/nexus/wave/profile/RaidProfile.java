@@ -94,7 +94,7 @@ public class RaidProfile {
                     if(raid != null) {
                         return;
                     }
-                    raid = new Raid(raidType, profile, plugin);
+                    setRaid(new Raid(raidType, profile, plugin));
                     raid.schedule();
                 } else {
                     if(profile.loaded()) {

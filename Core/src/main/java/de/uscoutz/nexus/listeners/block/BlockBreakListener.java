@@ -11,15 +11,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -105,6 +108,12 @@ public class BlockBreakListener implements Listener {
                     }.runTaskLater(plugin, respawnAfter*20);
                 }
             } else {
+                List<ItemStack> drops = new ArrayList<>(event.getBlock().getDrops());
+                event.setDropItems(false);
+                for(ItemStack drop : drops) {
+                    Item item = event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().clone().add(0, 0.75, 0), drop);
+                    //item.setVelocity(player.getLocation().toVector().subtract(item.getLocation().toVector())/*.normalize().multiply(0.5)*/);
+                }
                 BlockData blockData = event.getBlock().getBlockData().clone();
                 if(!destroyed.contains(event.getBlock().getLocation())) {
                     destroyed.add(event.getBlock().getLocation());

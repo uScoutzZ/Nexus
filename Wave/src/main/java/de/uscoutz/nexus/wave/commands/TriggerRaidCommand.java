@@ -45,6 +45,7 @@ public class TriggerRaidCommand implements CommandExecutor {
                 }
 
                 Raid raid = new Raid(raidType, profile, plugin);
+                raidProfile.setRaid(raid);
                 raid.schedule(30);
             }
         }
