@@ -6,6 +6,7 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -27,10 +28,12 @@ public class ProfileCheckoutListener implements Listener {
         Profile profile = event.getProfile();
         RaidProfile raidProfile = plugin.getRaidManager().getRaidProfileMap().get(profile.getProfileId());
         if(raidProfile.getTask() != null) {
+            Bukkit.getConsoleSender().sendMessage("[NexusWave] Cancelling raid for " + profile.getProfileId());
             raidProfile.getTask().cancel();
         }
 
         if(raidProfile.getRaid() != null) {
+            Bukkit.getConsoleSender().sendMessage("[NexusWave] Ending raid for " + profile.getProfileId());
             raidProfile.getRaid().end(false, false);
         }
 

@@ -11,6 +11,7 @@ import de.uscoutz.nexus.wave.raids.Raid;
 import de.uscoutz.nexus.wave.raids.RaidType;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -58,6 +59,7 @@ public class RaidProfile {
     }
 
     public void scheduleRaid() {
+        Bukkit.getConsoleSender().sendMessage("[NexusWave] Scheduling raid for " + profile.getProfileId());
         long rangeMin = plugin.getConfig().getLong("raid-range-min");
         long rangeMax = plugin.getConfig().getLong("raid-range-max");
         long startIn = new Random().nextLong(rangeMax-rangeMin)+rangeMin;
@@ -65,6 +67,9 @@ public class RaidProfile {
         task = new BukkitRunnable() {
             @Override
             public void run() {
+                if(task.isCancelled()) {
+                    return;
+                }
                 boolean isNexusIntact;
                 SchematicProfile schematicProfile = plugin.getSchematicPlugin().getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
                 BuiltSchematic builtNexusSchematic, builtWorkshopSchematic = null;

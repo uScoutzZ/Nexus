@@ -93,6 +93,7 @@ public class Profile {
 
     public void scheduleCheckout() {
         timeToCheckout = new int[]{plugin.getConfig().getInt("profile-checkout-after")};
+        Bukkit.getConsoleSender().sendMessage("[Nexus] Scheduling checkout for profile " + profileId + " in " + timeToCheckout[0] + " seconds.");
         checkoutTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -176,6 +177,7 @@ public class Profile {
             saveStorages();
             world = null;
             loading = false;
+            Bukkit.getConsoleSender().sendMessage("[Nexus] Profile " + profileId + " unloaded");
         }
     }
 

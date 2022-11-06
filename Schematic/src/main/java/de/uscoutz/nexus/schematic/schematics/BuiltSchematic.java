@@ -59,6 +59,9 @@ public class BuiltSchematic {
     }
 
     public void damage(double damage) {
+        if(!isBuilt) {
+            return;
+        }
         Condition oldCondition = getCondition(getPercentDamage());
         this.hits += damage;
         Condition newCondition = getCondition(getPercentDamage());

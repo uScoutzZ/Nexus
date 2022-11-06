@@ -103,6 +103,7 @@ public class Raid {
     }
 
     public void schedule() {
+        Bukkit.getConsoleSender().sendMessage("[NexusWave] Scheduled raid " + raidType.getRaidTypeId() + " for " + profile.getProfileId());
         long raidCounter = plugin.getConfig().getLong("raid-counter");
         int raidCounterSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(raidCounter);
         final int[] countdown = {(int) TimeUnit.MILLISECONDS.toSeconds(raidCounter)};
