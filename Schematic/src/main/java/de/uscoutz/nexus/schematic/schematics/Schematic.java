@@ -779,8 +779,15 @@ public class Schematic {
             Region region = plugin.getNexusPlugin().getRegionManager().getRegion(builtSchematic.getBlocks().get(0));
             profile.getRegions().remove(region);
             profile.getSchematicIds().remove(schematicId);
-            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().remove(schematicId);
-            plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getSchematicsByRegion().remove(region);
+            schematicProfile.getBuiltSchematics().remove(schematicId);
+            schematicProfile.getSchematicsByRegion().remove(region);
+        } else if(animation == DestroyAnimation.UPGRADE) {
+            int level = builtSchematic.getSchematic().level;
+            long finished = System.currentTimeMillis()+plugin.getSchematicManager().getSchematicsMap()
+                    .get(builtSchematic.getSchematic().getSchematicType()).get(Condition.INTACT).get(level+1).getTimeToFinish();
+            Region region = plugin.getNexusPlugin().getRegionManager().getRegion(builtSchematic.getBlocks().get(0));
+            schematicProfile.getBuiltSchematics().get(schematicId).setFinished(finished);
+            schematicProfile.getSchematicsByRegion().get(region).setFinished(finished);
         }
     }
 

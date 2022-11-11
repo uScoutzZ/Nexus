@@ -97,7 +97,7 @@ public class PlayerInteractListener implements Listener {
             Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(clicked.getWorld());
             SchematicProfile schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
             BuiltSchematic builtSchematic = schematicProfile.getSchematicsByRegion().get(region);
-            if(builtSchematic == null) {
+            if(builtSchematic == null || !builtSchematic.isBuilt()) {
                 return;
             }
             if(builtSchematic.getSchematic().getSchematicType() == SchematicType.NEXUS) {

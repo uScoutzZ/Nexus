@@ -34,6 +34,7 @@ public class BlockBreakListener implements Listener {
                     player.sendMessage("hits: " + profile.getSchematicsByRegion().get(region).getHits());
                     player.sendMessage("percent: " + profile.getSchematicsByRegion().get(region).getPercentDamage());
                     player.sendMessage("durability: " + profile.getSchematicsByRegion().get(region).getSchematic().getDurability());
+                    player.sendMessage("isBuilt: " + profile.getSchematicsByRegion().get(region).isBuilt());
                 }
                 event.setCancelled(true);
             } else {
