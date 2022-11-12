@@ -112,7 +112,7 @@ public class Collector {
     public void collect(Player player, Item item) {
         ItemStack itemStack = item.getItemStack();
         if(neededItems.containsKey(itemStack.getType())) {
-            int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+            int maxConcurrentBuildings = schematicProfile.getMaxConcurrentlyBuilding();
             if((schematic.getSchematic().getSchematicType() == SchematicType.WORKSHOP && !profile.getQuests().containsKey(Task.REPAIR_WORKSHOP)
                     || (schematic.getSchematic().getSchematicType() == SchematicType.NEXUS && !profile.getQuests().containsKey(Task.UPGRADE_NEXUS)))) {
                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "finish-quest-first"));

@@ -53,4 +53,15 @@ public class SchematicProfile {
             e.printStackTrace();
         }
     }
+
+    public int getMaxConcurrentlyBuilding() {
+        int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+        if(schematics.containsKey(SchematicType.HOME) && schematics.get(SchematicType.HOME).size() != 0) {
+            Region homeRegion = schematics.get(SchematicType.HOME).get(0);
+            if(schematicsByRegion.containsKey(homeRegion)) {
+                maxConcurrentBuildings += schematicsByRegion.get(homeRegion).getSchematic().getLevel();
+            }
+        }
+        return maxConcurrentBuildings;
+    }
 }

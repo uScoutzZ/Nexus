@@ -3,6 +3,7 @@ package de.uscoutz.nexus.schematic.listener.block;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Task;
+import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
@@ -59,7 +60,7 @@ public class BlockPlaceListener implements Listener {
                     } else {
                         Location location = event.getBlock().getLocation().subtract(0, 1, 0);
                         int rotation = schematicPlayer.getRotationFromFacing(player.getFacing());
-                        int maxConcurrentBuildings = plugin.getNexusPlugin().getConfig().getInt("concurrently-building");
+                        int maxConcurrentBuildings = schematicProfile.getMaxConcurrentlyBuilding();
                         Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(player.getWorld());
                         if(profile.getConcurrentlyBuilding() >= maxConcurrentBuildings) {
                             event.setCancelled(true);
@@ -89,9 +90,10 @@ public class BlockPlaceListener implements Listener {
                                     if(profile.getUnfinishedQuests().containsKey(Task.BUILD_TOWER)) {
                                         profile.getUnfinishedQuests().get(Task.BUILD_TOWER).finish(player);
                                     }
-                                }
-                                if(profile.getUnfinishedQuests().containsKey(Task.BUILD_PORTAL)) {
-                                    profile.getQuests().get(Task.BUILD_PORTAL).finish(player);
+                                } else if(schematic.getSchematicType() == SchematicType.PORTAL) {
+                                    if(profile.getUnfinishedQuests().containsKey(Task.BUILD_PORTAL)) {
+                                        profile.getQuests().get(Task.BUILD_PORTAL).finish(player);
+                                    }
                                 }
                                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
                             } else {

@@ -2,7 +2,7 @@ package de.uscoutz.nexus.schematic;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.schematic.autominer.AutoMinerManager;
-import de.uscoutz.nexus.schematic.commands.GetUpgradeItemsCommand;
+import de.uscoutz.nexus.schematic.commands.*;
 import de.uscoutz.nexus.schematic.gateways.GatewayManager;
 import de.uscoutz.nexus.schematic.listener.block.*;
 import de.uscoutz.nexus.schematic.listener.entity.EntityChangeBlockListener;
@@ -15,9 +15,6 @@ import de.uscoutz.nexus.schematic.listener.profile.ProfileLoadListener;
 import de.uscoutz.nexus.schematic.listener.schematic.SchematicItemBoughtListener;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItemManager;
 import de.uscoutz.nexus.schematic.collector.CollectorManager;
-import de.uscoutz.nexus.schematic.commands.CreateSchematicCommand;
-import de.uscoutz.nexus.schematic.commands.LoadSchematicCommand;
-import de.uscoutz.nexus.schematic.commands.SchematicWand;
 import de.uscoutz.nexus.schematic.files.FileManager;
 import de.uscoutz.nexus.schematic.player.SchematicPlayerManager;
 import de.uscoutz.nexus.schematic.schematics.SchematicManager;
@@ -74,6 +71,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         getCommand("createschematic").setExecutor(new CreateSchematicCommand(this));
         getCommand("loadschematic").setExecutor(new LoadSchematicCommand(this));
         getCommand("getupgradeitems").setExecutor(new GetUpgradeItemsCommand(this));
+        getCommand("getschematicitem").setExecutor(new GetSchematicItemCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);

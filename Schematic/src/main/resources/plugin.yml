@@ -8,6 +8,7 @@ commands:
   createschematic:
   loadschematic:
   getupgradeitems:
+  getschematicitem:
 depend:
   - NexusCore
 loadbefore:
