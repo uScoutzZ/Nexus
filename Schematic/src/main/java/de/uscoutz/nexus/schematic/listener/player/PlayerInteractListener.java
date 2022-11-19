@@ -7,6 +7,8 @@ import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -112,17 +114,21 @@ public class PlayerInteractListener implements Listener {
                         if(plugin.getSchematicItemManager().getSchematicItemBySchematic().containsKey(builtSchematic.getSchematic())) {
                             if(schematicPlayer.getBreaking() == null || !schematicPlayer.getBreaking().equals(builtSchematic)) {
                                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break"));
+                                ComponentBuilder message = new ComponentBuilder(NexusPlugin.getInstance().getLocaleManager().translate(
+                                        "de_DE", "questions_click"));
+                                message.append(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_break-confirmation"));
+                                message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/removeschematic " + builtSchematic.getSchematicId()));
+                                player.spigot().sendMessage(message.create());
+
                                 schematicPlayer.setBreaking(builtSchematic);
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        schematicPlayer.setBreaking(null);
+                                        if(schematicPlayer.getBreaking().equals(builtSchematic)) {
+                                            schematicPlayer.setBreaking(null);
+                                        }
                                     }
-                                }.runTaskLater(plugin, 40);
-                            } else {
-                                SchematicItem schematicItem = plugin.getSchematicItemManager().getSchematicItemBySchematic().get(builtSchematic.getSchematic());
-                                Schematic.destroy(profile, builtSchematic.getSchematicId(), plugin, DestroyAnimation.PLAYER, builtSchematic.getSchematic().getSchematicType());
-                                player.getInventory().addItem(schematicItem.getItemStack(builtSchematic.getSchematicId()));
+                                }.runTaskLater(plugin, 100);
                             }
                         } else {
                             player.sendMessage("§cThe schematic item is not set up");

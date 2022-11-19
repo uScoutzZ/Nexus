@@ -72,6 +72,7 @@ public class NexusSchematicPlugin extends JavaPlugin {
         getCommand("loadschematic").setExecutor(new LoadSchematicCommand(this));
         getCommand("getupgradeitems").setExecutor(new GetUpgradeItemsCommand(this));
         getCommand("getschematicitem").setExecutor(new GetSchematicItemCommand(this));
+        getCommand("removeschematic").setExecutor(new RemoveSchematicCommand(this));
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(this), this);
