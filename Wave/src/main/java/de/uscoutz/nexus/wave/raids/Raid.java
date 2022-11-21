@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.schematic.schematics.BuiltSchematic;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.customentities.*;
+import de.uscoutz.nexus.wave.customentities.others.NexusBlaze;
 import de.uscoutz.nexus.wave.customentities.others.NexusCaveSpider;
 import de.uscoutz.nexus.wave.customentities.others.NexusGolem;
 import de.uscoutz.nexus.wave.customentities.others.NexusSpider;
@@ -247,6 +248,8 @@ public class Raid {
             entity = new NexusNetheriteSkeleton(randomLocation, plugin, 5);
         } else if(nexusEntityType == NexusEntityType.NETHERITE_ZOMBIE) {
             entity = new NexusNetheriteZombie(randomLocation, plugin, 5);
+        } else if(nexusEntityType == NexusEntityType.BLAZE) {
+            entity = new NexusBlaze(randomLocation, plugin, 2);
         }
 
         randomLocation.getChunk().load();

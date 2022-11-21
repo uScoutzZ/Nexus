@@ -23,7 +23,6 @@ public class PacketCoopInvite extends Packet {
     @Override
     public Object execute() {
         NexusPlayer nexusPlayer = NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player);
-
         ComponentBuilder message = new ComponentBuilder(NexusPlugin.getInstance().getLocaleManager().translate(
                 "de_DE", "command_coop_request-received", sender));
         message.append(" " + NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "clickevent_accept"));

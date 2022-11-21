@@ -85,9 +85,14 @@ public class RaidProfile {
                         && profile.getQuests().containsKey(Task.BUILD_TOWER) && profile.getQuests().get(Task.BUILD_TOWER).isFinished())
                         && (builtWorkshopSchematic == null || builtWorkshopSchematic.isBuilt())) {
                     List<RaidType> raidTypes = plugin.getRaidManager().getRaidTypesByNexuslevel().get(profile.getNexusLevel());
-                    RaidType raidType;
+                    RaidType raidType = null;
                     try {
-                        raidType = raidTypes.get((int)(Math.random() * raidTypes.size())).clone();
+                        while(raidType == null) {
+                            RaidType randomRaidType = raidTypes.get((int)(Math.random() * raidTypes.size())).clone();
+                            if(randomRaidType.isEnabled()) {
+                                raidType = randomRaidType;
+                            }
+                        }
                     } catch (CloneNotSupportedException e) {
                         throw new RuntimeException(e);
                     }

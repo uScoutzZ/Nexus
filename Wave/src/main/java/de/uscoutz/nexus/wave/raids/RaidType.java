@@ -21,6 +21,8 @@ public class RaidType implements Cloneable {
     private Map<Integer, Integer> mobsPerWave;
     @Getter
     private String raidTypeId;
+    @Getter
+    private boolean enabled;
 
     @Override
     public RaidType clone() throws CloneNotSupportedException {
@@ -30,6 +32,7 @@ public class RaidType implements Cloneable {
     public RaidType(String raidTypeId, FileConfiguration fileConfiguration, NexusWavePlugin plugin) {
         this.plugin = plugin;
         this.raidTypeId = raidTypeId.replace(".yml", "");
+        enabled = fileConfiguration.getBoolean("enabled");
         mobsByWave = new HashMap<>();
         mobsPerWave = new HashMap<>();
 

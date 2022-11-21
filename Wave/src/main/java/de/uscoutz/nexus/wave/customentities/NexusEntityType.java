@@ -2,6 +2,7 @@ package de.uscoutz.nexus.wave.customentities;
 
 public enum NexusEntityType {
 
+    BLAZE,
     GOLEM,
     SPIDER,
     CAVE_SPIDER,
