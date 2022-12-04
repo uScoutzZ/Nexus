@@ -5,6 +5,7 @@ import de.uscoutz.nexus.profile.ProfilePlayer;
 import de.uscoutz.nexus.skills.Skill;
 import de.uscoutz.nexus.wave.NexusWavePlugin;
 import de.uscoutz.nexus.wave.profile.RaidProfile;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,7 +28,14 @@ public class EntityDamageByEntityListener implements Listener {
             Entity damager = event.getDamager();
 
             if(event.getDamage() >= damaged.getHealth()) {
-                if(damager instanceof Player player) {
+                Player player = null;
+                if(damager instanceof Player) {
+                    player = (Player) damager;
+                } else if(damager instanceof Arrow arrow) {
+                    player = (Player) arrow.getShooter();
+                }
+
+                if(player != null) {
                     Profile profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(damaged.getWorld());
                     ProfilePlayer profilePlayer = profile.getMembers().get(player.getUniqueId());
                     profilePlayer.addSkillXP(Skill.COMBAT, 4);
