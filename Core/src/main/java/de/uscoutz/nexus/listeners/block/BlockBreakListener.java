@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -109,6 +110,10 @@ public class BlockBreakListener implements Listener {
                 }
             } else {
                 List<ItemStack> drops = new ArrayList<>(event.getBlock().getDrops());
+                if(event.getPlayer().getInventory().getItemInMainHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
+                    drops.clear();
+                    drops.add(new ItemStack(event.getBlock().getType()));
+                }
                 event.setDropItems(false);
                 for(ItemStack drop : drops) {
                     Item item = event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().clone().add(0, 0.75, 0), drop);
