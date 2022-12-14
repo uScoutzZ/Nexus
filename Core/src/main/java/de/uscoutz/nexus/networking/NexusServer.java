@@ -121,7 +121,6 @@ public class NexusServer {
             if(getServiceByName(server) != null && getServiceByName(server).isOnline()) {
                 if(profileCountByServer.get(server) < profileCount) {
                     if(server.split("-")[0].equals(getThisServiceName().split("-")[0])) {
-                        Bukkit.broadcastMessage("Server: " + server + " ProfileCount: " + profileCountByServer.get(server));
                         emptiestServer = server;
                         profileCount = profileCountByServer.get(server);
                     }
@@ -131,7 +130,6 @@ public class NexusServer {
             }
         }
 
-        Bukkit.broadcastMessage("§aEmptiestServer: " + emptiestServer + " ProfileCount: " + profileCount);
 
         if(emptiestServer.equals(getThisServiceName()) && plugin.getWorldManager().getEmptyWorlds().size() == 0) {
             return null;
