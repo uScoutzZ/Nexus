@@ -16,10 +16,7 @@ import de.uscoutz.nexus.quests.Task;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.translation.Translatable;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -230,6 +227,10 @@ public class InventoryManager {
         if(simpleInventory instanceof PaginatedInventory) {
             paginatedInventory = (PaginatedInventory) simpleInventory;
             simpleInventory = paginatedInventory;
+        }
+
+        if(player.getGameMode() == GameMode.CREATIVE) {
+            playerHasItems = true;
         }
 
         boolean finalPlayerHasItems = playerHasItems;
