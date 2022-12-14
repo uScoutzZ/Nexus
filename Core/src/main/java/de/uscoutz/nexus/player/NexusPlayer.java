@@ -276,7 +276,9 @@ public class NexusPlayer {
                         Tool tool = plugin.getToolManager().getToolMap().get(key);
                         int toolBreakingPower = tool.getBreakingPower();
                         if(breakingPower != toolBreakingPower) {
-                            Objects.requireNonNull(itemMeta.lore()).clear();
+                            if(itemMeta.lore() != null) {
+                                itemMeta.lore().clear();
+                            }
                             itemMeta.lore(tool.getItemStack().lore());
                             itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
                         }
