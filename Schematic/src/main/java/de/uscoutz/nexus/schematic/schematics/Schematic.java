@@ -261,7 +261,9 @@ public class Schematic {
                             if(schematicType == SchematicType.NEXUS) {
                                 profile.setNexusLevel(level);
                                 for(NexusPlayer nexusPlayer : profile.getActivePlayers()) {
-                                    nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
+                                    if(nexusPlayer.getCurrentProfile() != null && nexusPlayer.getCurrentProfile().equals(profile)) {
+                                        nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.NEXUSLEVEL);
+                                    }
                                 }
                                 for(Collector collector : plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getCollectors().values()) {
                                     if(!collector.getTitle().equals("§c§lREPAIR")) {
