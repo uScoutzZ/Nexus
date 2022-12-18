@@ -49,22 +49,31 @@ public class NexusServer {
         serverPlayerMap = new HashMap<>();
         profileToLoad = new HashMap<>();
         createRedisConnection();
+
         Bukkit.getConsoleSender().sendMessage("[Nexus] Onlineplayers: " + onlinePlayers.size());
-        for(UUID onlinePlayer : onlinePlayers) {
-            Bukkit.getConsoleSender().sendMessage("[Nexus] Onlineplayer: " + onlinePlayer);
-            MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-            ServerLevel nmsWorld = ((CraftWorld) Bukkit.getWorlds().get(0)).getHandle();
-            GameProfile gameProfile;
-            ResultSet gameProfileResultSet = NexusPlugin.getInstance().getDatabaseAdapter().get("players", "player", String.valueOf(onlinePlayer));
-            try {
-                if (gameProfileResultSet.next()) {
-                    gameProfile = GameProfileSerializer.fromString(gameProfileResultSet.getString("gameprofile"));
-                    ServerPlayer serverPlayer = new ServerPlayer(nmsServer, nmsWorld, gameProfile, null);
-                    serverPlayerMap.put(onlinePlayer, serverPlayer);
+        try {
+            for(UUID onlinePlayer : onlinePlayers) {
+                Bukkit.getConsoleSender().sendMessage("[Nexus] Onlineplayer: " + onlinePlayer);
+                MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
+                ServerLevel nmsWorld = ((CraftWorld) Bukkit.getWorlds().get(0)).getHandle();
+                GameProfile gameProfile;
+                ResultSet gameProfileResultSet = NexusPlugin.getInstance().getDatabaseAdapter().get("players", "player", String.valueOf(onlinePlayer));
+                try {
+                    if (gameProfileResultSet.next()) {
+                        gameProfile = GameProfileSerializer.fromString(gameProfileResultSet.getString("gameprofile"));
+                        ServerPlayer serverPlayer = new ServerPlayer(nmsServer, nmsWorld, gameProfile, null);
+                        serverPlayerMap.put(onlinePlayer, serverPlayer);
+                    }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
             }
+        } catch (ClassCastException exception) {
+            onlinePlayers.clear();
+            spectators.clear();
+            profilesServerMap.clear();
+            profileCountByServer.clear();
+            Bukkit.getConsoleSender().sendMessage("[Nexus] Onlineplayers cleared");
         }
     }
 
