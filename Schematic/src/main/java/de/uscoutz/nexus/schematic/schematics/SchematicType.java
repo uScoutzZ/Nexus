@@ -15,6 +15,7 @@ public enum SchematicType {
     NEXUS,
     TOWER,
     WALL,
+    WALL_EDGE,
     WORKSHOP,
     HOME,
     PORTAL,
