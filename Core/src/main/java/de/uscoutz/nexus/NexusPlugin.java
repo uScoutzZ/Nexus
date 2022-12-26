@@ -129,6 +129,7 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("addmoney").setExecutor(new AddMoneyCommand(this));
         getCommand("joinprofile").setExecutor(new JoinProfileCommand(this));
         getCommand("loadprofile").setExecutor(new LoadProfileCommand(this));
+        getCommand("stats").setExecutor(new StatsCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
 

@@ -33,8 +33,8 @@ public class DatabaseAdapter {
         createTables();
     }
 
-    public void query(String query) {
-        this.mySQL.queryUpdate(query);
+    public ResultSet query(String query) {
+        return this.mySQL.query(query);
     }
 
     public boolean keyExists(String table, String whereKey, Object setKey) {
@@ -288,6 +288,10 @@ public class DatabaseAdapter {
 
     public void deleteTwoAsync(String table, String whereKey, Object setKey, String whereKey2, String setKey2) {
         this.executorService.execute(() -> deleteTwo(table, whereKey, setKey, whereKey2, setKey2));
+    }
+
+    public ResultSet get(String table, String orderBy, int limit) {
+        return this.mySQL.query("SELECT * FROM " + table + " ORDER BY " + orderBy + " LIMIT " + limit);
     }
 
     public ResultSet get(String table, String whereKey, String setkey) {
