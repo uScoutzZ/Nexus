@@ -2,6 +2,7 @@ package de.uscoutz.nexus;
 
 import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.biomes.BiomeManager;
+import de.uscoutz.nexus.broadcasts.BroadcastManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
 import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
@@ -64,6 +65,8 @@ public class NexusPlugin extends JavaPlugin {
     private BiomeManager biomeManager;
     @Getter
     private InventoryManager inventoryManager;
+    @Getter
+    private BroadcastManager broadcastManager;
 
     private NetworkServer networkServer;
 
@@ -89,9 +92,12 @@ public class NexusPlugin extends JavaPlugin {
         toolManager.loadBlockDrops();
         regionManager = new RegionManager(this);
         inventoryManager = new InventoryManager(this);
+        broadcastManager = new BroadcastManager(this, new File("/home/networksync/nexus/broadcasts.yml"));
+        broadcastManager.start();
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
+
 
         Bukkit.getPluginManager().registerEvents(new AsyncPrePlayerLoginListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerSpawnLocationListener(this), this);

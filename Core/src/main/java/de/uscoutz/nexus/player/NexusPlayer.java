@@ -27,6 +27,7 @@ import eu.thesimplecloud.api.service.ICloudService;
 import eu.thesimplecloud.plugin.startup.CloudPlugin;
 import lombok.Getter;
 import lombok.Setter;
+import net.apotox.gameapi.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
@@ -59,6 +60,8 @@ public class NexusPlayer {
     private UUID uuid;
     @Getter @Setter
     private Player player;
+    @Getter
+    private String language;
     @Getter
     private Map<Integer, Profile> profilesMap;
     @Getter
@@ -241,6 +244,7 @@ public class NexusPlayer {
         if(!join) {
             player.teleport(plugin.getLocationManager().getLocation("base-spawn", profile.getWorld().getWorld()));
         }
+        language = User.getFromPlayer(player).getLanguage();
         player.getInventory().clear();
         if(nexusScoreboard != null) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
