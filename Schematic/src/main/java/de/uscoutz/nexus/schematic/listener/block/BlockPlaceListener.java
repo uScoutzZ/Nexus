@@ -78,7 +78,7 @@ public class BlockPlaceListener implements Listener {
                                 plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
                                         plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),
                                         schematicId, schematic.getSchematicType(), schematic.getLevel(), rotation, nexusLocation, System.currentTimeMillis(), 0);
-                                if(schematic.getSchematicType() == SchematicType.WALL) {
+                                if(schematic.getSchematicType() == SchematicType.WALL || schematic.getSchematicType() == SchematicType.WALL_EDGE) {
                                     if(profile.getUnfinishedQuests().containsKey(Task.BUILD_WALLS)) {
                                         profile.getUnfinishedQuests().get(Task.BUILD_WALLS).addProgress(player, 1);
                                     }
