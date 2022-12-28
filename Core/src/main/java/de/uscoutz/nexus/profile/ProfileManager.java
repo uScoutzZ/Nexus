@@ -14,12 +14,9 @@ public class ProfileManager {
 
     @Getter
     private Map<UUID, Profile> profilesMap;
-    @Getter
-    private Map<UUID, List<UUID>> coopInvitations;
 
     public ProfileManager(NexusPlugin plugin) {
         this.plugin = plugin;
         profilesMap = new HashMap<>();
-        coopInvitations = new HashMap<>();
     }
 }

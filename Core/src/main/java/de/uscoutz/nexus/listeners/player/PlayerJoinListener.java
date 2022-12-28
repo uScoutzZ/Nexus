@@ -52,6 +52,10 @@ public class PlayerJoinListener implements Listener {
             player.setAllowFlight(true);
         }
 
+        if(nexusPlayer.getCoopInvitations().size() != 0) {
+            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "coop_open-requests", nexusPlayer.getCoopInvitations().size()));
+        }
+
         new BukkitRunnable() {
             @Override
             public void run() {

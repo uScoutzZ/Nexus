@@ -373,6 +373,7 @@ public class DatabaseAdapter {
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS boughtItems (profileId VARCHAR(36), item text, amount int)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS skills (profileId VARCHAR(36), player VARCHAR(36), skill text, level int, xp int)");
         mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS autoMiners (profileId VARCHAR(36), schematicId VARCHAR(36), autoMinerType text, inventory text)");
+        mySQL.queryUpdate("CREATE TABLE IF NOT EXISTS coopInvitations (profileId VARCHAR(36), sender VARCHAR(36), receiver VARCHAR(36))");
     }
 }
 

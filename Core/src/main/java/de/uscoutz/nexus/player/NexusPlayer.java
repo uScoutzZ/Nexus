@@ -2,6 +2,7 @@ package de.uscoutz.nexus.player;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
+import de.uscoutz.nexus.coop.CoopInvitation;
 import de.uscoutz.nexus.database.DatabaseUpdate;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
@@ -75,6 +76,8 @@ public class NexusPlayer {
     private Biome biome;
     @Getter
     private NexusScoreboard nexusScoreboard;
+    @Getter
+    private List<CoopInvitation> coopInvitations;
 
     public NexusPlayer(UUID uuid, NexusPlugin plugin) {
         this.plugin = plugin;
@@ -83,9 +86,11 @@ public class NexusPlayer {
         joined = System.currentTimeMillis();
         joinedProfile = System.currentTimeMillis();
         profilesMap = new HashMap<>();
+        coopInvitations = new ArrayList<>();
         if(registered()) {
             load();
             loadProfiles();
+            loadCoopInvitations();
         }
 
         if(profilesMap.size() == 0) {
@@ -376,6 +381,19 @@ public class NexusPlayer {
         return plugin.getDatabaseAdapter().keyExistsAsync("players", "player", uuid);
     }
 
+    private void loadCoopInvitations() {
+        ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("coopInvitations", "receiver", String.valueOf(uuid));
+        try {
+            if(resultSet.next()) {
+                coopInvitations.add(new CoopInvitation(resultSet.getString("sender"),
+                        UUID.fromString(resultSet.getString("receiver")),
+                        UUID.fromString(resultSet.getString("profileId"))));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void load() {
         ResultSet resultSet = plugin.getDatabaseAdapter().getAsync("players", "player", String.valueOf(uuid));
         try {
@@ -574,19 +592,39 @@ public class NexusPlayer {
                 inventory.setItem(i, itemBuilder, rightClick -> {
                     if(material == Material.WOODEN_PICKAXE) {
                         UUID profileId = UUID.fromString(coopInvitation);
-                        ICloudService iCloudService = CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
-                                plugin.getNexusServer().getProfilesServerMap().get(profileId));
-                        plugin.getProfileManager().getCoopInvitations().get(player.getUniqueId()).remove(profileId);
-                        new PacketCoopAccepted("123", profileId, uuid, player.getName(), finalCurrentSlot, plugin.getNexusServer().getThisServiceName()).send(iCloudService);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for(Profile profile1 : profilesMap.values()) {
-                                    profile1.loadMembers();
-                                }
+
+                        CoopInvitation coopInvitation1 = null;
+                        for(CoopInvitation invitation : coopInvitations) {
+                            if (invitation.getReceiver().equals(player.getUniqueId()) && invitation.getProfileId().equals(profileId)) {
+                                coopInvitation1 = invitation;
                             }
-                        }.runTaskLater(plugin, 20);
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_accepted_success"));
+                        }
+
+                        if(coopInvitation1 != null) {
+                            plugin.getDatabaseAdapter().deleteTwoAsync("coopInvitations", "profileId", profileId.toString(), "receiver", player.getUniqueId().toString());
+                            coopInvitations.remove(coopInvitation1);
+                            if(plugin.getNexusServer().getProfilesServerMap().containsKey(profileId)) {
+                                ICloudService iCloudService = CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
+                                        plugin.getNexusServer().getProfilesServerMap().get(profileId));
+                                new PacketCoopAccepted("123", profileId, uuid, player.getName(), finalCurrentSlot, plugin.getNexusServer().getThisServiceName()).send(iCloudService);
+                            } else {
+                                plugin.getDatabaseAdapter().set("playerProfiles", player.getUniqueId(), profileId, finalCurrentSlot,
+                                        System.currentTimeMillis(), 0, "empty", 0);
+                                plugin.getDatabaseAdapter().set("playerStats", player.getUniqueId(), profileId, 0, 0);
+                                player.closeInventory();
+                                loadProfiles();
+                            }
+
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    for(Profile profile1 : profilesMap.values()) {
+                                        profile1.loadMembers();
+                                    }
+                                }
+                            }.runTaskLater(plugin, 20);
+                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_accepted_success"));
+                        }
                     }
                 });
             }
