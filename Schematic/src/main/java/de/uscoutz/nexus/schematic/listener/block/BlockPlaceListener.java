@@ -3,17 +3,13 @@ package de.uscoutz.nexus.schematic.listener.block;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.quests.Task;
-import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
 import de.uscoutz.nexus.schematic.player.SchematicPlayer;
 import de.uscoutz.nexus.schematic.schematicitems.SchematicItem;
 import de.uscoutz.nexus.schematic.schematics.Schematic;
 import de.uscoutz.nexus.schematic.schematics.SchematicProfile;
 import de.uscoutz.nexus.schematic.schematics.SchematicType;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -68,12 +64,13 @@ public class BlockPlaceListener implements Listener {
                         } else {
                             if(!schematicItem.getSchematic().preview(location, rotation, true)) {
                                 event.setCancelled(true);
-                                if(schematic.getTimeToFinish() != 0) {
+                                if(schematic.getTimeToFinish() != 0 && !plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).isAdminMode()) {
                                     long finished = System.currentTimeMillis()+ schematic.getTimeToFinish();
                                     schematic.build(location, rotation, finished, schematicId, 0);
                                 } else {
                                     schematic.build(location, rotation, schematicId, 0, false);
                                 }
+                                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1.3F);
                                 String nexusLocation = location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ();
                                 plugin.getNexusPlugin().getDatabaseAdapter().set("schematics",
                                         plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCurrentProfile().getProfileId(),

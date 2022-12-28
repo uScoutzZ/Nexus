@@ -44,6 +44,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +63,8 @@ public class NexusPlayer {
     private Player player;
     @Getter
     private String language;
+    @Getter @Setter
+    private boolean adminMode;
     @Getter
     private Map<Integer, Profile> profilesMap;
     @Getter
@@ -76,6 +79,7 @@ public class NexusPlayer {
     public NexusPlayer(UUID uuid, NexusPlugin plugin) {
         this.plugin = plugin;
         this.uuid = uuid;
+        adminMode = false;
         joined = System.currentTimeMillis();
         joinedProfile = System.currentTimeMillis();
         profilesMap = new HashMap<>();
@@ -594,5 +598,9 @@ public class NexusPlayer {
         }
 
         return inventory;
+    }
+
+    public boolean isBedrockUser() {
+        return player.getUniqueId().toString().startsWith("00000000-0000");
     }
 }

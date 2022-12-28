@@ -17,6 +17,8 @@ commands:
     aliases: [spectate]
   addmoney:
   stats:
+  adminmode:
+    aliases: [admin, am]
 loadbefore:
   - NexusSchematic
   - NexusWave

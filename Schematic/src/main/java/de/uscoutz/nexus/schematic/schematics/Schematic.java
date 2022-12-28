@@ -549,7 +549,11 @@ public class Schematic {
                             .setFilledAction(player1 -> {
                                 destroy(profile, schematicId, plugin, schematicType);
                                 Schematic nextLevel = plugin.getSchematicManager().getSchematicsMap().get(schematicType).get(Condition.INTACT).get(level+1);
-                                nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId, 0);
+                                if(plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player1.getUniqueId()).isAdminMode()) {
+                                    nextLevel.build(location, rotation, 0, schematicId, 0);
+                                } else {
+                                    nextLevel.build(location, rotation, System.currentTimeMillis()+nextLevel.timeToFinish, schematicId, 0);
+                                }
                                 plugin.getNexusPlugin().getDatabaseAdapter().updateTwoAsync("schematics", "profileId",
                                         profile.getProfileId(),
                                         "schematicId", schematicId,

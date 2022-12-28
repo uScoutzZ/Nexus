@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.listener.player;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.profile.Profile;
 import de.uscoutz.nexus.regions.Region;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
@@ -111,16 +112,27 @@ public class PlayerInteractListener implements Listener {
                     if(BuiltSchematic.getCondition(builtSchematic.getPercentDamage()) != Condition.INTACT) {
                         player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_damaged-not-breakable"));
                     } else {
+                        NexusPlayer nexusPlayer = plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId());
                         if(plugin.getSchematicItemManager().getSchematicItemBySchematic().containsKey(builtSchematic.getSchematic())) {
                             if(schematicPlayer.getBreaking() == null || !schematicPlayer.getBreaking().equals(builtSchematic)) {
                                 player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break"));
-                                ComponentBuilder message = new ComponentBuilder(NexusPlugin.getInstance().getLocaleManager().translate(
-                                        "de_DE", "questions_click"));
-                                message.append(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_break-confirmation"));
-                                message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/removeschematic " + builtSchematic.getSchematicId()));
-                                player.spigot().sendMessage(message.create());
+                                if(!nexusPlayer.isBedrockUser()) {
+                                    ComponentBuilder message = new ComponentBuilder(NexusPlugin.getInstance().getLocaleManager().translate(
+                                            "de_DE", "questions_click"));
+                                    message.append(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "schematic_break-confirmation"));
+                                    message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/removeschematic " + builtSchematic.getSchematicId()));
+                                    player.spigot().sendMessage(message.create());
+                                    schematicPlayer.setBreaking(builtSchematic);
+                                } else {
+                                    player.sendMessage(plugin.getNexusPlugin().getLocaleManager().translate("de_DE", "schematic_break_bedrock-confirmation"));
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            schematicPlayer.setBreaking(builtSchematic);
+                                        }
+                                    }.runTaskLater(plugin, 1);
+                                }
 
-                                schematicPlayer.setBreaking(builtSchematic);
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
@@ -129,6 +141,8 @@ public class PlayerInteractListener implements Listener {
                                         }
                                     }
                                 }.runTaskLater(plugin, 100);
+                            } else if(schematicPlayer.getBreaking().equals(builtSchematic) && nexusPlayer.isBedrockUser()) {
+                                player.performCommand("removeschematic " + builtSchematic.getSchematicId());
                             }
                         } else {
                             player.sendMessage("§cThe schematic item is not set up");
