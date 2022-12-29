@@ -33,7 +33,7 @@ public enum Task {
                 .translate("de_DE", "george_build-walls-assigned", NexusPlugin.getInstance().getConfig().get("villager-name"), quest.getTask().next().getGoal()));
         sendMessages(player, messages);
     }),
-    BUILD_WALLS(true, 5, (player, quest) -> {
+    BUILD_WALLS(true, 3, (player, quest) -> {
         List<String> messages = NexusPlugin.getInstance().getLocaleManager().split(NexusPlugin.getInstance().getLocaleManager()
                 .translate("de_DE", "george_build-home-assigned", NexusPlugin.getInstance().getConfig().get("villager-name")));
         sendMessages(player, messages);

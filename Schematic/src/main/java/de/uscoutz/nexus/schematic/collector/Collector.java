@@ -66,16 +66,32 @@ public class Collector {
 
     public void spawn(Location location) {
         this.location = location;
+        this.profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(location.getWorld());
+        schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
+        this.schematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
+        updateNeededItems();
         spawnHolograms();
         blockLocation = location.clone().subtract(0, 1, 0);
         block = blockLocation.getBlock();
         oldBlockType = block.getType();
         block.setType(blockType);
 
-        this.profile = plugin.getNexusPlugin().getWorldManager().getWorldProfileMap().get(blockLocation.getWorld());
-        schematicProfile = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId());
-        this.schematic = plugin.getSchematicManager().getSchematicProfileMap().get(profile.getProfileId()).getBuiltSchematics().get(schematicId);
         schematicProfile.getCollectors().put(block, this);
+    }
+
+    private void updateNeededItems() {
+        List<ItemStack> standardCollectorItems = plugin.getCollectorManager().getCollectorNeededMap().get(
+                schematic.getSchematic().getSchematicType()).get(schematic.getCondition()).get(schematic.getSchematic().getLevel());
+        for(Material material : neededItems.keySet()) {
+            for(ItemStack standardCollectorItem : standardCollectorItems) {
+                if(standardCollectorItem.getType() == material) {
+                    if(standardCollectorItem.getAmount() < neededItems.get(material)) {
+                        this.neededItems.put(material, standardCollectorItem.getAmount());
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private void spawnHolograms() {

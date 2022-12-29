@@ -8,6 +8,7 @@ import lombok.Getter;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,14 @@ public class Quest {
 
     public void display(Player player) {
         player.showBossBar(bossBars.get("de_DE"));
+        if(task.getGoal() != 0) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    addProgress(player, 0); //That's for when a quests goal was changed and the player might have already reached it
+                }
+            }.runTaskLater(plugin, 20);
+        }
     }
 
     public Quest assign() {
@@ -110,7 +119,7 @@ public class Quest {
                     .translate(key, descriptionKey) + " " + progress));
             bossBar.progress(barProgress);
         }
-        if(this.progress >= task.getGoal()) {
+        if(finished == 0 && this.progress >= task.getGoal()) {
             finish(player);
         }
         return this.progress;
