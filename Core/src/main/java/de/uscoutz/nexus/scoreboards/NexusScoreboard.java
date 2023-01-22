@@ -34,44 +34,27 @@ public class NexusScoreboard {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective("abcd", "abcd");
 
-        int maxScore = 10;
+        int maxScore = ScoreboardUpdateType.values().length*3;
 
         objective.displayName(Component.text("§lAPOTOX.NET"));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         objective.getScore("§1").setScore(maxScore--);
 
-        objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_nexuslevel")).setScore(maxScore--);
-        Team nexusLevel = scoreboard.registerNewTeam("nexuslevel");
-        nexusLevel.addEntry("§2§a");
-        nexusLevel.setSuffix("§cLoading...");
-        nexusLevel.setPrefix(plugin.getLocaleManager().translate("de_DE", "scoreboard_nexuslevel-level"));
-        objective.getScore("§2§a").setScore(maxScore--);
-        entriesByType.put(ScoreboardUpdateType.NEXUSLEVEL, "§2§a");
-        scoresByType.put(ScoreboardUpdateType.NEXUSLEVEL, maxScore+1);
+        int i = 0;
+        for(ScoreboardUpdateType type : ScoreboardUpdateType.values()) {
+            objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_" +
+                    type.toString().toLowerCase() + "-title")).setScore(maxScore--);
+            Team team = scoreboard.registerNewTeam(type.toString().toLowerCase());
+            team.addEntry("§" + i + "§a");
+            team.setSuffix("§cLoading...");
+            team.setPrefix("§7");
+            objective.getScore("§" + i + "§a").setScore(maxScore--);
+            entriesByType.put(type, "§" + i + "§a");
+            scoresByType.put(type, maxScore+1);
 
-        objective.getScore("§2").setScore(maxScore--);
-
-        objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_money")).setScore(maxScore--);
-        Team money = scoreboard.registerNewTeam("money");
-        money.addEntry("§3§a");
-        money.setSuffix("§cLoading...");
-        money.setPrefix("");
-        objective.getScore("§3§a").setScore(maxScore--);
-        entriesByType.put(ScoreboardUpdateType.MONEY, "§3§a");
-        scoresByType.put(ScoreboardUpdateType.MONEY, maxScore+1);
-
-        objective.getScore("§3").setScore(maxScore--);
-
-        objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_biome")).setScore(maxScore--);
-        Team biome = scoreboard.registerNewTeam("biome");
-        biome.addEntry("§1§a");
-        biome.setSuffix("§cLoading...");
-        biome.setPrefix("§7⏣ ");
-        objective.getScore("§1§a").setScore(maxScore--);
-        entriesByType.put(ScoreboardUpdateType.BIOME, "§1§a");
-        scoresByType.put(ScoreboardUpdateType.BIOME, maxScore+1);
-
-        objective.getScore("§4").setScore(maxScore--);
+            objective.getScore("§" + i + "§b").setScore(maxScore--);
+            i++;
+        }
     }
 
     public void setup(Player player) {
@@ -82,28 +65,33 @@ public class NexusScoreboard {
     }
 
     public void update(ScoreboardUpdateType type) {
+        Team team = scoreboard.getTeam(type.toString().toLowerCase());
+        String translationKey = "scoreboard_" + type.toString().toLowerCase() + "-display";
         if(type == ScoreboardUpdateType.BIOME) {
-            Team biome = scoreboard.getTeam("biome");
             if(nexusPlayer.getBiome() == null) {
-                biome.setSuffix(plugin.getLocaleManager().translate("de_DE", "biome_travelling"));
+                team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
+                        plugin.getLocaleManager().translate("de_DE", "biome_travelling")));
             } else {
-                biome.setSuffix(plugin.getLocaleManager().translate("de_DE", nexusPlayer.getBiome().getLocaleKey()));
+                team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
+                        plugin.getLocaleManager().translate("de_DE", nexusPlayer.getBiome().getLocaleKey())));
             }
         } else if(type == ScoreboardUpdateType.NEXUSLEVEL) {
-            Team nexusLevel = scoreboard.getTeam("nexuslevel");
-            nexusLevel.setSuffix("§b" + profile.getNexusLevel());
+            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,profile.getNexusLevel()));
         } else if(type == ScoreboardUpdateType.MONEY) {
-            Team money = scoreboard.getTeam("money");
-            money.setSuffix(plugin.getLocaleManager().translate("de_DE", "scoreboard_money-display",
+            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
                     profile.getMembers().get(player.getUniqueId()).getMoney()));
-        }
+        } /*else if(type == ScoreboardUpdateType.SOULS) {
+            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
+                    profile.getMembers().get(player.getUniqueId()).getSouls()));
+        }*/
         objective.getScore(entriesByType.get(type)).setScore(scoresByType.get(type));
     }
 
     public enum ScoreboardUpdateType {
 
-        BIOME,
         NEXUSLEVEL,
-        MONEY;
+        MONEY,
+        //SOULS,
+        BIOME;
     }
 }

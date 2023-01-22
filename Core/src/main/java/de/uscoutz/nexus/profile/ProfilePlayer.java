@@ -35,7 +35,7 @@ public class ProfilePlayer {
     @Getter @Setter
     private long playtime, joinedProfile, money;
     @Getter
-    private int kills, deaths;
+    private int kills, deaths, souls;
     @Getter
     private UUID playerUUID;
     @Getter @Setter
@@ -195,6 +195,14 @@ public class ProfilePlayer {
 
     public void addDeath() {
         deaths++;
+    }
+
+    public void addSouls(int souls) {
+        this.souls += souls;
+    }
+
+    public void removeSouls(int souls) {
+        this.souls -= souls;
     }
 
     public String getOnlineTime() {

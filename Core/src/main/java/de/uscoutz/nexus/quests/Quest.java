@@ -139,9 +139,15 @@ public class Quest {
         }
 
         for(String key : plugin.getLocaleManager().getLanguageKeys()) {
-            bossBars.put(key, BossBar.bossBar(Component.text(plugin.getLocaleManager()
-                    .translate(key, titleKey) + "§7: " + plugin.getLocaleManager()
-                    .translate(key, descriptionKey) + " " + progress), barProgress, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_6));
+            try {
+                bossBars.put(key, BossBar.bossBar(Component.text(plugin.getLocaleManager()
+                        .translate(key, titleKey) + "§7: " + plugin.getLocaleManager()
+                        .translate(key, descriptionKey) + " " + progress), barProgress, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_6));
+            } catch (IllegalArgumentException exception) {
+                bossBars.put(key, BossBar.bossBar(Component.text(plugin.getLocaleManager()
+                        .translate(key, titleKey) + "§7: " + plugin.getLocaleManager()
+                        .translate(key, descriptionKey) + " " + progress), 1, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_6));
+            }
         }
     }
 }

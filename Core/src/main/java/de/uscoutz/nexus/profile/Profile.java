@@ -44,7 +44,7 @@ public class Profile {
     @Getter @Setter
     private int nexusLevel, concurrentlyBuilding, wonRaids, lostRaids, highestTower = -1;
     @Getter @Setter
-    private long start, lastActivity;
+    private long start, lastActivity, souls;
     @Getter
     private NexusWorld world;
     @Getter
@@ -170,7 +170,8 @@ public class Profile {
                     plugin.getNexusServer().getProfileCountByServer().get(plugin.getNexusServer().getThisServiceName())-1);
             plugin.getDatabaseAdapter().update("profiles", "profileId", profileId,
                     new DatabaseUpdate("nexusLevel", nexusLevel),
-                    new DatabaseUpdate("lastActivity", System.currentTimeMillis()));
+                    new DatabaseUpdate("lastActivity", System.currentTimeMillis()),
+                    new DatabaseUpdate("souls", souls));
             plugin.getDatabaseAdapter().update("profileStats", "profileId", profileId,
                     new DatabaseUpdate("wonRaids", wonRaids),
                     new DatabaseUpdate("lostRaids", lostRaids));
@@ -279,6 +280,7 @@ public class Profile {
                 nexusLevel = profileResultSet.getInt("nexusLevel");
                 start = profileResultSet.getLong("start");
                 lastActivity = profileResultSet.getLong("lastActivity");
+                souls = profileResultSet.getInt("souls");
             }
             plugin.getProfileManager().getProfilesMap().put(profileId, this);
             loadMembers();
@@ -304,7 +306,7 @@ public class Profile {
     }
 
     public void create(UUID owner, int profileSlot) {
-        plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis());
+        plugin.getDatabaseAdapter().set("profiles", profileId, owner, 0, System.currentTimeMillis(), System.currentTimeMillis(), 0);
         plugin.getDatabaseAdapter().set("profileStats", profileId, 0, 0);
         plugin.getDatabaseAdapter().set("playerProfiles", owner, profileId, profileSlot,
                 System.currentTimeMillis(), 0, "empty", 0);
