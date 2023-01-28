@@ -10,6 +10,7 @@ import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.regions.Region;
+import de.uscoutz.nexus.scoreboards.NexusScoreboard;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.worlds.NexusWorld;
 import eu.thesimplecloud.api.CloudAPI;
@@ -72,6 +73,13 @@ public class Profile {
         regions = new ArrayList<>();
         if(exists()) {
             prepare();
+        }
+    }
+
+    public void addSoul(long souls) {
+        this.souls += souls;
+        for(NexusPlayer nexusPlayer : getActivePlayers()) {
+            nexusPlayer.getNexusScoreboard().update(NexusScoreboard.ScoreboardUpdateType.SOULS);
         }
     }
 
@@ -153,8 +161,6 @@ public class Profile {
                 }
             }
         }
-
-
     }
 
     public void checkout() {

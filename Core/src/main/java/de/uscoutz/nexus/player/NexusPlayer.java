@@ -285,39 +285,7 @@ public class NexusPlayer {
                     ItemMeta itemMeta = itemStack.getItemMeta();
 
                     if(plugin.getNexusItemManager().isNexusItem(itemMeta)) {
-                        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
-                        NexusItem nexusItem = plugin.getNexusItemManager().getItemMap().get(key);
-
-                        List<Component> lore = new ArrayList<>();
-                        if(itemMeta.lore() != null) {
-                            itemMeta.lore().clear();
-                        }
-                        if(plugin.getToolManager().isTool(itemMeta)) {
-                            Tool tool = plugin.getToolManager().getToolMap().get(key);
-                            NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
-                            int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
-                            int toolBreakingPower = tool.getBreakingPower();
-
-                            lore.add(Component.text(plugin.getLocaleManager().translate(
-                                    language, "tool_breaking-power", breakingPower)));
-                            if(breakingPower != toolBreakingPower) {
-                                itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
-                            }
-                        }
-                        if(nexusItem.getLocale() != null) {
-                            String displayName = plugin.getLocaleManager().translate(language, nexusItem.getLocale());
-                            itemMeta.displayName(Component.text(displayName));
-                        } else {
-                            itemMeta.displayName(Component.text(""));
-                        }
-
-                        lore.add(Component.text(""));
-                        lore.add(Component.text(nexusItem.getRarity().toString(language)));
-
-                        itemMeta.lore(lore);
-                        itemStack.setItemMeta(itemMeta);
-                        itemStack.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                        plugin.getNexusItemManager().updateItem(itemStack, language);
                     }
                 }
             }

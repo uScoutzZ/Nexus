@@ -200,7 +200,8 @@ public class InventoryManager {
     public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, String message, NexusPrice... prices) {
         List<Component> lore = new ArrayList<>();
         ItemStack shopItem = itemStack.clone();
-        lore.add(Component.text(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "workshop_needed-items")));
+        String language = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage();
+        lore.add(Component.text(plugin.getLocaleManager().translate(language, "workshop_needed-items")));
         boolean playerHasItems = true;
 
         if(prices.length == 0) {
@@ -257,7 +258,10 @@ public class InventoryManager {
                         nexusPrice.remove(player);
                     }
                     player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
-                    player.getInventory().addItem(itemStack);
+
+                    ItemStack playerItem = itemStack.clone();
+                    plugin.getNexusItemManager().updateItem(playerItem, language);
+                    player.getInventory().addItem(playerItem);
                     Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
                 }
             };

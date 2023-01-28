@@ -80,10 +80,10 @@ public class NexusScoreboard {
         } else if(type == ScoreboardUpdateType.MONEY) {
             team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
                     profile.getMembers().get(player.getUniqueId()).getMoney()));
-        } /*else if(type == ScoreboardUpdateType.SOULS) {
+        } else if(type == ScoreboardUpdateType.SOULS) {
             team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
-                    profile.getMembers().get(player.getUniqueId()).getSouls()));
-        }*/
+                    profile.getSouls()));
+        }
         objective.getScore(entriesByType.get(type)).setScore(scoresByType.get(type));
     }
 
