@@ -110,15 +110,15 @@ public class ProfilePlayer {
         Player player = Bukkit.getPlayer(playerUUID);
         if(player != null) {
             if(skill.getSkillLevels().length > skillMap.getValues1().get(skill)) {
-                player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added",
+                player.sendActionBar(Component.text(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "skill_xp-added",
                         xp, skill.getTitle(), skillMap.getValues2().get(skill), skill.getSkillLevels()[skillMap.getValues1().get(skill)].getNeededXP())));
             } else {
-                player.sendActionBar(Component.text(plugin.getLocaleManager().translate("de_DE", "skill_xp-added-maximum",
+                player.sendActionBar(Component.text(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "skill_xp-added-maximum",
                         xp, skill.getTitle())));
             }
 
             if(levelUp) {
-                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "skill_level-up", skill.getTitle(), skillMap.getValues1().get(skill)));
+                player.sendMessage(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "skill_level-up", skill.getTitle(), skillMap.getValues1().get(skill)));
                 for(SkillReward skillReward : skill.getSkillLevels()[skillMap.getValues1().get(skill)-1].getRewards()) {
                     player.sendMessage("§f    " + skillReward.getDisplay());
                     skillReward.addReward(player);
@@ -205,7 +205,7 @@ public class ProfilePlayer {
         this.souls -= souls;
     }
 
-    public String getOnlineTime() {
-        return DateUtilities.getTime(0, playtime, plugin);
+    public String getOnlineTime(String language) {
+        return DateUtilities.getTime(0, playtime, plugin, language);
     }
 }

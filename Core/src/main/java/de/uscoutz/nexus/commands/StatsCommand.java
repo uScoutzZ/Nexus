@@ -47,6 +47,7 @@ public class StatsCommand implements CommandExecutor {
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                 PaginatedInventory paginatedInventory = InventoryBuilder.createPaginated(5*9, "Players");
+                String language = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage();
                 paginatedInventory.addDynamicSlots(IntStream.range(0, 42).toArray());
                 ResultSet resultSet = plugin.getDatabaseAdapter().get("players", "firstlogin DESC", limit);
 
@@ -57,8 +58,8 @@ public class StatsCommand implements CommandExecutor {
                         long firstlogin = resultSet.getLong("firstLogin");
                         paginatedInventory.addItem(ItemBuilder.skull().owner(gameProfile).name("§7" + gameProfile.getName()).lore(
                                 "§7Erster Join: §6" + sdf.format(firstlogin),
-                                plugin.getLocaleManager().translate("de_DE", "profiles_members_playtime",
-                                        DateUtilities.getTime(0, playtime, plugin))), inventoryClickEvent -> {
+                                plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "profiles_members_playtime",
+                                        DateUtilities.getTime(0, playtime, plugin, language))), inventoryClickEvent -> {
                             SimpleInventory simpleInventory = InventoryBuilder.create(3*9, "§7" + gameProfile.getName() + "'s Profile");
 
                             ResultSet profiles = plugin.getDatabaseAdapter().query("SELECT DISTINCT * FROM playerProfiles, profiles, profileStats, playerStats WHERE " +
@@ -72,7 +73,7 @@ public class StatsCommand implements CommandExecutor {
                                     String profileId = profiles.getString("profileId");
                                     lore.add("§7Erstellt am: §6" + sdf.format(profiles.getLong("start")));
                                     lore.add("§7Letze Aktivität des Profiles: §6" + sdf.format(profiles.getLong("lastActivity")));
-                                    lore.add("§7Spielzeit des Spielers: §6" + DateUtilities.getTime(0, profiles.getLong("playtime"), plugin));
+                                    lore.add("§7Spielzeit des Spielers: §6" + DateUtilities.getTime(0, profiles.getLong("playtime"), plugin, language));
                                     lore.add("§7Tode: §6" + profiles.getInt("deaths"));
                                     lore.add("§7Kills: §6" + profiles.getInt("kills"));
                                     lore.add("§7Gewonnene Raids: §6" + profiles.getInt("wonRaids"));

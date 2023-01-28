@@ -24,7 +24,7 @@ public class VotetokenPrice implements NexusPrice{
 
     @Override
     public String getDisplay(Player player) {
-        return plugin.getLocaleManager().translate("de_DE", localeKey, votetokens);
+        return plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), localeKey, votetokens);
     }
 
     @Override

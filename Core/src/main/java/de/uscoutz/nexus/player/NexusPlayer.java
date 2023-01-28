@@ -4,6 +4,8 @@ import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
 import de.uscoutz.nexus.coop.CoopInvitation;
 import de.uscoutz.nexus.database.DatabaseUpdate;
+import de.uscoutz.nexus.gamemechanics.NexusItem;
+import de.uscoutz.nexus.gamemechanics.NexusItemManager;
 import de.uscoutz.nexus.gamemechanics.tools.Tool;
 import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.SimpleInventory;
@@ -121,7 +123,7 @@ public class NexusPlayer {
                 oldProfile.getMembers().get(uuid).checkout(joined);
                 Quest mainQuest = oldProfile.getMainQuest();
                 if(mainQuest != null) {
-                    player.hideBossBar(mainQuest.getBossBars().get("de_DE"));
+                    player.hideBossBar(mainQuest.getBossBars().get(language));
                 }
             }
         }
@@ -200,7 +202,7 @@ public class NexusPlayer {
                             @Override
                             public void run() {
                                 if(player != null) {
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "ressources-occupied"));
+                                    player.sendMessage(plugin.getLocaleManager().translate(language, "ressources-occupied"));
                                     if(join) {
                                         player.kick();
                                     }
@@ -259,7 +261,7 @@ public class NexusPlayer {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
         biome = plugin.getBiomeManager().getBiome(player.getLocation());
-        nexusScoreboard = new NexusScoreboard(plugin);
+        nexusScoreboard = new NexusScoreboard(plugin, this);
         nexusScoreboard.setup(player);
         for(NexusScoreboard.ScoreboardUpdateType scoreboardUpdateType : NexusScoreboard.ScoreboardUpdateType.values()) {
             nexusScoreboard.update(scoreboardUpdateType);
@@ -270,8 +272,8 @@ public class NexusPlayer {
             mainQuest.display(player);
             if(mainQuest.getTask() == Task.TALK_TO_GEORGE) {
                 Quest quest = profile.getQuests().get(Task.TALK_TO_GEORGE);
-                player.showTitle(Title.title(Component.text(plugin.getLocaleManager().translate("de_DE", quest.getTitleKey())),
-                        Component.text(plugin.getLocaleManager().translate("de_DE", quest.getDescriptionKey())), Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(1))));
+                player.showTitle(Title.title(Component.text(plugin.getLocaleManager().translate(language, quest.getTitleKey())),
+                        Component.text(plugin.getLocaleManager().translate(language, quest.getDescriptionKey())), Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(8), Duration.ofSeconds(1))));
             }
         }
 
@@ -281,31 +283,41 @@ public class NexusPlayer {
             for(ItemStack itemStack : player.getInventory().getContents()) {
                 if(itemStack != null && itemStack.getItemMeta() != null) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
-                    if(plugin.getToolManager().isTool(itemMeta)) {
-                        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-                        NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
-                        int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
-                        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
-                        Tool tool = plugin.getToolManager().getToolMap().get(key);
-                        int toolBreakingPower = tool.getBreakingPower();
-                        if(breakingPower != toolBreakingPower) {
-                            if(itemMeta.lore() != null) {
-                                itemMeta.lore().clear();
-                            }
-                            itemMeta.lore(tool.getItemStack().lore());
-                            itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
-                        }
 
-                        if(tool.getLocale() != null) {
-                            String displayName = plugin.getLocaleManager().translate("de_DE", tool.getLocale());
-                            if(itemMeta.hasDisplayName() && !itemMeta.getDisplayName().equals(displayName)) {
-                                itemMeta.displayName(Component.text(displayName));
+                    if(plugin.getNexusItemManager().isNexusItem(itemMeta)) {
+                        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+                        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+                        NexusItem nexusItem = plugin.getNexusItemManager().getItemMap().get(key);
+
+                        List<Component> lore = new ArrayList<>();
+                        if(itemMeta.lore() != null) {
+                            itemMeta.lore().clear();
+                        }
+                        if(plugin.getToolManager().isTool(itemMeta)) {
+                            Tool tool = plugin.getToolManager().getToolMap().get(key);
+                            NamespacedKey namespacedKey = new NamespacedKey(plugin.getName().toLowerCase(), "breakingpower");
+                            int breakingPower = dataContainer.get(namespacedKey, PersistentDataType.INTEGER);
+                            int toolBreakingPower = tool.getBreakingPower();
+
+                            lore.add(Component.text(plugin.getLocaleManager().translate(
+                                    language, "tool_breaking-power", breakingPower)));
+                            if(breakingPower != toolBreakingPower) {
+                                itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, toolBreakingPower);
                             }
+                        }
+                        if(nexusItem.getLocale() != null) {
+                            String displayName = plugin.getLocaleManager().translate(language, nexusItem.getLocale());
+                            itemMeta.displayName(Component.text(displayName));
                         } else {
                             itemMeta.displayName(Component.text(""));
                         }
 
+                        lore.add(Component.text(""));
+                        lore.add(Component.text(nexusItem.getRarity().toString(language)));
+
+                        itemMeta.lore(lore);
                         itemStack.setItemMeta(itemMeta);
+                        itemStack.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                     }
                 }
             }
@@ -452,13 +464,13 @@ public class NexusPlayer {
             }
         }
 
-        SimpleInventory inventory = InventoryBuilder.create(size, plugin.getLocaleManager().translate("de_DE", "profiles-title"));
+        SimpleInventory inventory = InventoryBuilder.create(size, plugin.getLocaleManager().translate(language, "profiles-title"));
 
         int currentSlot = 0;
         for(int i : slots) {
             Material material;
             int finalCurrentSlot = currentSlot;
-            List<String> lore = Arrays.asList(" ", plugin.getLocaleManager().translate("de_DE", "profiles_click-to-create"));
+            List<String> lore = Arrays.asList(" ", plugin.getLocaleManager().translate(language, "profiles_click-to-create"));
             Profile profile = profilesMap.get(finalCurrentSlot);
             if(profilesMap.containsKey(currentSlot)) {
                 if(coopInvitation == null) {
@@ -475,14 +487,14 @@ public class NexusPlayer {
                     }
                     String lastActivity;
                     if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
-                        lastActivity = plugin.getLocaleManager().translate("de_DE", "right-now");
+                        lastActivity = plugin.getLocaleManager().translate(language, "right-now");
                     } else {
-                        lastActivity = DateUtilities.getTime(profile.getLastActivity(), System.currentTimeMillis(), plugin);
+                        lastActivity = DateUtilities.getTime(profile.getLastActivity(), System.currentTimeMillis(), plugin, language);
                     }
-                    lore = Arrays.asList(" ", plugin.getLocaleManager().translate("de_DE", "profiles_owner", profile.getMembers().get(profile.getOwner()).getGameProfile().getName()),
-                            plugin.getLocaleManager().translate("de_DE", "profiles_members", members), " ",
-                            plugin.getLocaleManager().translate("de_DE", "profiles_nexus-level", profile.getNexusLevel()),
-                            plugin.getLocaleManager().translate("de_DE", "last-activity", lastActivity));
+                    lore = Arrays.asList(" ", plugin.getLocaleManager().translate(language, "profiles_owner", profile.getMembers().get(profile.getOwner()).getGameProfile().getName()),
+                            plugin.getLocaleManager().translate(language, "profiles_members", members), " ",
+                            plugin.getLocaleManager().translate(language, "profiles_nexus-level", profile.getNexusLevel()),
+                            plugin.getLocaleManager().translate(language, "last-activity", lastActivity));
                 } else {
                     material = Material.BARRIER;
                 }
@@ -490,7 +502,7 @@ public class NexusPlayer {
                 material = Material.WOODEN_PICKAXE;
             }
             ItemBuilder itemBuilder = ItemBuilder.create(material);
-            itemBuilder.name(plugin.getLocaleManager().translate("de_DE", "profile-slot", String.valueOf((currentSlot+1))));
+            itemBuilder.name(plugin.getLocaleManager().translate(language, "profile-slot", String.valueOf((currentSlot+1))));
             itemBuilder.lore(lore);
             if(coopInvitation == null && currentProfileSlot == currentSlot) {
                 itemBuilder.enchant(Enchantment.LUCK, 1).flag(ItemFlag.HIDE_ENCHANTS);
@@ -500,24 +512,24 @@ public class NexusPlayer {
             if(coopInvitation == null) {
                 inventory.setItem(i, itemBuilder, leftClick -> {
                     if(profile != null) {
-                        SimpleInventory simpleInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_members-title"));
+                        SimpleInventory simpleInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate(language, "profiles_members-title"));
                         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
                         simpleInventory.fill(0, 9, ItemBuilder.create(Material.GRAY_STAINED_GLASS_PANE).name(" "));
                         simpleInventory.setItem(4, ItemBuilder.skull()
                                 .skinURL("https://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f")
-                                .name(plugin.getLocaleManager().translate("de_DE", "profiles_coop"))
-                                .lore(plugin.getLocaleManager().translate("de_DE", "profiles_coop_lore")));
+                                .name(plugin.getLocaleManager().translate(language, "profiles_coop"))
+                                .lore(plugin.getLocaleManager().translate(language, "profiles_coop_lore")));
 
                         if(profile.getOwner().equals(player.getUniqueId())) {
                             simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
-                                    .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"))
-                                    .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile_lore")), deleteLeftClick -> {
-                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile"));
+                                    .name(plugin.getLocaleManager().translate(language, "profiles_delete-profile"))
+                                    .lore(plugin.getLocaleManager().translate(language, "profiles_delete-profile_lore")), deleteLeftClick -> {
+                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate(language, "profiles_delete-profile"));
                                 deleteInventory.setItem(13, ItemBuilder.skull()
                                         .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
-                                        .name(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm"))
-                                        .lore(plugin.getLocaleManager().translate("de_DE", "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
+                                        .name(plugin.getLocaleManager().translate(language, "profiles_delete-profile-confirm"))
+                                        .lore(plugin.getLocaleManager().translate(language, "profiles_delete-profile-confirm_lore")), confirmLeftClick -> {
                                     if(plugin.getNexusServer().getProfilesServerMap().containsKey(profile.getProfileId())) {
                                         new PacketDeleteProfile("123", profile.getProfileId())
                                                 .send(CloudAPI.getInstance().getCloudServiceManager().getCloudServiceByName(
@@ -526,22 +538,22 @@ public class NexusPlayer {
                                         profile.delete();
                                     }
                                     player.closeInventory();
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted", (finalCurrentSlot+1)));
+                                    player.sendMessage(plugin.getLocaleManager().translate(language, "profile-deleted", (finalCurrentSlot+1)));
                                 });
                                 deleteInventory.open(player);
                             });
                         } else {
                             simpleInventory.setItem(8, ItemBuilder.create(Material.BARRIER)
-                                    .name(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile"))
-                                    .lore(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile_lore")), deleteLeftClick -> {
-                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile"));
+                                    .name(plugin.getLocaleManager().translate(language, "profiles_leave-profile"))
+                                    .lore(plugin.getLocaleManager().translate(language, "profiles_leave-profile_lore")), deleteLeftClick -> {
+                                SimpleInventory deleteInventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate(language, "profiles_leave-profile"));
                                 deleteInventory.setItem(13, ItemBuilder.skull()
                                         .skinURL("https://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6")
-                                        .name(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile-confirm"))
-                                        .lore(plugin.getLocaleManager().translate("de_DE", "profiles_leave-profile_lore")), confirmLeftClick -> {
+                                        .name(plugin.getLocaleManager().translate(language, "profiles_leave-profile-confirm"))
+                                        .lore(plugin.getLocaleManager().translate(language, "profiles_leave-profile_lore")), confirmLeftClick -> {
 
                                     player.closeInventory();
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "profiles_left-profile", (finalCurrentSlot+1)));
+                                    player.sendMessage(plugin.getLocaleManager().translate(language, "profiles_left-profile", (finalCurrentSlot+1)));
                                     profile.kickPlayer(player.getUniqueId());
                                     new BukkitRunnable() {
                                         @Override
@@ -566,8 +578,8 @@ public class NexusPlayer {
                             for(ProfilePlayer profilePlayer : profile.getMembers().values()) {
                                 if(profilePlayer != null && profilePlayer.getGameProfile() != null) {
                                     simpleInventory.addItem(ItemBuilder.skull().owner(profilePlayer.getGameProfile()).name("§7" + profilePlayer.getGameProfile().getName()).lore(
-                                            plugin.getLocaleManager().translate("de_DE", "profiles_members_joined", sdf.format(new Date(profilePlayer.getJoinedProfile()))),
-                                            plugin.getLocaleManager().translate("de_DE", "profiles_members_playtime", profilePlayer.getOnlineTime())));
+                                            plugin.getLocaleManager().translate(language, "profiles_members_joined", sdf.format(new Date(profilePlayer.getJoinedProfile()))),
+                                            plugin.getLocaleManager().translate(language, "profiles_members_playtime", profilePlayer.getOnlineTime(language))));
                                 }
                             }
                         }

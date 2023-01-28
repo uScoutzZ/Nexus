@@ -22,7 +22,7 @@ public class PacketCoopDenied extends Packet {
         NexusPlayer nexusPlayer = NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(
                 NexusPlugin.getInstance().getProfileManager().getProfilesMap().get(profileId).getOwner());
 
-        nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "command_coop_deny", sender));
+        nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_deny", sender));
 
         return this;
     }

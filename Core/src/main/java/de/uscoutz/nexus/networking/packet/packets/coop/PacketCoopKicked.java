@@ -39,7 +39,7 @@ public class PacketCoopKicked extends Packet {
                     public void run() {
                         nexusPlayer.loadProfiles();
                         if(kicked) {
-                            nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "command_coop_kicked_other-profiles"));
+                            nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_kicked_other-profiles"));
                         }
                         final int[] lowestSlot = {-1};
                         for(int i = 0; i < finalMaxProfiles; i++) {
@@ -79,7 +79,7 @@ public class PacketCoopKicked extends Packet {
                                 public void run() {
                                     nexusPlayer.loadProfiles();
                                     if(kicked) {
-                                        nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "command_coop__kick_kicked", (finalI +1)));
+                                        nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop__kick_kicked", (finalI +1)));
                                     }
                                 }
                             }.runTaskLater(NexusPlugin.getInstance(), 2);

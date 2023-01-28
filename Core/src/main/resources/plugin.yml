@@ -19,6 +19,7 @@ commands:
   stats:
   adminmode:
     aliases: [admin, am]
+  listitems:
 loadbefore:
   - NexusSchematic
   - NexusWave

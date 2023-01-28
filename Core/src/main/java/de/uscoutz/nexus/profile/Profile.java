@@ -77,7 +77,7 @@ public class Profile {
 
     public void broadcast(String key, Object... args) {
         for(NexusPlayer nexusPlayer : getActivePlayers()) {
-            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate("de_DE", key, args));
+            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), key, args));
         }
     }
 
@@ -85,9 +85,9 @@ public class Profile {
         for(NexusPlayer nexusPlayer : getActivePlayers()) {
             String[] args = new String[keyArgument.length];
             for(int i = 0; i < keyArgument.length; i++) {
-                args[i] = plugin.getLocaleManager().translate("de_DE", keyArgument[i]);
+                args[i] = plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), keyArgument[i]);
             }
-            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate("de_DE", key, args));
+            nexusPlayer.getPlayer().sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), key, args));
         }
     }
 
@@ -125,7 +125,8 @@ public class Profile {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
                 if(all.getUniqueId().equals(owner)) {
-                    all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-deleted-teleport"));
+                    all.sendMessage(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(
+                            all.getUniqueId()).getLanguage(), "profile-deleted-teleport"));
                 }
                 //plugin.getPlayerManager().getPlayersMap().get(all.getUniqueId()).switchProfile(0);
             }
@@ -159,7 +160,7 @@ public class Profile {
     public void checkout() {
         if(loaded()) {
             for(Player all : world.getWorld().getPlayers()) {
-                all.sendMessage(plugin.getLocaleManager().translate("de_DE", "profile-unloaded"));
+                all.sendMessage(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(all.getUniqueId()).getLanguage(), "profile-unloaded"));
                 all.kick(Component.text(""));
             }
             Bukkit.getPluginManager().callEvent(new ProfileCheckoutEvent(Profile.this));

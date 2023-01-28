@@ -66,7 +66,7 @@ public class LocaleManager {
             String message = propertie.getProperty(translationKey);
 
             if(message.contains("%prefix%")) {
-                message = message.replace("%prefix%", translate("de_DE", "prefix"));
+                message = message.replace("%prefix%", translate(languageKey, "prefix"));
             }
 
             message = message.replace(" Nexus", plugin.getConfig().getString("nexus-color") + " Nexus");

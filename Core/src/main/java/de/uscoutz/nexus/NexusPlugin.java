@@ -1,10 +1,10 @@
 package de.uscoutz.nexus;
 
-import com.mojang.authlib.GameProfile;
 import de.uscoutz.nexus.biomes.BiomeManager;
 import de.uscoutz.nexus.broadcasts.BroadcastManager;
 import de.uscoutz.nexus.commands.*;
 import de.uscoutz.nexus.database.DatabaseAdapter;
+import de.uscoutz.nexus.gamemechanics.NexusItemManager;
 import de.uscoutz.nexus.gamemechanics.tools.ToolManager;
 import de.uscoutz.nexus.inventory.InventoryListener;
 import de.uscoutz.nexus.listeners.block.BlockBreakListener;
@@ -19,23 +19,15 @@ import de.uscoutz.nexus.networking.NexusServer;
 import de.uscoutz.nexus.player.PlayerManager;
 import de.uscoutz.nexus.profile.ProfileManager;
 import de.uscoutz.nexus.regions.RegionManager;
-import de.uscoutz.nexus.utilities.GameProfileSerializer;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import de.uscoutz.nexus.utilities.LocaleManager;
 import de.uscoutz.nexus.worlds.WorldManager;
 import lombok.Getter;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 
 public class NexusPlugin extends JavaPlugin {
@@ -57,6 +49,8 @@ public class NexusPlugin extends JavaPlugin {
     private LocaleManager localeManager;
     @Getter
     private LocationManager locationManager;
+    @Getter
+    private NexusItemManager nexusItemManager;
     @Getter
     private ToolManager toolManager;
     @Getter
@@ -81,23 +75,23 @@ public class NexusPlugin extends JavaPlugin {
         nexusServer = new NexusServer(this);
         //nexusServer.updatePlayersOnServer();
         localeManager = new LocaleManager(this);
-        localeManager.assignFiles(new File("/home/networksync/nexus/languages"));
-        locationManager = new LocationManager(this, new File("/home/networksync/nexus/locations.yml"));
-        biomeManager = new BiomeManager(this, new File("/home/networksync/nexus/biomes.yml"));
+        localeManager.assignFiles(new File("/home/networksync/nexusdev/languages"));
+        locationManager = new LocationManager(this, new File("/home/networksync/nexusdev/locations.yml"));
+        biomeManager = new BiomeManager(this, new File("/home/networksync/nexusdev/biomes.yml"));
         biomeManager.loadBiomes();
-        toolManager = new ToolManager(this, new File("/home/networksync/nexus/tools.yml"),
-                new File("/home/networksync/nexus/blockresistance.yml"), new File("/home/networksync/nexus/blockdrops.yml"));
-        toolManager.loadTools();
+        nexusItemManager = new NexusItemManager(this);
+        toolManager = new ToolManager(this, new File("/home/networksync/nexusdev/items/"),
+                new File("/home/networksync/nexusdev/blockresistance.yml"), new File("/home/networksync/nexusdev/blockdrops.yml"));
+        toolManager.loadTools(toolManager.getToolsDirectory());
         toolManager.loadBlockResistances();
         toolManager.loadBlockDrops();
         regionManager = new RegionManager(this);
         inventoryManager = new InventoryManager(this);
-        broadcastManager = new BroadcastManager(this, new File("/home/networksync/nexus/broadcasts.yml"));
+        broadcastManager = new BroadcastManager(this, new File("/home/networksync/nexusdev/broadcasts.yml"));
         broadcastManager.start();
 
         networkServer = new NetworkServer(Bukkit.getPort() + 70, this);
         networkServer.start();
-
 
         Bukkit.getPluginManager().registerEvents(new AsyncPrePlayerLoginListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerSpawnLocationListener(this), this);
@@ -131,6 +125,7 @@ public class NexusPlugin extends JavaPlugin {
         getCommand("loadprofile").setExecutor(new LoadProfileCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("adminmode").setExecutor(new AdminModeCommand(this));
+        getCommand("listitems").setExecutor(new ListItemsCommand(this));
 
         Bukkit.getConsoleSender().sendMessage("[NexusCore] Enabled");
 

@@ -1,6 +1,7 @@
 package de.uscoutz.nexus.schematic.schematicitems;
 
 import de.uscoutz.nexus.NexusPlugin;
+import de.uscoutz.nexus.gamemechanics.Rarity;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.quests.Task;
 import de.uscoutz.nexus.schematic.NexusSchematicPlugin;
@@ -66,9 +67,14 @@ public class SchematicItemManager {
                 if(schematic == null) {
                     Bukkit.getConsoleSender().sendMessage("[NexusSchematic] Couldn't find " + schematicType +" level " + level);
                 } else {
-                    SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic, obtainable);
+                    SchematicItem schematicItem = new SchematicItem(key, ItemBuilder.create(material), plugin, schematic, obtainable, "none");
                     if(itemsConfig.getString(key + ".locale") != null) {
                         schematicItem.name(itemsConfig.getString(key + ".locale"));
+                    }
+                    if (itemsConfig.getString(key + ".rarity") != null) {
+                        schematicItem.rarity(Rarity.valueOf(itemsConfig.getString(key + ".rarity")));
+                    } else {
+                        schematicItem.rarity(Rarity.COMMON);
                     }
                     if(obtainable) {
                         String ingredients = itemsConfig.getString(key+ ".ingredients");

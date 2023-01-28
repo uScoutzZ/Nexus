@@ -2,6 +2,7 @@ package de.uscoutz.nexus.gamemechanics.tools;
 
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.biomes.Biome;
+import de.uscoutz.nexus.gamemechanics.Rarity;
 import de.uscoutz.nexus.item.ItemBuilder;
 import de.uscoutz.nexus.utilities.InventoryManager;
 import lombok.Getter;
@@ -28,19 +29,19 @@ public class ToolManager {
     @Getter
     private Map<Material, Material> blockDrop;
     @Getter
-    private File toolsFile, resistanceFile, blockdropsFile;
+    private File toolsDirectory, resistanceFile, blockdropsFile;
     @Getter
-    private FileConfiguration toolsConfig, resistanceConfig, blockdropsConfig;
+    private FileConfiguration resistanceConfig, blockdropsConfig;
 
-    public ToolManager(NexusPlugin plugin, File toolsFile, File resistanceFile, File blockdropsFile) {
+    public ToolManager(NexusPlugin plugin, File toolsDirectory, File resistanceFile, File blockdropsFile) {
         this.plugin = plugin;
         toolMap = new LinkedHashMap<>();
         blockDrop = new HashMap<>();
-        this.toolsFile = toolsFile;
+        this.toolsDirectory = toolsDirectory;
         this.resistanceFile = resistanceFile;
-        if(!toolsFile.exists()) {
+        if(!toolsDirectory.exists()) {
             try {
-                toolsFile.createNewFile();
+                toolsDirectory.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -59,30 +60,41 @@ public class ToolManager {
                 throw new RuntimeException(e);
             }
         }
-        toolsConfig = YamlConfiguration.loadConfiguration(toolsFile);
         resistanceConfig = YamlConfiguration.loadConfiguration(resistanceFile);
         blockdropsConfig = YamlConfiguration.loadConfiguration(blockdropsFile);
     }
 
-    public void loadTools() {
-        for(String key : toolsConfig.getKeys(false)) {
-            Material material = Material.getMaterial(toolsConfig.getString(key + ".material"));
+    public void loadTools(File directory) {
+        for(File file : directory.listFiles()) {
+            if(file.isDirectory()) {
+                loadTools(file);
+            } else {
+                FileConfiguration toolsConfig = YamlConfiguration.loadConfiguration(file);
+                for(String key : toolsConfig.getKeys(false)) {
+                    Material material = Material.getMaterial(toolsConfig.getString(key + ".material"));
 
-            Tool tool = new Tool(key, ItemBuilder.create(material), plugin);
-            tool.breakingPower(toolsConfig.getInt(key + ".breakingPower"));
-            if(toolsConfig.getString(key + ".locale") != null) {
-                tool.name(toolsConfig.getString(key + ".locale"));
+                    Tool tool = new Tool(key, ItemBuilder.create(material), plugin,
+                            file.getAbsolutePath().replace(toolsDirectory.getAbsolutePath(), ""));
+                    tool.breakingPower(toolsConfig.getInt(key + ".breakingPower"));
+                    if(toolsConfig.getString(key + ".locale") != null) {
+                        tool.name(toolsConfig.getString(key + ".locale"));
+                    }
+                    if (toolsConfig.getString(key + ".rarity") != null) {
+                        tool.rarity(Rarity.valueOf(toolsConfig.getString(key + ".rarity")));
+                    } else {
+                        tool.rarity(Rarity.COMMON);
+                    }
+                    String ingredients = toolsConfig.getString(key+ ".ingredients");
+                    tool.setMoneyPrice(toolsConfig.getInt(key + ".money"));
+                    tool.setVotetokensPrice(toolsConfig.getInt(key + ".votetokens"));
+                    if(ingredients != null) {
+                        tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
+                    }
+
+                    tool.build();
+                    toolMap.put(key, tool);
+                }
             }
-            String ingredients = toolsConfig.getString(key+ ".ingredients");
-            tool.setMoneyPrice(toolsConfig.getInt(key + ".money"));
-            tool.setVotetokensPrice(toolsConfig.getInt(key + ".votetokens"));
-            if(ingredients != null) {
-                tool.setIngredients(InventoryManager.getNeededItemsFromString(ingredients));
-            }
-
-
-            tool.build();
-            toolMap.put(key, tool);
         }
     }
 

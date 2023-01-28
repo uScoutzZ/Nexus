@@ -25,17 +25,17 @@ public class PacketCoopInvite extends Packet {
     public Object execute() {
         NexusPlayer nexusPlayer = NexusPlugin.getInstance().getPlayerManager().getPlayersMap().get(player);
         nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(
-                "de_DE", "command_coop_request-received", sender));
+                nexusPlayer.getLanguage(), "command_coop_request-received", sender));
 
         if(nexusPlayer.isBedrockUser()) {
             nexusPlayer.getPlayer().sendMessage(NexusPlugin.getInstance().getLocaleManager().translate(
-                    "de_DE", "command_coop_deny-or-accept"));
+                    nexusPlayer.getLanguage(), "command_coop_deny-or-accept"));
         } else {
             ComponentBuilder message = new ComponentBuilder(NexusPlugin.getInstance().getLocaleManager().translate(
-                    "de_DE", "questions_click"));
-            message.append(NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "clickevent_accept"));
+                    nexusPlayer.getLanguage(), "questions_click"));
+            message.append(NexusPlugin.getInstance().getLocaleManager().translate(nexusPlayer.getLanguage(), "clickevent_accept"));
             message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/coop accept " + profileId + " " + sender));
-            message.append(" " + NexusPlugin.getInstance().getLocaleManager().translate("de_DE", "clickevent_deny") + " ");
+            message.append(" " + NexusPlugin.getInstance().getLocaleManager().translate(nexusPlayer.getLanguage(), "clickevent_deny") + " ");
             message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/coop deny " + profileId + " " + sender));
             nexusPlayer.getPlayer().spigot().sendMessage(message.create());
         }

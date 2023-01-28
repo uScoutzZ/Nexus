@@ -170,7 +170,8 @@ public class BlockBreakListener implements Listener {
             }.runTaskLater(plugin, 1);
 
         } else {
-            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "tool-break_too-high-resistance"));
+            player.sendMessage(plugin.getLocaleManager().translate(
+                    plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "tool-break_too-high-resistance"));
             event.setCancelled(true);
         }
     }

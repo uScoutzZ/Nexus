@@ -16,12 +16,14 @@ public class RaidPlayer {
     }
 
     public void joinRaid(Raid raid) {
-        player.showBossBar(raid.getBossBars().get("de_DE"));
+        player.showBossBar(raid.getBossBars().get(
+                plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage()));
         raid.getPlayers().add(player);
     }
 
     public void leaveRaid(Raid raid) {
-        player.hideBossBar(raid.getBossBars().get("de_DE"));
+        player.hideBossBar(raid.getBossBars().get(
+                plugin.getNexusPlugin().getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage()));
         raid.getPlayers().remove(player);
     }
 }

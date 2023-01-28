@@ -27,7 +27,7 @@ public class NexusScoreboard {
     private Map<ScoreboardUpdateType, String> entriesByType;
     private Map<ScoreboardUpdateType, Integer> scoresByType;
 
-    public NexusScoreboard(NexusPlugin plugin) {
+    public NexusScoreboard(NexusPlugin plugin, NexusPlayer nexusPlayer) {
         this.plugin = plugin;
         entriesByType = new HashMap<>();
         scoresByType = new HashMap<>();
@@ -42,7 +42,7 @@ public class NexusScoreboard {
 
         int i = 0;
         for(ScoreboardUpdateType type : ScoreboardUpdateType.values()) {
-            objective.getScore(plugin.getLocaleManager().translate("de_DE", "scoreboard_" +
+            objective.getScore(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "scoreboard_" +
                     type.toString().toLowerCase() + "-title")).setScore(maxScore--);
             Team team = scoreboard.registerNewTeam(type.toString().toLowerCase());
             team.addEntry("§" + i + "§a");
@@ -69,19 +69,19 @@ public class NexusScoreboard {
         String translationKey = "scoreboard_" + type.toString().toLowerCase() + "-display";
         if(type == ScoreboardUpdateType.BIOME) {
             if(nexusPlayer.getBiome() == null) {
-                team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
-                        plugin.getLocaleManager().translate("de_DE", "biome_travelling")));
+                team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
+                        plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "biome_travelling")));
             } else {
-                team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
-                        plugin.getLocaleManager().translate("de_DE", nexusPlayer.getBiome().getLocaleKey())));
+                team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
+                        plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), nexusPlayer.getBiome().getLocaleKey())));
             }
         } else if(type == ScoreboardUpdateType.NEXUSLEVEL) {
-            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,profile.getNexusLevel()));
+            team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,profile.getNexusLevel()));
         } else if(type == ScoreboardUpdateType.MONEY) {
-            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
+            team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
                     profile.getMembers().get(player.getUniqueId()).getMoney()));
         } /*else if(type == ScoreboardUpdateType.SOULS) {
-            team.setSuffix(plugin.getLocaleManager().translate("de_DE", translationKey,
+            team.setSuffix(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), translationKey,
                     profile.getMembers().get(player.getUniqueId()).getSouls()));
         }*/
         objective.getScore(entriesByType.get(type)).setScore(scoresByType.get(type));
@@ -91,7 +91,7 @@ public class NexusScoreboard {
 
         NEXUSLEVEL,
         MONEY,
-        //SOULS,
+        SOULS,
         BIOME;
     }
 }

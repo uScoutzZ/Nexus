@@ -4,7 +4,7 @@ import de.uscoutz.nexus.NexusPlugin;
 
 public class DateUtilities {
 
-    public static String getTime(long start, long current, NexusPlugin plugin) {
+    public static String getTime(long start, long current, NexusPlugin plugin, String language) {
         long different = current-start;
 
         int seconds = 0;
@@ -29,21 +29,21 @@ public class DateUtilities {
             days++;
         }
 
-        String daysLocale = plugin.getLocaleManager().translate("de_DE", "days", String.valueOf(days));
+        String daysLocale = plugin.getLocaleManager().translate(language, "days", String.valueOf(days));
         if(days == 1) {
-            daysLocale = plugin.getLocaleManager().translate("de_DE", "day");
+            daysLocale = plugin.getLocaleManager().translate(language, "day");
         }
-        String hoursLocale = plugin.getLocaleManager().translate("de_DE", "hours", String.valueOf(hours));
+        String hoursLocale = plugin.getLocaleManager().translate(language, "hours", String.valueOf(hours));
         if(hours == 1) {
-            hoursLocale = plugin.getLocaleManager().translate("de_DE", "hour");
+            hoursLocale = plugin.getLocaleManager().translate(language, "hour");
         }
-        String minutesLocale = plugin.getLocaleManager().translate("de_DE", "minutes", String.valueOf(minutes));
+        String minutesLocale = plugin.getLocaleManager().translate(language, "minutes", String.valueOf(minutes));
         if(minutes == 1) {
-            minutesLocale = plugin.getLocaleManager().translate("de_DE", "minute");
+            minutesLocale = plugin.getLocaleManager().translate(language, "minute");
         }
-        String secondsLocale = plugin.getLocaleManager().translate("de_DE", "seconds", String.valueOf(seconds));
+        String secondsLocale = plugin.getLocaleManager().translate(language, "seconds", String.valueOf(seconds));
         if(seconds == 1) {
-            secondsLocale = plugin.getLocaleManager().translate("de_DE", "second");
+            secondsLocale = plugin.getLocaleManager().translate(language, "second");
         }
         if(days == 0) {
             if(hours == 0) {

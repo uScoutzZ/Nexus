@@ -31,8 +31,8 @@ public class SchematicItem extends NexusItem {
     private int maxObtainable, requiredLevel;
     private NexusSchematicPlugin plugin;
 
-    public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic, boolean obtainable) {
-        super(key, itemBuilder, plugin.getNexusPlugin());
+    public SchematicItem(String key, ItemBuilder<ItemMeta> itemBuilder, NexusSchematicPlugin plugin, Schematic schematic, boolean obtainable, String path) {
+        super(key, itemBuilder, plugin.getNexusPlugin(), path);
         this.schematic = schematic;
         this.plugin = plugin;
         this.obtainable = obtainable;

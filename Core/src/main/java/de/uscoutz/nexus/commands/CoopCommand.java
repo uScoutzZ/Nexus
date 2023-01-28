@@ -52,31 +52,31 @@ public class CoopCommand implements CommandExecutor {
                                     if(!nexusPlayer.getCurrentProfile().getMembers().containsKey(uuid)) {
                                         if(plugin.getDatabaseAdapter().keyExistsTwoAsync("coopInvitations",
                                                 "profileId", profile.getProfileId(), "receiver", uuid)) {
-                                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_already-invited"));
+                                            player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_already-invited"));
                                         } else {
-                                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop-request-sent", args[1]));
+                                            player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop-request-sent", args[1]));
                                             new PacketCoopInvite("123", uuid, profile.getProfileId(), player.getName()).send(cloudPlayer.getConnectedServer());
                                         }
 
                                     } else {
-                                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_already-in-coop"));
+                                        player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_already-in-coop"));
                                     }
                                 } else {
                                     IOfflineCloudPlayer offlineCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(args[1]).getBlockingOrNull();
                                     NexusPlugin.getInstance().getDatabaseAdapter().setAsync("coopInvitations", profile.getProfileId(), player.getName(), offlineCloudPlayer.getUniqueId());
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop-request-sent", args[1]));
+                                    player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop-request-sent", args[1]));
                                 }
                             } else if(args[0].equalsIgnoreCase("kick")) {
                                 if(!uuid.equals(player.getUniqueId())) {
                                     if(!nexusPlayer.getCurrentProfile().getMembers().containsKey(uuid)) {
-                                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop__kick_player-not-in-coop"));
+                                        player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop__kick_player-not-in-coop"));
                                     } else {
                                         if(cloudPlayer.isOnline() && cloudPlayer.getConnectedServer().getGroupName().equals(plugin.getConfig().getString("cloudtype"))) {
                                             new PacketCoopKicked("123", uuid, nexusPlayer.getCurrentProfile().getProfileId(), true).send(cloudPlayer.getConnectedServer());
                                         } else {
                                             nexusPlayer.getCurrentProfile().kickPlayer(uuid);
                                         }
-                                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop__kick_player-kicked", args[1]));
+                                        player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop__kick_player-kicked", args[1]));
                                         new BukkitRunnable() {
                                             @Override
                                             public void run() {
@@ -86,14 +86,14 @@ public class CoopCommand implements CommandExecutor {
                                         }.runTaskLater(plugin, 20);
                                     }
                                 } else {
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_kick-self"));
+                                    player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_kick-self"));
                                 }
                             }
                         } else {
-                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_kick_player-not-found"));
+                            player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_kick_player-not-found"));
                         }
                     } else {
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_not-owner"));
+                        player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_not-owner"));
                         return false;
                     }
 
@@ -116,24 +116,24 @@ public class CoopCommand implements CommandExecutor {
 
                             if (args[0].equalsIgnoreCase("accept")) {
                                 if (nexusPlayer.getProfilesMap().size() >= plugin.getConfig().getInt("profile-slots")) {
-                                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_accept_no-slot"));
+                                    player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_accept_no-slot"));
                                 } else {
                                     nexusPlayer.openProfiles(profileId.toString(), true);
                                 }
                             } else if (args[0].equalsIgnoreCase("deny")) {
                                 plugin.getDatabaseAdapter().deleteTwoAsync("coopInvitations", "profileId", coopInvitation.getProfileId().toString(), "receiver", player.getUniqueId().toString());
                                 nexusPlayer.getCoopInvitations().remove(coopInvitation);
-                                player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_denied"));
+                                player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_denied"));
                                 if(cloudPlayer != null) {
                                     new PacketCoopDenied("123", profileId, player.getName()).send(cloudPlayer.getConnectedServer());
                                 }
                             }
                         } else {
-                            player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_no-invitation"));
+                            player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_no-invitation"));
                         }
                     } catch (IllegalArgumentException exception) {
                         player.sendMessage("§cAn error occurred");
-                        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_coop_no-invitation"));
+                        player.sendMessage(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "command_coop_no-invitation"));
                         exception.printStackTrace();
                     }
                 } else {
@@ -142,17 +142,17 @@ public class CoopCommand implements CommandExecutor {
             } else if(args.length == 1) {
                 if(args[0].equalsIgnoreCase("requests")) {
                     PaginatedInventory paginatedInventory = InventoryBuilder.createPaginated(4*9,
-                            plugin.getLocaleManager().translate("de_DE", "coop_requests-title"));
+                            plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "coop_requests-title"));
                     paginatedInventory.addDynamicSlots(IntStream.range(0, 2*9).toArray());
                     for(CoopInvitation coopInvitation : plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getCoopInvitations()) {
                         paginatedInventory.addItem(ItemBuilder.create(Material.WRITABLE_BOOK)
-                                .name(plugin.getLocaleManager().translate("de_DE",
+                                .name(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(),
                                         "coop_requests-display", coopInvitation.getSender())).build(), inventoryClickEvent -> {
                             SimpleInventory inventory = InventoryBuilder.create(3*9,
-                                    plugin.getLocaleManager().translate("de_DE", "coop_requests_confirm-title", coopInvitation.getSender()));
+                                    plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "coop_requests_confirm-title", coopInvitation.getSender()));
 
                             inventory.setItem(12, ItemBuilder.create(Material.LIME_CONCRETE)
-                                    .name(plugin.getLocaleManager().translate("de_DE", "accept"))
+                                    .name(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "accept"))
                                     .build(), inventoryClickEvent1 -> {
                                 player.performCommand("coop accept " + coopInvitation.getProfileId() + " " + coopInvitation.getSender());
                             });

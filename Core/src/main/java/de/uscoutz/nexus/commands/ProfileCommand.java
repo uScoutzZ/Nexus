@@ -29,6 +29,6 @@ public class ProfileCommand implements CommandExecutor {
     }
 
     private void sendHelp(Player player) {
-        player.sendMessage(plugin.getLocaleManager().translate("de_DE", "command_profile_help"));
+        player.sendMessage(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "command_profile_help"));
     }
 }

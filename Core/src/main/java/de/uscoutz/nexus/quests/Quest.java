@@ -55,7 +55,7 @@ public class Quest {
     }
 
     public void display(Player player) {
-        player.showBossBar(bossBars.get("de_DE"));
+        player.showBossBar(bossBars.get(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage()));
         if(task.getGoal() != 0) {
             new BukkitRunnable() {
                 @Override
@@ -98,7 +98,7 @@ public class Quest {
 
         Quest mainQuest = profile.getMainQuest();
         for(Player all : profile.getWorld().getWorld().getPlayers()) {
-            all.hideBossBar(bossBars.get("de_DE"));
+            all.hideBossBar(bossBars.get(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage()));
             if(mainQuest != null) {
                 mainQuest.display(all);
             }

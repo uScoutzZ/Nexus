@@ -58,12 +58,12 @@ public class NexusSchematicPlugin extends JavaPlugin {
         fileManager.loadSchematicFiles();
         schematicManager = new SchematicManager(this);
         schematicManager.loadSchematics();
-        collectorManager = new CollectorManager(new File("/home/networksync/nexus/schematiccollectors.yml"), this);
+        collectorManager = new CollectorManager(new File("/home/networksync/nexusdev/schematiccollectors.yml"), this);
         collectorManager.loadCollectors();
         schematicItemManager = new SchematicItemManager(this,
-                new File("/home/networksync/nexus/schematicitems.yml"));
+                new File("/home/networksync/nexusdev/schematicitems.yml"));
         schematicItemManager.loadItems();
-        gatewayManager = new GatewayManager(new File("/home/networksync/nexus/gateways.yml"), this);
+        gatewayManager = new GatewayManager(new File("/home/networksync/nexusdev/gateways.yml"), this);
         gatewayManager.loadGateways();
         autoMinerManager = new AutoMinerManager(this);
 

@@ -19,7 +19,7 @@ public class MoneyPrice implements NexusPrice{
 
     @Override
     public String getDisplay(Player player) {
-        return plugin.getLocaleManager().translate("de_DE", localeKey, money);
+        return plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), localeKey, money);
     }
 
     @Override

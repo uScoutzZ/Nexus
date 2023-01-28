@@ -19,15 +19,15 @@ public class Tool extends NexusItem {
 
     private NexusPlugin nexusPlugin;
 
-    public Tool(String key, ItemBuilder<ItemMeta> itemBuilder, NexusPlugin plugin) {
-        super(key, itemBuilder, plugin);
+    public Tool(String key, ItemBuilder<ItemMeta> itemBuilder, NexusPlugin plugin, String path) {
+        super(key, itemBuilder, plugin, path);
         nexusPlugin = plugin;
     }
 
     public Tool breakingPower(int breakingPower) {
         this.breakingPower = breakingPower;
         if(breakingPower != 0) {
-            getItemBuilder().lore(nexusPlugin.getLocaleManager().translate("de_DE", "tool_breaking-power", breakingPower));
+            getItemBuilder().lore(nexusPlugin.getLocaleManager().translate("en_US", "tool_breaking-power", breakingPower));
         }
         NamespacedKey key = new NamespacedKey(nexusPlugin.getName().toLowerCase(), "breakingpower");
         addPersistentData(key, PersistentDataType.INTEGER, breakingPower);

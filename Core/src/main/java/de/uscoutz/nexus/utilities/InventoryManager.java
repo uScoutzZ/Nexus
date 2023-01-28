@@ -3,6 +3,7 @@ package de.uscoutz.nexus.utilities;
 import de.uscoutz.nexus.NexusPlugin;
 import de.uscoutz.nexus.events.SchematicInventoryOpenedEvent;
 import de.uscoutz.nexus.events.SchematicItemBoughtEvent;
+import de.uscoutz.nexus.gamemechanics.NexusItem;
 import de.uscoutz.nexus.gamemechanics.shops.ItemPrice;
 import de.uscoutz.nexus.gamemechanics.shops.MoneyPrice;
 import de.uscoutz.nexus.gamemechanics.shops.NexusPrice;
@@ -11,6 +12,7 @@ import de.uscoutz.nexus.inventory.InventoryBuilder;
 import de.uscoutz.nexus.inventory.PaginatedInventory;
 import de.uscoutz.nexus.inventory.SimpleInventory;
 import de.uscoutz.nexus.item.ItemBuilder;
+import de.uscoutz.nexus.player.NexusPlayer;
 import de.uscoutz.nexus.quests.Quest;
 import de.uscoutz.nexus.quests.Task;
 import net.kyori.adventure.text.Component;
@@ -153,7 +155,8 @@ public class InventoryManager {
     }
 
     public void openWorkshopSchematics(Player player) {
-        SimpleInventory inventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate("de_DE", "workshop_schematics"));
+        SimpleInventory inventory = InventoryBuilder.create(3*9, plugin.getLocaleManager().translate(
+                plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "workshop_schematics"));
 
         Bukkit.getPluginManager().callEvent(new SchematicInventoryOpenedEvent(inventory, player));
 
@@ -162,7 +165,7 @@ public class InventoryManager {
     }
 
     public void openWorkshopTools(Player player) {
-        PaginatedInventory inventory = InventoryBuilder.createPaginated(4*9, plugin.getLocaleManager().translate("de_DE", "workshop_tools"));
+        PaginatedInventory inventory = InventoryBuilder.createPaginated(4*9, plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "workshop_tools"));
         inventory.addDynamicSlots(IntStream.range(0, 2*9).toArray());
 
         for(Tool tool : plugin.getToolManager().getToolMap().values()) {
@@ -183,7 +186,7 @@ public class InventoryManager {
     }
 
     public void openRescuedItems(Player player) {
-        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate("de_DE", "villager_rescue"));
+        SimpleInventory inventory = InventoryBuilder.create(5*9, plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "villager_rescue"));
 
         setNavigationItems(inventory, player, FilterType.RESCUED);
         inventory.open(player);
@@ -197,7 +200,7 @@ public class InventoryManager {
     public ItemStack getShopItem(Player player, SimpleInventory simpleInventory, ItemStack itemStack, String message, NexusPrice... prices) {
         List<Component> lore = new ArrayList<>();
         ItemStack shopItem = itemStack.clone();
-        lore.add(Component.text(plugin.getLocaleManager().translate("de_DE", "workshop_needed-items")));
+        lore.add(Component.text(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "workshop_needed-items")));
         boolean playerHasItems = true;
 
         if(prices.length == 0) {
@@ -221,6 +224,14 @@ public class InventoryManager {
             lore.add(Component.text(" "));
             lore.add(Component.text(message));
         }
+
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
+        NexusItem item = plugin.getNexusItemManager().getItemMap().get(key);
+        lore.add(Component.text(" "));
+        lore.add(Component.text(item.getRarity().toString(player)));
+
+        shopItem.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         shopItem.lore(lore);
 
         PaginatedInventory paginatedInventory = null;
@@ -235,11 +246,11 @@ public class InventoryManager {
 
         boolean finalPlayerHasItems = playerHasItems;
         Consumer<InventoryClickEvent> clickEventConsumer;
-        if(message == null) {
+        if(message == null) { //TODO: diesen Pfusch ausbessern -> checken ob maximum schematics dieses typs erreicht
             clickEventConsumer = event -> {
                 if(!finalPlayerHasItems) {
                     player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0F, 1.0F);
-                    player.sendMessage(plugin.getLocaleManager().translate("de_DE", "workshop_missing-items", plugin.getConfig().get("villager-name")));
+                    player.sendMessage(plugin.getLocaleManager().translate(plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId()).getLanguage(), "workshop_missing-items", plugin.getConfig().get("villager-name")));
                 } else {
                     player.closeInventory();
                     for(NexusPrice nexusPrice : prices) {
@@ -247,8 +258,6 @@ public class InventoryManager {
                     }
                     player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
                     player.getInventory().addItem(itemStack);
-                    PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
-                    String key = dataContainer.get(new NamespacedKey(plugin.getName().toLowerCase(), "key"), PersistentDataType.STRING);
                     Bukkit.getPluginManager().callEvent(new SchematicItemBoughtEvent(key, plugin.getWorldManager().getWorldProfileMap().get(player.getWorld())));
                 }
             };
@@ -267,8 +276,9 @@ public class InventoryManager {
     }
 
     private void setNavigationItems(SimpleInventory inventory, Player player, FilterType filterType) {
+        NexusPlayer nexusPlayer = plugin.getPlayerManager().getPlayersMap().get(player.getUniqueId());
         ItemBuilder schematics = ItemBuilder.create(Material.OAK_LOG)
-                .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_schematics"));
+                .name(plugin.getLocaleManager().translate(nexusPlayer.getLanguage(), "workshop_item_schematics"));
         ItemBuilder tools = ItemBuilder.create(Material.GOLDEN_PICKAXE)
                 .name(plugin.getLocaleManager().translate("de_DE", "workshop_item_tools"));
         ItemBuilder profiles = ItemBuilder.create(Material.COMPARATOR)
